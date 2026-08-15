@@ -89,3 +89,99 @@ nav a,
 nav a:hover,
 .nav a:hover {
   background: var(--yellow
+/* =========================================
+   FIX MOBILE HEADER / MENU
+   ========================================= */
+
+@media (max-width: 700px) {
+
+  header,
+  .header {
+    padding: 0;
+  }
+
+  header .container,
+  .header .container {
+    width: 100%;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .brand,
+  .site-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .brand-logo,
+  .logo,
+  .site-logo {
+    width: 58px !important;
+    height: 58px !important;
+    max-height: 58px !important;
+    object-fit: contain;
+    flex: 0 0 58px;
+  }
+
+  .brand-text,
+  .site-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.05;
+    min-width: 0;
+  }
+
+  .brand-text strong,
+  .site-brand-text strong {
+    font-size: 14px;
+    line-height: 1.05;
+  }
+
+  .brand-text span,
+  .site-brand-text span {
+    font-size: 12px;
+    line-height: 1.05;
+  }
+
+  nav,
+  .nav {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  nav a,
+  .nav a {
+    display: block;
+    text-align: center;
+    padding: 9px 6px;
+    font-size: 13px;
+    border-radius: 7px;
+    background: #151515;
+  }
+
+  nav a:hover,
+  .nav a:hover {
+    background: var(--yellow);
+    color: #000;
+  }
+
+  .home-hero {
+    padding-top: 22px;
+  }
+
+  .home-hero-logo {
+    width: 160px;
+    max-width: 55vw;
+    margin: 0 auto 20px;
+    display: block;
+  }
+}

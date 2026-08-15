@@ -1,352 +1,94 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Staff Calcio a 5 ASD SGM Spadafora Sport">
-  <title>Staff Calcio a 5 | ASD SGM Spadafora Sport</title>
-
-  <link rel="stylesheet" href="style.css?v=3">
-
-  <style>
-    .staff-page {
-      background: #f5f5f5;
-      min-height: 100vh;
-    }
-
-    .staff-hero {
-      background: #111;
-      color: #fff;
-      padding: 38px 26px 42px;
-      border-bottom: 5px solid #ffd400;
-    }
-
-    .staff-hero .eyebrow {
-      color: #ffd400;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 12px;
-    }
-
-    .staff-hero h1 {
-      font-size: clamp(42px, 9vw, 68px);
-      line-height: 1;
-      margin: 0 0 20px;
-    }
-
-    .staff-hero p {
-      color: #ccc;
-      font-size: 20px;
-      line-height: 1.5;
-      margin: 0;
-    }
-
-    .staff-section {
-      padding: 55px 26px 70px;
-    }
-
-    .staff-section-title {
-      color: #ffd400;
-      font-size: 17px;
-      font-weight: 900;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-
-    .staff-section h2 {
-      margin: 0 0 30px;
-      font-size: 42px;
-      text-transform: uppercase;
-    }
-
-    .staff-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 24px;
-      max-width: 1050px;
-      margin: 0 auto;
-    }
-
-    .staff-card {
-      background: #111;
-      border-radius: 24px;
-      overflow: hidden;
-      border: 1px solid #333;
-      box-shadow: 0 10px 25px rgba(0,0,0,.08);
-    }
-
-    .staff-photo {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      object-fit: cover;
-      object-position: center top;
-      display: block;
-      background: #000;
-    }
-
-    .staff-info {
-      padding: 22px 22px 25px;
-    }
-
-    .staff-info h3 {
-      color: #fff;
-      font-size: 25px;
-      margin: 0 0 8px;
-    }
-
-    .staff-role {
-      color: #ffd400;
-      font-size: 15px;
-      line-height: 1.4;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    @media (max-width: 700px) {
-      .staff-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .staff-section {
-        padding-left: 27px;
-        padding-right: 27px;
-      }
-
-      .staff-card {
-        border-radius: 22px;
-      }
-
-      .staff-info h3 {
-        font-size: 26px;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Staff Calcio a 5 ASD SGM Spadafora Sport - stagione 2026/2027">
+<title>Staff Calcio a 5 | ASD SGM Spadafora Sport</title>
+<link rel="stylesheet" href="style.css?v=100">
+<style>
+.staff-hero{padding:64px 0 34px;background:#111;color:#fff;border-bottom:4px solid var(--yellow)}
+.staff-hero h1{margin:0;font-size:clamp(38px,7vw,72px);line-height:.95}
+.staff-hero p{max-width:680px;color:#c8c8c8}
+.staff-section{padding:42px 0 60px;background:#f5f5f5}
+.staff-section h2{margin:0 0 20px;font-size:30px}
+.staff-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.staff-card{display:flex;align-items:center;gap:16px;background:#111;color:#fff;border:1px solid #2a2a2a;border-radius:14px;padding:18px}
+.staff-badge{width:64px;height:64px;flex:0 0 64px;display:grid;place-items:center;background:var(--yellow);color:#000;border-radius:12px;font-size:17px;font-weight:900}
+.staff-info h3{margin:0 0 4px;font-size:19px}
+.staff-info p{margin:0;color:#aaa;font-size:13px;font-weight:800;text-transform:uppercase}
+.staff-back{padding:28px 0 50px}
+@media(max-width:600px){.staff-grid{grid-template-columns:1fr}.staff-card{padding:15px}.staff-badge{width:56px;height:56px;flex-basis:56px}}
+</style>
 </head>
-
-<body class="staff-page">
-
-<header class="site-header">
-  <div class="container nav-wrap">
-
-    <a class="brand" href="index.html">
-      <img
-        class="brand-logo"
-        src="IMG-20250217-WA0006.jpg"
-        alt="Logo ASD SGM Spadafora Sport"
-      >
-
-      <div class="brand-text">
-        <strong>ASD SGM</strong>
-        <span>Spadafora Sport</span>
-      </div>
-    </a>
-
-    <button
-      class="menu-toggle"
-      aria-label="Apri menu"
-      aria-expanded="false"
-    >
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-
-    <nav class="main-nav">
-      <a href="index.html">Home</a>
-      <a href="squadre.html">Squadre</a>
-      <a href="rose.html">Rose</a>
-      <a href="staff.html">Staff</a>
-      <a href="calendario-risultati.html">Calendario</a>
-      <a href="news.html">News</a>
-      <a href="sponsor.html">Sponsor</a>
-      <a href="galleria.html">Galleria</a>
-      <a href="sgm-tv.html">SGM TV</a>
-      <a href="palmares.html">Palmares</a>
-      <a href="contatti.html">Contatti</a>
-    </nav>
-
-  </div>
-</header>
-
-
+<body>
+<header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html"><img class="brand-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"><div class="brand-text"><strong>ASD SGM</strong><span>Spadafora Sport</span></div></a><button class="menu-toggle" aria-label="Apri menu" aria-expanded="false"><span></span><span></span><span></span></button><nav class="main-nav"><a href="index.html">Home</a><a href="squadre.html">Squadre</a><a href="rose.html">Rose</a><a href="staff.html">Staff</a><a href="calendario-risultati.html">Calendario</a><a href="news.html">News</a><a href="sponsor.html">Sponsor</a><a href="galleria.html">Galleria</a><a href="sgm-tv.html">SGM TV</a>
+<a href="palmares.html">Palmarès</a>
+<a href="contatti.html">Contatti</a></nav></div></header>
 <main>
-
-  <section class="staff-hero">
-    <div class="container">
-
-      <div class="eyebrow">CALCIO A 5</div>
-
-      <h1>STAFF</h1>
-
-      <p>
-        Lo staff della prima squadra di calcio a 5
-        dell'ASD SGM Spadafora Sport.
-      </p>
-
-    </div>
-  </section>
-
-
-  <section class="staff-section">
-
-    <div class="container">
-
-      <div class="staff-section-title">
-        STAGIONE 2026/2027
-      </div>
-
-      <h2>STAFF TECNICO E DIRIGENZIALE</h2>
-
-
-      <div class="staff-grid">
-
-        <article class="staff-card">
-
-          <img
-            class="staff-photo"
-            src="andrea-giacobbo.jpg"
-            alt="Andrea Giacobbo"
-          >
-
-          <div class="staff-info">
-            <h3>Andrea Giacobbo</h3>
-            <div class="staff-role">
-              Allenatore Calcio a 5
-            </div>
-          </div>
-
-        </article>
-
-
-        <article class="staff-card">
-
-          <img
-            class="staff-photo"
-            src="antonio-romeo.jpg"
-            alt="Antonio Romeo"
-          >
-
-          <div class="staff-info">
-            <h3>Antonio Romeo</h3>
-            <div class="staff-role">
-              Allenatore dei portieri
-            </div>
-          </div>
-
-        </article>
-
-
-        <article class="staff-card">
-
-          <img
-            class="staff-photo"
-            src="antonio-vitale.jpg"
-            alt="Antonio Vitale"
-          >
-
-          <div class="staff-info">
-            <h3>Antonio Vitale</h3>
-            <div class="staff-role">
-              Dirigente Calcio a 5
-            </div>
-          </div>
-
-        </article>
-
-
-        <article class="staff-card">
-
-          <img
-            class="staff-photo"
-            src="pippo-arcoraci.jpg"
-            alt="Pippo Arcoraci"
-          >
-
-          <div class="staff-info">
-            <h3>Pippo Arcoraci</h3>
-            <div class="staff-role">
-              Collaboratore
-            </div>
-          </div>
-
-        </article>
-
-
-        <article class="staff-card">
-
-          <img
-            class="staff-photo"
-            src="luca-scibilia.jpg"
-            alt="Luca Scibilia"
-          >
-
-          <div class="staff-info">
-            <h3>Luca Scibilia</h3>
-            <div class="staff-role">
-              Dirigente delegato Calcio a 5
-            </div>
-          </div>
-
-        </article>
-
-      </div>
-
-    </div>
-
-  </section>
-
+<section class="staff-hero"><div class="container">
+<p class="section-kicker yellow">STAGIONE SPORTIVA 2026/2027</p>
+<h1>STAFF CALCIO A 5</h1>
+<p>Staff tecnico e dirigenziale della prima squadra ASD SGM Spadafora Sport.</p>
+</div></section>
+<section class="staff-section"><div class="container">
+<p class="section-kicker yellow">CALCIO A 5</p>
+<h2>STAFF TECNICO E DIRIGENZIALE</h2>
+<div class="staff-grid">
+<article class="staff-card">
+  <div class="staff-badge">SGM</div>
+  <div class="staff-info">
+    <h3>Andrea Giacobbo</h3>
+    <p>Allenatore</p>
+  </div>
+</article>
+<article class="staff-card">
+  <div class="staff-badge">SGM</div>
+  <div class="staff-info">
+    <h3>Antonio Romeo</h3>
+    <p>Allenatore dei portieri</p>
+  </div>
+</article>
+<article class="staff-card">
+  <div class="staff-badge">SGM</div>
+  <div class="staff-info">
+    <h3>Antonio Vitale</h3>
+    <p>Dirigente Calcio a 5</p>
+  </div>
+</article>
+<article class="staff-card">
+  <div class="staff-badge">SGM</div>
+  <div class="staff-info">
+    <h3>Pippo Arcoraci</h3>
+    <p>Collaboratore</p>
+  </div>
+</article>
+<article class="staff-card">
+  <div class="staff-badge">SGM</div>
+  <div class="staff-info">
+    <h3>Luca Scibilia</h3>
+    <p>Dirigente delegato Calcio a 5</p>
+  </div>
+</article></div>
+</div></section>
+<section class="staff-back"><div class="container"><a class="btn btn-primary" href="calcio-a-5.html">← Torna a Calcio a 5</a></div></section>
 </main>
-
-
-<script src="script.js"></script>
-
+<footer class="footer">
+<div class="container"><img class="footer-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"></div><div class="container footer-wrap"><p>© 2026 ASD SGM Spadafora Sport</p><p>Stagione sportiva 2026/2027 · 🖤💛</p></div><div style="text-align:center;background:#080808;padding:0 0 18px"><a href="admin.html" style="font-size:9px;color:#555">Area amministratore</a></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="supabase-data.js"></script>
+<script src="site-data.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-
-  const toggle =
-    document.querySelector(".menu-toggle");
-
-  const menu =
-    document.querySelector(".main-nav");
-
-  if (toggle && menu) {
-
-    toggle.addEventListener("click", function () {
-
-      menu.classList.toggle("menu-open");
-
-      const aperto =
-        menu.classList.contains("menu-open");
-
-      toggle.setAttribute(
-        "aria-expanded",
-        aperto ? "true" : "false"
-      );
-
-    });
-
-    menu.querySelectorAll("a").forEach(function (link) {
-
-      link.addEventListener("click", function () {
-
-        menu.classList.remove("menu-open");
-
-        toggle.setAttribute(
-          "aria-expanded",
-          "false"
-        );
-
-      });
-
-    });
-
-  }
-
+document.addEventListener("DOMContentLoaded",()=>{
+ const toggle=document.querySelector(".menu-toggle"),menu=document.querySelector(".main-nav");
+ if(!toggle||!menu)return;
+ const close=()=>{menu.classList.remove("menu-open");toggle.setAttribute("aria-expanded","false");};
+ toggle.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();const o=menu.classList.toggle("menu-open");toggle.setAttribute("aria-expanded",o?"true":"false");});
+ menu.querySelectorAll("a").forEach(a=>a.addEventListener("click",close));
+ document.addEventListener("click",e=>{if(!menu.contains(e.target)&&!toggle.contains(e.target))close();});
+ window.addEventListener("resize",()=>{if(window.innerWidth>768)close();});
 });
 </script>
-
 </body>
 </html>

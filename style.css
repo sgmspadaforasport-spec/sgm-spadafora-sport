@@ -1,0 +1,91 @@
+/* =========================================
+   ASD SGM SPADAFORA SPORT
+   Stile principale - Stagione 2026/2027
+   ========================================= */
+
+:root {
+  --yellow: #ffd400;
+  --yellow-dark: #e6bf00;
+  --black: #0b0b0b;
+  --dark: #151515;
+  --dark-2: #202020;
+  --white: #ffffff;
+  --gray: #f4f4f4;
+  --text: #202020;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #fff;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.container {
+  width: min(1180px, 92%);
+  margin: 0 auto;
+}
+
+/* HEADER */
+
+header,
+.header {
+  background: var(--black);
+  color: var(--white);
+  border-bottom: 4px solid var(--yellow);
+}
+
+header .container,
+.header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 0;
+}
+
+.logo,
+.site-logo {
+  max-height: 80px;
+  width: auto;
+}
+
+nav,
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+nav a,
+.nav a {
+  color: #fff;
+  font-weight: 700;
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: 0.2s ease;
+}
+
+nav a:hover,
+.nav a:hover {
+  background: var(--yellow

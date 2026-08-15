@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin | ASD SGM Spadafora Sport</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+:root{--adm-yellow:#ffd400;--adm-bg:#080808;--adm-card:#111;--adm-line:#2d2d2d;--adm-muted:#9a9a9a}
+body{background:var(--adm-bg);color:#fff;font-family:Montserrat,Arial,sans-serif}
+.admin-shell{width:min(1240px,95%);margin:auto;padding:24px 0 80px}
+.admin-header{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:22px}
+.admin-brand{display:flex;align-items:center;gap:14px}
+.admin-brand img{width:64px;height:64px;object-fit:contain;border-radius:11px;background:#fff}
+.admin-brand h1{font-size:25px;text-transform:uppercase;line-height:1}
+.admin-brand p{font-size:11px;color:var(--adm-muted);margin-top:6px}
+.admin-online{background:#16330f;border:1px solid #2f6a24;color:#aee6a3;padding:8px 11px;border-radius:999px;font-size:9px;font-weight:900;letter-spacing:.7px}
+.admin-layout{display:grid;grid-template-columns:230px 1fr;gap:18px}
+.admin-nav{display:grid;gap:7px;align-self:start;position:sticky;top:15px}
+.admin-nav button{border:1px solid var(--adm-line);background:var(--adm-card);color:#ddd;text-align:left;padding:13px;border-radius:10px;font-weight:800;cursor:pointer}
+.admin-nav button.active,.admin-nav button:hover{border-color:var(--adm-yellow);color:var(--adm-yellow)}
+.admin-panel{display:none;background:var(--adm-card);border:1px solid var(--adm-line);border-radius:16px;padding:22px}
+.admin-panel.active{display:block}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px}
+.panel-head h2{font-size:26px;text-transform:uppercase}
+.panel-head p{font-size:11px;color:var(--adm-muted)}
+.btn{border:0;border-radius:9px;padding:11px 14px;font-weight:900;cursor:pointer;font-family:inherit}
+.btn-primary{background:var(--adm-yellow);color:#000}
+.btn-dark{background:#222;color:#fff;border:1px solid #3a3a3a}
+.btn-danger{background:#351010;color:#fff;border:1px solid #6b2323}
+.btn-small{padding:8px 10px;font-size:10px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:grid;gap:6px;margin-bottom:12px}
+.field.full{grid-column:1/-1}
+.field label{font-size:9px;color:#aaa;text-transform:uppercase;font-weight:900;letter-spacing:.5px}
+input,textarea,select{width:100%;background:#090909;border:1px solid #333;color:#fff;border-radius:9px;padding:11px;font:inherit}
+textarea{min-height:120px;resize:vertical}
+.item-list{display:grid;gap:10px}
+.item-card{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:15px;border:1px solid var(--adm-line);border-radius:12px;background:#0b0b0b}
+.item-card h3{font-size:15px;margin-bottom:5px}
+.item-card p{font-size:11px;color:var(--adm-muted)}
+.item-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.sport-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.sport-tabs button{background:#151515;color:#ddd;border:1px solid #333;padding:9px 11px;border-radius:999px;font-size:10px;font-weight:900;cursor:pointer}
+.sport-tabs button.active{background:var(--adm-yellow);border-color:var(--adm-yellow);color:#000}
+.subtabs{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}
+.subtabs button{background:#121212;color:#bbb;border:1px solid #333;padding:9px 11px;border-radius:9px;font-weight:800;cursor:pointer}
+.subtabs button.active{border-color:var(--adm-yellow);color:var(--adm-yellow)}
+.subpanel{display:none}.subpanel.active{display:block}
+.status{margin-top:14px;font-size:12px;color:#9bd18b}
+.empty{padding:28px;border:1px dashed #333;border-radius:12px;text-align:center;color:#777}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.76);z-index:999;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modal-card{width:min(600px,100%);max-height:90vh;overflow:auto;background:#111;border:1px solid #333;border-radius:16px;padding:22px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.modal-head h3{text-transform:uppercase}
+.modal-close{background:none;border:0;color:#aaa;font-size:26px;cursor:pointer}
+.sticky-save{position:sticky;bottom:12px;margin-top:20px;display:flex;justify-content:flex-end;gap:10px;padding:12px;background:rgba(8,8,8,.94);border:1px solid #262626;border-radius:12px;backdrop-filter:blur(10px)}
+.upload-note{font-size:11px;color:#aaa;margin-top:7px}
+@media(max-width:850px){
+ .admin-layout{grid-template-columns:1fr}.admin-nav{position:static;grid-template-columns:1fr 1fr}
+ .fields{grid-template-columns:1fr}.panel-head{align-items:flex-start;flex-direction:column}
+}
+@media(max-width:560px){
+ .admin-nav{grid-template-columns:1fr}.admin-header{align-items:flex-start;flex-direction:column}
+ .item-card{grid-template-columns:1fr}.item-actions{justify-content:flex-start}
+ .admin-panel{padding:16px}
+}
+</style>
+</head>
+<body>
+<div class="admin-shell">
+  <header class="admin-header">
+    <div class="admin-brand">
+      <img src="assets/logo-sgm.jpg" alt="Logo SGM">
+      <div><h1>Pannello Amministratore</h1><p>ASD SGM Spadafora Sport</p></div>
+    </div>
+    <span class="admin-online">● AREA PROTETTA</span>
+  </header>
+
+  <div class="admin-layout">
+    <nav class="admin-nav">
+      <button class="nav-btn active" data-panel="dashboard">Panoramica</button>
+      <button class="nav-btn" data-panel="matches">Prossime gare</button>
+<button class="nav-btn" data-panel="results">Ultimi risultati</button>
+      <button class="nav-btn" data-panel="sports">Rose e staff</button>
+      <button class="nav-btn" data-panel="standings">Classifiche</button>
+<button class="nav-btn" data-panel="calendar">Calendari</button>
+<button class="nav-btn" data-panel="palmaresAdmin">Palmarès</button>
+      <button class="nav-btn" data-panel="tv">SGM TV</button>
+      <button class="nav-btn" data-panel="contacts">Contatti</button>
+      <button class="nav-btn" data-panel="advanced">Avanzate</button>
+    </nav>
+
+    <main>
+      <section class="admin-panel active" id="dashboard">
+        <div class="panel-head">
+          <div><h2>Panoramica</h2><p>Gestisci il sito senza modificare codice.</p></div>
+        </div>
+        <div class="item-list">
+          <div class="item-card"><div><h3>⚽ Prossime gare</h3><p>Aggiorna data, ora, casa e ospite per tutte le discipline.</p></div><button class="btn btn-dark btn-small jump" data-to="matches">Apri</button></div>
+          <div class="item-card"><div><h3>👥 Rose e staff</h3><p>Aggiungi, modifica o elimina giocatori e membri dello staff.</p></div><button class="btn btn-dark btn-small jump" data-to="sports">Apri</button></div>
+          <div class="item-card"><div><h3>🏆 Classifiche</h3><p>Gestisci posizioni, punti e statistiche.</p></div><button class="btn btn-dark btn-small jump" data-to="standings">Apri</button></div>
+          <div class="item-card"><div><h3>📺 SGM TV</h3><p>Aggiungi video, interviste, highlights, format e puntate.</p></div><button class="btn btn-dark btn-small jump" data-to="tv">Apri</button></div>
+        </div>
+      </section>
+
+      <section class="admin-panel" id="matches">
+        <div class="panel-head">
+          <div><h2>Prossime gare</h2><p>Modifica le partite mostrate in Homepage.</p></div>
+          <button class="btn btn-primary" id="addMatch">+ Aggiungi gara</button>
+        </div>
+        <div id="matchesList" class="item-list"></div>
+      </section>
+
+      <section class="admin-panel" id="sports">
+        <div class="panel-head"><div><h2>Rose e staff</h2><p>Scegli la disciplina e gestisci i componenti.</p></div></div>
+        <div class="sport-tabs" id="sportTabs"></div>
+        <div class="subtabs">
+          <button class="subtab active" data-sub="rosterSub">Giocatori / Atleti</button>
+          <button class="subtab" data-sub="staffSub">Staff</button>
+        </div>
+        <div class="subpanel active" id="rosterSub">
+          <div class="toolbar"><button class="btn btn-primary" id="addPlayer">+ Aggiungi giocatore</button></div>
+          <div id="rosterList" class="item-list" style="margin-top:14px"></div>
+        </div>
+        <div class="subpanel" id="staffSub">
+          <div class="toolbar"><button class="btn btn-primary" id="addStaff">+ Aggiungi membro staff</button></div>
+          <div id="staffList" class="item-list" style="margin-top:14px"></div>
+        </div>
+      </section>
+
+      <section class="admin-panel" id="standings">
+        <div class="panel-head">
+          <div><h2>Classifiche</h2><p>Gestisci una classifica per ogni disciplina.</p></div>
+          <button class="btn btn-primary" id="addStanding">+ Aggiungi squadra</button>
+        </div>
+        <div class="sport-tabs" id="standingSportTabs"></div>
+        <div id="standingsList" class="item-list"></div>
+      </section>
+
+      
+<section class="admin-panel" id="results">
+  <div class="panel-head"><div><h2>Ultimi risultati</h2><p>Gestisci il risultato più recente di ogni disciplina.</p></div><button class="btn btn-primary" id="addResult">+ Aggiungi risultato</button></div>
+  <div id="resultsList" class="item-list"></div>
+</section>
+
+<section class="admin-panel" id="calendar">
+  <div class="panel-head"><div><h2>Calendari completi</h2><p>Gestisci tutte le gare della stagione.</p></div><button class="btn btn-primary" id="addCalendarGame">+ Aggiungi gara</button></div>
+  <div class="sport-tabs" id="calendarSportTabs"></div>
+  <div id="calendarList" class="item-list"></div>
+</section>
+
+<section class="admin-panel" id="palmaresAdmin">
+  <div class="panel-head"><div><h2>Palmarès</h2><p>Aggiungi trofei, promozioni e traguardi.</p></div><button class="btn btn-primary" id="addPalmares">+ Aggiungi successo</button></div>
+  <div id="palmaresList" class="item-list"></div>
+</section>
+
+<section class="admin-panel" id="tv">
+        <div class="panel-head">
+          <div><h2>SGM TV</h2><p>Video, interviste, highlights, format e puntate.</p></div>
+          <button class="btn btn-primary" id="addVideo">+ Aggiungi video</button>
+        </div>
+        <div class="fields">
+          <div class="field full"><label>Canale Twitch</label><input id="tvTwitch"></div>
+        </div>
+        <div id="videoList" class="item-list"></div>
+      </section>
+
+      <section class="admin-panel" id="contacts">
+        <div class="panel-head"><div><h2>Contatti</h2><p>Aggiorna sede, email e social.</p></div></div>
+        <div class="fields">
+          <div class="field"><label>Email</label><input id="email"></div>
+          <div class="field"><label>PEC</label><input id="pec"></div>
+          <div class="field full"><label>Sede legale</label><input id="address"></div>
+          <div class="field"><label>Facebook</label><input id="facebook"></div>
+          <div class="field"><label>Instagram</label><input id="instagram"></div>
+          <div class="field"><label>Twitch</label><input id="twitch"></div>
+<div class="field"><label>TikTok</label><input id="tiktok"></div>
+        </div>
+      </section>
+
+      <section class="admin-panel" id="advanced">
+        <div class="panel-head"><div><h2>Strumenti avanzati</h2><p>Backup, ripristino e caricamento immagini.</p></div></div>
+        <div class="toolbar">
+          <button class="btn btn-dark" id="downloadBackup">Scarica backup JSON</button>
+          <label class="btn btn-dark">Importa backup<input id="importBackup" type="file" accept=".json" hidden></label>
+          <label class="btn btn-dark">Carica immagine<input id="imageUpload" type="file" accept="image/jpeg,image/png,image/webp" hidden></label>
+        </div>
+        <p class="upload-note" id="uploadStatus"></p>
+        <div class="field" style="margin-top:20px"><label>Editor JSON completo</label><textarea id="rawJson" style="min-height:420px"></textarea></div>
+        <button class="btn btn-dark" id="applyRaw">Applica JSON all'editor</button>
+      </section>
+
+      <div class="sticky-save">
+        <button class="btn btn-dark" id="logout">Esci</button>
+        <button class="btn btn-primary" id="saveOnline">Salva online</button>
+      </div>
+      <div id="status" class="status"></div>
+    </main>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <div class="modal-head"><h3 id="modalTitle">Modifica</h3><button class="modal-close" id="modalClose">×</button></div>
+    <div id="modalBody"></div>
+    <div class="toolbar" style="justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-dark" id="modalCancel">Annulla</button>
+      <button class="btn btn-primary" id="modalSave">Salva</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let data = null;
+let currentSport = 'calcio_a_5';
+let currentStandingSport = 'calcio_a_5';
+let modalSaveFn = null;
+
+const sportLabels = {
+  calcio_a_5:'Calcio a 5',
+  pallavolo_maschile:'Pallavolo Maschile',
+  pallavolo_femminile:'Pallavolo Femminile',
+  basket:'Basket'
+};
+
+const $ = id => document.getElementById(id);
+const esc = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;').replace(/>/g,'&gt;');
+function status(msg, err=false){ $('status').textContent=msg; $('status').style.color=err?'#ff8b8b':'#9bd18b'; }
+
+function openPanel(id){
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.panel===id));
+  $(id).classList.add('active');
+  if(id==='advanced') $('rawJson').value=JSON.stringify(data,null,2);
+}
+document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>openPanel(b.dataset.panel));
+document.querySelectorAll('.jump').forEach(b=>b.onclick=()=>openPanel(b.dataset.to));
+
+document.querySelectorAll('.subtab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.subtab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.subpanel').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); $(b.dataset.sub).classList.add('active');
+});
+
+function ensureData(){
+  data.contacts=data.contacts||{};
+  data.next_matches=data.next_matches||[];
+  data.sports=data.sports||{};
+  Object.keys(sportLabels).forEach(k=>{
+    data.sports[k]=data.sports[k]||{name:sportLabels[k],roster:[],staff:[],standings:[]};
+    data.sports[k].roster=data.sports[k].roster||[];
+    data.sports[k].staff=data.sports[k].staff||[];
+    data.sports[k].standings=data.sports[k].standings||[];data.sports[k].calendar=data.sports[k].calendar||[];
+  });
+  data.sgm_tv=data.sgm_tv||{videos:[]};data.recent_results=data.recent_results||[];data.palmares=data.palmares||[];
+  data.sgm_tv.videos=data.sgm_tv.videos||[];
+}
+
+function renderSportTabs(){
+  $('sportTabs').innerHTML=Object.entries(sportLabels).map(([k,v])=>`<button data-k="${k}" class="${k===currentSport?'active':''}">${v}</button>`).join('');
+  $('sportTabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{currentSport=b.dataset.k;renderSportTabs();renderRoster();renderStaff();});
+  $('standingSportTabs').innerHTML=Object.entries(sportLabels).map(([k,v])=>`<button data-k="${k}" class="${k===currentStandingSport?'active':''}">${v}</button>`).join('');
+  $('standingSportTabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{currentStandingSport=b.dataset.k;renderSportTabs();renderStandings();});
+}
+
+function renderMatches(){
+  const list=$('matchesList');
+  if(!data.next_matches.length){list.innerHTML='<div class="empty">Nessuna gara inserita.</div>';return;}
+  list.innerHTML=data.next_matches.map((m,i)=>`
+    <div class="item-card">
+      <div><h3>${esc(m.sport||'Gara')}</h3><p>${esc(m.date||'Data da definire')} · ${esc(m.time||'--:--')}<br>${esc(m.home||'')} vs ${esc(m.away||'')}</p></div>
+      <div class="item-actions"><button class="btn btn-dark btn-small edit-match" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-match" data-i="${i}">Elimina</button></div>
+    </div>`).join('');
+  list.querySelectorAll('.edit-match').forEach(b=>b.onclick=()=>editMatch(+b.dataset.i));
+  list.querySelectorAll('.del-match').forEach(b=>b.onclick=()=>{data.next_matches.splice(+b.dataset.i,1);renderMatches();});
+}
+
+function renderRoster(){
+  const arr=data.sports[currentSport].roster;
+  const list=$('rosterList');
+  if(!arr.length){list.innerHTML='<div class="empty">Nessun giocatore/atleta inserito.</div>';return;}
+  list.innerHTML=arr.map((p,i)=>`
+  <div class="item-card"><div><h3>${p.number!==undefined?esc(p.number)+' · ':''}${esc(p.name)}</h3><p>${esc(p.role||'')}</p></div>
+  <div class="item-actions"><button class="btn btn-dark btn-small edit-player" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-player" data-i="${i}">Elimina</button></div></div>`).join('');
+  list.querySelectorAll('.edit-player').forEach(b=>b.onclick=()=>editPlayer(+b.dataset.i));
+  list.querySelectorAll('.del-player').forEach(b=>b.onclick=()=>{data.sports[currentSport].roster.splice(+b.dataset.i,1);renderRoster();});
+}
+
+function renderStaff(){
+  const arr=data.sports[currentSport].staff;
+  const list=$('staffList');
+  if(!arr.length){list.innerHTML='<div class="empty">Nessun membro staff inserito.</div>';return;}
+  list.innerHTML=arr.map((p,i)=>`
+  <div class="item-card"><div><h3>${esc(p.name)}</h3><p>${esc(p.role||'')}</p></div>
+  <div class="item-actions"><button class="btn btn-dark btn-small edit-staff" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-staff" data-i="${i}">Elimina</button></div></div>`).join('');
+  list.querySelectorAll('.edit-staff').forEach(b=>b.onclick=()=>editStaff(+b.dataset.i));
+  list.querySelectorAll('.del-staff').forEach(b=>b.onclick=()=>{data.sports[currentSport].staff.splice(+b.dataset.i,1);renderStaff();});
+}
+
+function renderStandings(){
+  const arr=data.sports[currentStandingSport].standings;
+  const list=$('standingsList');
+  if(!arr.length){list.innerHTML='<div class="empty">Classifica ancora vuota.</div>';return;}
+  list.innerHTML=arr.map((r,i)=>`
+  <div class="item-card"><div><h3>${esc(r.pos)}° · ${esc(r.team)}</h3><p>PG ${esc(r.played||0)} · V ${esc(r.won||0)} · N ${esc(r.drawn||0)} · P ${esc(r.lost||0)} · Pt ${esc(r.points||0)}</p></div>
+  <div class="item-actions"><button class="btn btn-dark btn-small edit-standing" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-standing" data-i="${i}">Elimina</button></div></div>`).join('');
+  list.querySelectorAll('.edit-standing').forEach(b=>b.onclick=()=>editStanding(+b.dataset.i));
+  list.querySelectorAll('.del-standing').forEach(b=>b.onclick=()=>{data.sports[currentStandingSport].standings.splice(+b.dataset.i,1);renderStandings();});
+}
+
+function renderVideos(){
+  $('tvTwitch').value=data.sgm_tv.twitch||data.contacts.twitch||'';
+  const arr=data.sgm_tv.videos;
+  const list=$('videoList');
+  if(!arr.length){list.innerHTML='<div class="empty">Nessun video pubblicato.</div>';return;}
+  list.innerHTML=arr.map((v,i)=>`
+  <div class="item-card"><div><h3>${esc(v.title||'Video')}</h3><p>${esc(v.category||'')} · ${esc(v.date||'')}<br>${esc(v.url||'')}</p></div>
+  <div class="item-actions"><button class="btn btn-dark btn-small edit-video" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-video" data-i="${i}">Elimina</button></div></div>`).join('');
+  list.querySelectorAll('.edit-video').forEach(b=>b.onclick=()=>editVideo(+b.dataset.i));
+  list.querySelectorAll('.del-video').forEach(b=>b.onclick=()=>{data.sgm_tv.videos.splice(+b.dataset.i,1);renderVideos();});
+}
+
+function loadContacts(){
+  $('email').value=data.contacts.email||'';$('pec').value=data.contacts.pec||'';$('address').value=data.contacts.address||'';
+  $('facebook').value=data.contacts.facebook||'';$('instagram').value=data.contacts.instagram||'';$('twitch').value=data.contacts.twitch||'';$('tiktok').value=data.contacts.tiktok||'';
+}
+function saveContacts(){
+  data.contacts.email=$('email').value.trim();data.contacts.pec=$('pec').value.trim();data.contacts.address=$('address').value.trim();
+  data.contacts.facebook=$('facebook').value.trim();data.contacts.instagram=$('instagram').value.trim();data.contacts.twitch=$('twitch').value.trim();data.contacts.tiktok=$('tiktok').value.trim();
+  data.sgm_tv.twitch=$('tvTwitch').value.trim();
+}
+
+function openModal(title, body, saveFn){
+  $('modalTitle').textContent=title;$('modalBody').innerHTML=body;modalSaveFn=saveFn;$('modal').classList.add('open');
+}
+function closeModal(){$('modal').classList.remove('open');modalSaveFn=null;}
+$('modalClose').onclick=closeModal;$('modalCancel').onclick=closeModal;
+$('modalSave').onclick=()=>{try{if(modalSaveFn)modalSaveFn();closeModal();}catch(e){alert('Controlla i dati inseriti.');}};
+
+function editMatch(i=null){
+ const m=i===null?{sport:'Calcio a 5',date:'',time:'',home:'ASD SGM Spadafora Sport',away:'',page:''}:data.next_matches[i];
+ openModal(i===null?'Aggiungi gara':'Modifica gara',`
+ <div class="fields">
+ <div class="field"><label>Disciplina</label><select id="mSport">${Object.values(sportLabels).map(x=>`<option ${x===m.sport?'selected':''}>${x}</option>`).join('')}</select></div>
+ <div class="field"><label>Data</label><input id="mDate" value="${esc(m.date)}"></div>
+ <div class="field"><label>Orario</label><input id="mTime" value="${esc(m.time)}"></div>
+ <div class="field"><label>Squadra di casa</label><input id="mHome" value="${esc(m.home)}"></div>
+ <div class="field full"><label>Squadra ospite</label><input id="mAway" value="${esc(m.away)}"></div></div>`,
+ ()=>{const obj={sport:$('mSport').value,date:$('mDate').value,time:$('mTime').value,home:$('mHome').value,away:$('mAway').value,page:m.page||''};if(i===null)data.next_matches.push(obj);else data.next_matches[i]=obj;renderMatches();});
+}
+$('addMatch').onclick=()=>editMatch();
+
+function editPlayer(i=null){
+ const p=i===null?{number:'',name:'',role:''}:data.sports[currentSport].roster[i];
+ openModal(i===null?'Aggiungi giocatore':'Modifica giocatore',`
+ <div class="fields"><div class="field"><label>Numero</label><input id="pNumber" value="${esc(p.number)}"></div>
+ <div class="field"><label>Nome e cognome</label><input id="pName" value="${esc(p.name)}"></div>
+ <div class="field full"><label>Ruolo</label><input id="pRole" value="${esc(p.role)}"></div></div>`,
+ ()=>{const num=$('pNumber').value.trim();const obj={name:$('pName').value.trim(),role:$('pRole').value.trim()};if(num!=='')obj.number=isNaN(Number(num))?num:Number(num);if(i===null)data.sports[currentSport].roster.push(obj);else data.sports[currentSport].roster[i]=obj;renderRoster();});
+}
+$('addPlayer').onclick=()=>editPlayer();
+
+function editStaff(i=null){
+ const p=i===null?{name:'',role:''}:data.sports[currentSport].staff[i];
+ openModal(i===null?'Aggiungi membro staff':'Modifica membro staff',`
+ <div class="fields"><div class="field full"><label>Nome e cognome</label><input id="sName" value="${esc(p.name)}"></div>
+ <div class="field full"><label>Ruolo</label><input id="sRole" value="${esc(p.role)}"></div></div>`,
+ ()=>{const obj={name:$('sName').value.trim(),role:$('sRole').value.trim()};if(i===null)data.sports[currentSport].staff.push(obj);else data.sports[currentSport].staff[i]=obj;renderStaff();});
+}
+$('addStaff').onclick=()=>editStaff();
+
+function editStanding(i=null){
+ const r=i===null?{pos:'',team:'',played:0,won:0,drawn:0,lost:0,for:0,against:0,points:0}:data.sports[currentStandingSport].standings[i];
+ openModal(i===null?'Aggiungi squadra':'Modifica classifica',`
+ <div class="fields">
+ <div class="field"><label>Posizione</label><input id="stPos" type="number" value="${esc(r.pos)}"></div>
+ <div class="field"><label>Squadra</label><input id="stTeam" value="${esc(r.team)}"></div>
+ <div class="field"><label>PG</label><input id="stPlayed" type="number" value="${esc(r.played||0)}"></div>
+ <div class="field"><label>V</label><input id="stWon" type="number" value="${esc(r.won||0)}"></div>
+ <div class="field"><label>N</label><input id="stDrawn" type="number" value="${esc(r.drawn||0)}"></div>
+ <div class="field"><label>P</label><input id="stLost" type="number" value="${esc(r.lost||0)}"></div>
+ <div class="field"><label>Fatti</label><input id="stFor" type="number" value="${esc(r.for||0)}"></div>
+ <div class="field"><label>Subiti</label><input id="stAgainst" type="number" value="${esc(r.against||0)}"></div>
+ <div class="field"><label>Punti</label><input id="stPoints" type="number" value="${esc(r.points||0)}"></div></div>`,
+ ()=>{const n=id=>Number($(id).value||0);const obj={pos:n('stPos'),team:$('stTeam').value.trim(),played:n('stPlayed'),won:n('stWon'),drawn:n('stDrawn'),lost:n('stLost'),for:n('stFor'),against:n('stAgainst'),points:n('stPoints')};if(i===null)data.sports[currentStandingSport].standings.push(obj);else data.sports[currentStandingSport].standings[i]=obj;data.sports[currentStandingSport].standings.sort((a,b)=>(a.pos||999)-(b.pos||999));renderStandings();});
+}
+$('addStanding').onclick=()=>editStanding();
+
+function editVideo(i=null){
+ const v=i===null?{title:'',category:'Interviste',date:'',url:'',thumbnail:''}:data.sgm_tv.videos[i];
+ openModal(i===null?'Aggiungi video':'Modifica video',`
+ <div class="fields">
+ <div class="field full"><label>Titolo</label><input id="vTitle" value="${esc(v.title)}"></div>
+ <div class="field"><label>Categoria</label><select id="vCategory">${['Interviste','Highlights','Format','Puntate'].map(x=>`<option ${x===v.category?'selected':''}>${x}</option>`).join('')}</select></div>
+ <div class="field"><label>Data</label><input id="vDate" value="${esc(v.date)}"></div>
+ <div class="field full"><label>Link video</label><input id="vUrl" value="${esc(v.url)}"></div>
+ <div class="field full"><label>Copertina / immagine (percorso)</label><input id="vThumb" value="${esc(v.thumbnail)}"></div></div>`,
+ ()=>{const obj={title:$('vTitle').value.trim(),category:$('vCategory').value,date:$('vDate').value.trim(),url:$('vUrl').value.trim(),thumbnail:$('vThumb').value.trim()};if(i===null)data.sgm_tv.videos.unshift(obj);else data.sgm_tv.videos[i]=obj;renderVideos();});
+}
+$('addVideo').onclick=()=>editVideo();
+
+
+let currentCalendarSport='calcio_a_5';
+
+function renderResults(){
+ const arr=data.recent_results||[];const list=$('resultsList');
+ if(!arr.length){list.innerHTML='<div class="empty">Nessun risultato inserito.</div>';return;}
+ list.innerHTML=arr.map((r,i)=>`<div class="item-card"><div><h3>${esc(r.sport)}</h3><p>${esc(r.date||'')}<br>${esc(r.home)} ${esc(r.home_score)} - ${esc(r.away_score)} ${esc(r.away)}</p></div><div class="item-actions"><button class="btn btn-dark btn-small edit-result" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-result" data-i="${i}">Elimina</button></div></div>`).join('');
+ list.querySelectorAll('.edit-result').forEach(b=>b.onclick=()=>editResult(+b.dataset.i));
+ list.querySelectorAll('.del-result').forEach(b=>b.onclick=()=>{data.recent_results.splice(+b.dataset.i,1);renderResults();});
+}
+function editResult(i=null){
+ const r=i===null?{sport:'Calcio a 5',date:'',home:'ASD SGM Spadafora Sport',home_score:'',away_score:'',away:''}:data.recent_results[i];
+ openModal(i===null?'Aggiungi risultato':'Modifica risultato',`
+ <div class="fields">
+ <div class="field"><label>Disciplina</label><select id="rSport">${Object.values(sportLabels).map(x=>`<option ${x===r.sport?'selected':''}>${x}</option>`).join('')}</select></div>
+ <div class="field"><label>Data</label><input id="rDate" value="${esc(r.date)}"></div>
+ <div class="field"><label>Casa</label><input id="rHome" value="${esc(r.home)}"></div>
+ <div class="field"><label>Gol/Punti casa</label><input id="rHomeScore" value="${esc(r.home_score)}"></div>
+ <div class="field"><label>Gol/Punti ospite</label><input id="rAwayScore" value="${esc(r.away_score)}"></div>
+ <div class="field"><label>Ospite</label><input id="rAway" value="${esc(r.away)}"></div></div>`,
+ ()=>{const obj={sport:$('rSport').value,date:$('rDate').value,home:$('rHome').value,home_score:$('rHomeScore').value,away_score:$('rAwayScore').value,away:$('rAway').value,page:r.page||''};if(i===null)data.recent_results.push(obj);else data.recent_results[i]=obj;renderResults();});
+}
+$('addResult').onclick=()=>editResult();
+
+function renderCalendarTabs(){
+ $('calendarSportTabs').innerHTML=Object.entries(sportLabels).map(([k,v])=>`<button data-k="${k}" class="${k===currentCalendarSport?'active':''}">${v}</button>`).join('');
+ $('calendarSportTabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{currentCalendarSport=b.dataset.k;renderCalendarTabs();renderCalendarList();});
+}
+function renderCalendarList(){
+ const arr=data.sports[currentCalendarSport].calendar||[];const list=$('calendarList');
+ if(!arr.length){list.innerHTML='<div class="empty">Calendario ancora vuoto.</div>';return;}
+ list.innerHTML=arr.map((g,i)=>`<div class="item-card"><div><h3>${esc(g.round||'Gara')} · ${esc(g.date||'')}</h3><p>${esc(g.time||'')} · ${esc(g.home)} ${esc(g.home_score??'-')} - ${esc(g.away_score??'-')} ${esc(g.away)}<br>${esc(g.venue||'')}</p></div><div class="item-actions"><button class="btn btn-dark btn-small edit-cal" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-cal" data-i="${i}">Elimina</button></div></div>`).join('');
+ list.querySelectorAll('.edit-cal').forEach(b=>b.onclick=()=>editCalendarGame(+b.dataset.i));
+ list.querySelectorAll('.del-cal').forEach(b=>b.onclick=()=>{data.sports[currentCalendarSport].calendar.splice(+b.dataset.i,1);renderCalendarList();});
+}
+function editCalendarGame(i=null){
+ const g=i===null?{round:'',date:'',time:'',home:'ASD SGM Spadafora Sport',away:'',venue:'',home_score:'',away_score:''}:data.sports[currentCalendarSport].calendar[i];
+ openModal(i===null?'Aggiungi gara calendario':'Modifica gara calendario',`
+ <div class="fields">
+ <div class="field"><label>Giornata / Turno</label><input id="cRound" value="${esc(g.round)}"></div>
+ <div class="field"><label>Data</label><input id="cDate" value="${esc(g.date)}"></div>
+ <div class="field"><label>Ora</label><input id="cTime" value="${esc(g.time)}"></div>
+ <div class="field"><label>Impianto</label><input id="cVenue" value="${esc(g.venue)}"></div>
+ <div class="field"><label>Casa</label><input id="cHome" value="${esc(g.home)}"></div>
+ <div class="field"><label>Ospite</label><input id="cAway" value="${esc(g.away)}"></div>
+ <div class="field"><label>Risultato casa</label><input id="cHS" value="${esc(g.home_score)}"></div>
+ <div class="field"><label>Risultato ospite</label><input id="cAS" value="${esc(g.away_score)}"></div></div>`,
+ ()=>{const obj={round:$('cRound').value,date:$('cDate').value,time:$('cTime').value,venue:$('cVenue').value,home:$('cHome').value,away:$('cAway').value,home_score:$('cHS').value,away_score:$('cAS').value};if(i===null)data.sports[currentCalendarSport].calendar.push(obj);else data.sports[currentCalendarSport].calendar[i]=obj;renderCalendarList();});
+}
+$('addCalendarGame').onclick=()=>editCalendarGame();
+
+function renderPalmares(){
+ const arr=data.palmares||[];const list=$('palmaresList');
+ if(!arr.length){list.innerHTML='<div class="empty">Nessun successo inserito.</div>';return;}
+ list.innerHTML=arr.map((x,i)=>`<div class="item-card"><div><h3>${esc(x.title)}</h3><p>${esc(x.season||'')} · ${esc(x.sport||'')}<br>${esc(x.description||'')}</p></div><div class="item-actions"><button class="btn btn-dark btn-small edit-pal" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-pal" data-i="${i}">Elimina</button></div></div>`).join('');
+ list.querySelectorAll('.edit-pal').forEach(b=>b.onclick=()=>editPalmares(+b.dataset.i));
+ list.querySelectorAll('.del-pal').forEach(b=>b.onclick=()=>{data.palmares.splice(+b.dataset.i,1);renderPalmares();});
+}
+function editPalmares(i=null){
+ const x=i===null?{season:'',title:'',sport:'',description:'',trophy_image:'',promotion_image:''}:data.palmares[i];
+ openModal(i===null?'Aggiungi successo':'Modifica successo',`
+ <div class="fields"><div class="field"><label>Stagione</label><input id="pSeason" value="${esc(x.season)}"></div>
+ <div class="field"><label>Disciplina</label><input id="pSport" value="${esc(x.sport)}"></div>
+ <div class="field full"><label>Titolo / Traguardo</label><input id="pTitle" value="${esc(x.title)}"></div>
+ <div class="field full"><label>Descrizione</label><textarea id="pDesc">${esc(x.description)}</textarea></div>
+ <div class="field full"><label>Foto del trofeo</label><input id="pTrophy" value="${esc(x.trophy_image||'')}" placeholder="Percorso immagine"><input id="pTrophyFile" type="file" accept="image/jpeg,image/png,image/webp"><small>Carica una foto del trofeo.</small></div>
+ <div class="field full"><label>Foto festa promozione</label><input id="pPromotion" value="${esc(x.promotion_image||'')}" placeholder="Percorso immagine"><input id="pPromotionFile" type="file" accept="image/jpeg,image/png,image/webp"><small>Carica una foto della festa promozione.</small></div></div>`,
+ ()=>{
+   const finish=()=>{const obj={season:$('pSeason').value,title:$('pTitle').value,sport:$('pSport').value,description:$('pDesc').value,trophy_image:$('pTrophy').value,promotion_image:$('pPromotion').value};if(i===null)data.palmares.push(obj);else data.palmares[i]=obj;renderPalmares();};
+   const uploadOne=async(file,inputId)=>{if(!file)return;const url=await window.SGM_DB.uploadImage(file,'palmares');$(inputId).value=url;};
+   Promise.resolve().then(async()=>{await uploadOne($('pTrophyFile').files[0],'pTrophy');await uploadOne($('pPromotionFile').files[0],'pPromotion');finish();}).catch(e=>alert(e.message));
+ });
+}
+$('addPalmares').onclick=()=>editPalmares();
+
+
+async function loadData(){
+ await window.SGM_DB.init();
+ if(!window.SGM_DB.enabled){status('Supabase non configurato.',true);return;}
+ const sess=await window.SGM_DB.getSession();
+ if(!sess){location.href='login.html';return;}
+ try{
+   data=await window.SGM_DB.getSiteData();
+   ensureData();renderAll();
+ }catch(e){status('Impossibile caricare i dati online: '+e.message,true);}
+}
+function renderAll(){renderSportTabs();renderMatches();renderRoster();renderStaff();renderStandings();renderVideos();renderResults();renderCalendarTabs();renderCalendarList();renderPalmares();loadContacts();$('rawJson').value=JSON.stringify(data,null,2);}
+
+$('saveOnline').onclick=async()=>{
+ try{
+  saveContacts();
+  await window.SGM_DB.saveSiteData(data);
+  status('✓ Modifiche salvate online.');
+  $('rawJson').value=JSON.stringify(data,null,2);
+ }catch(e){status('Salvataggio non riuscito: '+e.message,true);}
+};
+
+$('downloadBackup').onclick=()=>{
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sgm-site-backup.json';a.click();URL.revokeObjectURL(a.href);
+};
+$('importBackup').onchange=async e=>{try{data=JSON.parse(await e.target.files[0].text());ensureData();renderAll();status('Backup importato. Premi Salva online per pubblicarlo.');}catch(x){status('Backup non valido.',true);}};
+$('imageUpload').onchange=async e=>{
+ const file=e.target.files[0];if(!file)return;
+ try{
+   const url=await window.SGM_DB.uploadImage(file,'uploads');
+   $('uploadStatus').textContent='Immagine caricata: '+url;
+ }catch(err){
+   $('uploadStatus').textContent='Errore caricamento: '+err.message;
+ }
+};
+$('applyRaw').onclick=()=>{try{data=JSON.parse($('rawJson').value);ensureData();renderAll();status('JSON applicato all’editor. Premi Salva online per pubblicarlo.');}catch(e){status('JSON non valido.',true);}};
+$('logout').onclick=async()=>{await window.SGM_DB.signOut();location.href='login.html';};
+
+loadData();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="supabase-data.js"></script>
+</body>
+</html>

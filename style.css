@@ -276,7 +276,7 @@ nav a:hover,
 
 
    /* MENU MOBILE */
-@@media (max-width: 768px) {
+@media (max-width: 768px) {
 
   .nav-wrap {
     display: flex;
@@ -329,4 +329,4 @@ nav a:hover,
     text-align: center;
     box-sizing: border-box;
   }
-}} 
+}}

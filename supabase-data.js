@@ -1,137 +1,120 @@
-// ============================================================
-// SGM SPADAFORA SPORT
-// Gestione dati online con Supabase
-// ============================================================
+(function () {
+  const cfg = window.SGM_SUPABASE_CONFIG || {};
 
-const SGM_TABLE = "site_data";
-const SGM_ROW_ID = 1;
+  const valid =
+    cfg.url &&
+    cfg.anonKey &&
+    !cfg.url.startsWith("INSERISCI_") &&
+    !cfg.anonKey.startsWith("INSERISCI_");
 
-// ------------------------------------------------------------
-// CLIENT SUPABASE
-// ------------------------------------------------------------
+  window.SGM_DB = {
+    enabled: false,
+    client: null,
 
-function getSGMSupabase() {
-  if (window.sgmSupabase) {
-    return window.sgmSupabase;
-  }
+    async init() {
+      if (!valid || !window.supabase) return false;
 
-  console.error("Supabase non inizializzato. Controlla supabase-config.js");
-  return null;
-}
+      this.client = window.supabase.createClient(
+        cfg.url,
+        cfg.anonKey
+      );
 
-// ------------------------------------------------------------
-// LETTURA DATI ONLINE
-// ------------------------------------------------------------
+      this.enabled = true;
+      return true;
+    },
 
-async function loadSiteData() {
-  const supabase = getSGMSupabase();
+    async getSiteData() {
+      if (!this.enabled)
+        throw new Error("Supabase non configurato");
 
-  if (!supabase) {
-    return null;
-  }
+      const { data, error } = await this.client
+        .from("site_data")
+        .select("payload")
+        .eq("id", 1)
+        .single();
 
-  try {
-    const { data, error } = await supabase
-      .from(SGM_TABLE)
-      .select("payload")
-      .eq("id", SGM_ROW_ID)
-      .single();
+      if (error) throw error;
 
-    if (error) {
-      console.error("Errore caricamento dati:", error);
-      return null;
+      return data?.payload || {};
+    },
+
+    async saveSiteData(payload) {
+      if (!this.enabled)
+        throw new Error("Supabase non configurato");
+
+      const { error } = await this.client
+        .from("site_data")
+        .upsert(
+          {
+            id: 1,
+            payload,
+            updated_at: new Date().toISOString()
+          },
+          {
+            onConflict: "id"
+          }
+        );
+
+      if (error) throw error;
+
+      return true;
+    },
+
+    async signIn(email, password) {
+      if (!this.enabled)
+        throw new Error("Supabase non configurato");
+
+      const { data, error } =
+        await this.client.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      if (error) throw error;
+
+      return data;
+    },
+
+    async signOut() {
+      if (this.enabled)
+        await this.client.auth.signOut();
+    },
+
+    async getSession() {
+      if (!this.enabled) return null;
+
+      const { data } =
+        await this.client.auth.getSession();
+
+      return data?.session || null;
+    },
+
+    async uploadImage(file, folder = "uploads") {
+      if (!this.enabled)
+        throw new Error("Supabase non configurato");
+
+      const clean = (file.name || "image")
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]+/g, "-");
+
+      const path =
+        `${folder}/${Date.now()}-${clean}`;
+
+      const { error } =
+        await this.client.storage
+          .from(cfg.storageBucket || "sgm-media")
+          .upload(path, file, {
+            upsert: false
+          });
+
+      if (error) throw error;
+
+      const { data } =
+        this.client.storage
+          .from(cfg.storageBucket || "sgm-media")
+          .getPublicUrl(path);
+
+      return data.publicUrl;
     }
-
-    if (!data) {
-      return null;
-    }
-
-    return data.payload || {};
-
-  } catch (error) {
-    console.error("Errore durante il caricamento:", error);
-    return null;
-  }
-}
-
-// ------------------------------------------------------------
-// SALVATAGGIO DATI ONLINE
-// ------------------------------------------------------------
-
-async function saveSiteData(payload) {
-  const supabase = getSGMSupabase();
-
-  if (!supabase) {
-    return {
-      success: false,
-      error: "Supabase non inizializzato"
-    };
-  }
-
-  try {
-    const {
-      data: { user },
-      error: userError
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      console.error("Utente non autenticato");
-
-      return {
-        success: false,
-        error: "Devi effettuare il login come amministratore."
-      };
-    }
-
-    const { error } = await supabase
-      .from(SGM_TABLE)
-      .update({
-        payload: payload,
-        updated_at: new Date().toISOString()
-      })
-      .eq("id", SGM_ROW_ID);
-
-    if (error) {
-      console.error("Errore salvataggio:", error);
-
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-
-    return {
-      success: true
-    };
-
-  } catch (error) {
-    console.error("Errore durante il salvataggio:", error);
-
-    return {
-      success: false,
-      error: error.message
-    };
-  }
-}
-
-// ------------------------------------------------------------
-// AGGIORNAMENTO PARZIALE
-// ------------------------------------------------------------
-
-async function updateSiteData(section, value) {
-  const currentData = await loadSiteData();
-
-  if (!currentData) {
-    return {
-      success: false,
-      error: "Impossibile caricare i dati attuali."
-    };
-  }
-
-  currentData[section] = value;
-
-  return await saveSiteData(currentData);
-}
-
-// ------------------------------------------------------------
-// CONTROLLO LOGIN ADMIN
+  };
+})();

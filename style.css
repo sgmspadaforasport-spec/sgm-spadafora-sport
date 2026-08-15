@@ -169,3 +169,67 @@ nav a:hover,
     width: auto;
   }
 }
+/* ===== FIX DEFINITIVO MENU MOBILE ===== */
+@media screen and (max-width: 768px) {
+
+  header .container,
+  .header .container {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  .nav-wrap {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    position: relative !important;
+  }
+
+  .main-nav {
+    display: none !important;
+    position: absolute !important;
+    top: calc(100% + 4px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    background: #0b0b0b !important;
+    padding: 10px !important;
+    margin: 0 !important;
+    z-index: 99999 !important;
+  }
+
+  .main-nav.open {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .main-nav a {
+    width: 100% !important;
+    display: block !important;
+    text-align: center !important;
+    padding: 12px !important;
+  }
+
+  .menu-toggle {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 46px !important;
+    height: 46px !important;
+    flex: 0 0 46px !important;
+    gap: 5px !important;
+  }
+
+  .menu-toggle span {
+    display: block !important;
+    width: 23px !important;
+    height: 2px !important;
+    background: white !important;
+  }
+}

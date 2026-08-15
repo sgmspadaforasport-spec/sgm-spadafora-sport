@@ -273,3 +273,60 @@ nav a:hover,
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
+
+
+   /* MENU MOBILE */
+@@media (max-width: 768px) {
+
+  .nav-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .menu-toggle {
+    display: flex;
+    width: 46px;
+    height: 46px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    background: #161616;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .menu-toggle span {
+    display: block;
+    width: 23px;
+    height: 2px;
+    background: #fff;
+  }
+
+  .main-nav {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #0b0b0b;
+    padding: 10px;
+    z-index: 9999;
+  }
+
+  .main-nav.open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-nav a {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+}} 

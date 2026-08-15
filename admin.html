@@ -519,10 +519,12 @@ $('imageUpload').onchange=async e=>{
 $('applyRaw').onclick=()=>{try{data=JSON.parse($('rawJson').value);ensureData();renderAll();status('JSON applicato all’editor. Premi Salva online per pubblicarlo.');}catch(e){status('JSON non valido.',true);}};
 $('logout').onclick=async()=>{await window.SGM_DB.signOut();location.href='login.html';};
 
-loadData();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="supabase-data.js"></script>
+ <script>
+loadData();
+</script>
 </body>
 </html>

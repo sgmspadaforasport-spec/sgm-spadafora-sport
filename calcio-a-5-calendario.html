@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Calendario e risultati Calcio a 5 ASD SGM Spadafora Sport">
+<title>Calendario Calcio a 5 | ASD SGM Spadafora Sport</title>
+<link rel="stylesheet" href="style.css?v=100">
+<style>
+.cal-hero{padding:64px 0 34px;background:#111;color:#fff;border-bottom:4px solid var(--yellow)}
+.cal-hero h1{margin:0;font-size:clamp(38px,7vw,72px);line-height:.95}
+.cal-hero p{max-width:680px;color:#c8c8c8}
+.cal-section{padding:55px 0 70px;background:#f5f5f5}
+.cal-box{background:#111;color:#fff;border-radius:16px;padding:34px 24px;border:1px solid #2a2a2a;text-align:center}
+.cal-box .icon{font-size:42px;margin-bottom:12px}
+.cal-box h2{margin:0 0 10px;font-size:30px}
+.cal-box p{margin:0;color:#aaa}
+.cal-back{padding:28px 0 50px}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html"><img class="brand-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"><div class="brand-text"><strong>ASD SGM</strong><span>Spadafora Sport</span></div></a><button class="menu-toggle" aria-label="Apri menu" aria-expanded="false"><span></span><span></span><span></span></button><nav class="main-nav"><a href="index.html">Home</a><a href="squadre.html">Squadre</a><a href="rose.html">Rose</a><a href="staff.html">Staff</a><a href="calendario-risultati.html">Calendario</a><a href="news.html">News</a><a href="sponsor.html">Sponsor</a><a href="galleria.html">Galleria</a><a href="sgm-tv.html">SGM TV</a>
+<a href="palmares.html">Palmarès</a>
+<a href="contatti.html">Contatti</a></nav></div></header>
+<main>
+<section class="cal-hero"><div class="container">
+<p class="section-kicker yellow">STAGIONE SPORTIVA 2026/2027</p>
+<h1>CALENDARIO E RISULTATI</h1>
+<p>Prima squadra Calcio a 5 · ASD SGM Spadafora Sport.</p>
+</div></section>
+<section class="cal-section"><div class="container">
+<div class="cal-box">
+<div class="icon">📅</div>
+<p class="section-kicker yellow">CALCIO A 5</p>
+<h2>CALENDARIO IN AGGIORNAMENTO</h2>
+<p>Le gare della stagione sportiva 2026/2027 saranno pubblicate appena disponibili.</p>
+</div>
+</div></section>
+<section class="cal-back"><div class="container">
+<a class="btn btn-primary" href="calcio-a-5.html">← Torna a Calcio a 5</a>
+</div></section>
+</main>
+<footer class="footer">
+<div class="container"><img class="footer-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"></div><div class="container footer-wrap"><p>© 2026 ASD SGM Spadafora Sport</p><p>Stagione sportiva 2026/2027 · 🖤💛</p></div><div style="text-align:center;background:#080808;padding:0 0 18px"><a href="admin.html" style="font-size:9px;color:#555">Area amministratore</a></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="supabase-data.js"></script>
+<script src="site-data.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const t=document.querySelector(".menu-toggle"),m=document.querySelector(".main-nav");
+ if(!t||!m)return;
+ const c=()=>{m.classList.remove("menu-open");t.setAttribute("aria-expanded","false");};
+ t.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();const o=m.classList.toggle("menu-open");t.setAttribute("aria-expanded",o?"true":"false");});
+ m.querySelectorAll("a").forEach(a=>a.addEventListener("click",c));
+ document.addEventListener("click",e=>{if(!m.contains(e.target)&&!t.contains(e.target))c();});
+ window.addEventListener("resize",()=>{if(window.innerWidth>768)c();});
+});
+</script>
+</body>
+</html>

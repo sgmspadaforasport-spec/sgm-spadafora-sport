@@ -1,33 +1,88 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Direttivo, ufficio economico-amministrativo, dirigenti e staff ASD SGM Spadafora Sport.">
-  <title>Staff | ASD SGM Spadafora Sport</title>
-  <link rel="stylesheet" href="style.css?v=103">
-  <style>
-    .staff-hero{padding:64px 0 38px;background:#111;color:#fff;border-bottom:4px solid var(--yellow)}
-    .staff-hero h1{margin:0;font-size:clamp(42px,7vw,76px);line-height:.95;font-weight:900}
-    .staff-hero p:last-child{max-width:720px;color:#c8c8c8;margin-top:16px}
-    .staff-section{padding:52px 0;background:#f5f5f5}.staff-section:nth-child(even){background:#fff}
-    .staff-section-head{margin-bottom:24px}.staff-section-head h2{margin:0;font-size:clamp(30px,5vw,48px);line-height:1;font-weight:900;text-transform:uppercase}.staff-section-head p{margin:9px 0 0;color:#777}
-    .staff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.staff-card{background:#111;color:#fff;border:1px solid #292929;border-radius:15px;padding:20px;min-height:118px;display:flex;flex-direction:column;justify-content:center}.staff-card span{color:var(--yellow);font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}.staff-card h3{margin:0 0 7px;font-size:20px;line-height:1.15}.staff-card p{margin:0;color:#aaa;font-size:12px;font-weight:800;text-transform:uppercase;line-height:1.4}
-    @media(max-width:850px){.staff-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.staff-grid{grid-template-columns:1fr}.staff-section{padding:40px 0}.staff-card{min-height:105px}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Direttivo, ufficio economico-amministrativo, social media manager, dirigenti e staff ASD SGM Spadafora Sport.">
+<title>Staff | ASD SGM Spadafora Sport</title>
+<link rel="stylesheet" href="style.css?v=104">
+<style>
+.staff-hero{padding:64px 0 38px;background:#111;color:#fff;border-bottom:4px solid var(--yellow)}
+.staff-hero h1{margin:0;font-size:clamp(42px,7vw,76px);line-height:.95;font-weight:900}
+.staff-hero p:last-child{max-width:760px;color:#c8c8c8;margin-top:16px}
+.staff-section{padding:52px 0;background:#f5f5f5}.staff-section.alt{background:#fff}
+.staff-section-head{margin-bottom:24px}.staff-section-head h2{margin:0;font-size:clamp(30px,5vw,48px);line-height:1;font-weight:900;text-transform:uppercase}.staff-section-head p{margin:9px 0 0;color:#777}
+.staff-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.staff-grid.single{grid-template-columns:minmax(240px,360px)}
+.staff-card{overflow:hidden;background:#111;color:#fff;border:1px solid #292929;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.staff-photo-wrap{position:relative;aspect-ratio:4/5;background:linear-gradient(145deg,#1b1b1b,#090909);overflow:hidden}
+.staff-photo{width:100%;height:100%;display:block;object-fit:cover;object-position:center;opacity:0;transition:opacity .2s ease}
+.staff-photo.loaded{opacity:1}
+.staff-photo-fallback{position:absolute;inset:0;display:grid;place-items:center;color:#ffd400;font-size:36px;font-weight:900}
+.staff-photo.loaded+.staff-photo-fallback{display:none}
+.staff-card-body{padding:18px 18px 20px}
+.staff-card-body span{display:block;color:var(--yellow);font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.staff-card h3{margin:0 0 7px;font-size:20px;line-height:1.15}.staff-card p{margin:0;color:#aaa;font-size:12px;font-weight:800;text-transform:uppercase;line-height:1.4}
+@media(max-width:1000px){.staff-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.staff-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.staff-grid,.staff-grid.single{grid-template-columns:1fr}.staff-section{padding:40px 0}}
+</style>
 </head>
 <body>
 <header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html"><img class="brand-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"><div class="brand-text"><strong>ASD SGM</strong><span>Spadafora Sport</span></div></a><button class="menu-toggle" aria-label="Apri menu" aria-expanded="false"><span></span><span></span><span></span></button><nav class="main-nav"><a href="index.html">Home</a><a href="squadre.html">Squadre</a><a href="rose.html">Rose</a><a href="staff.html">Staff</a><a href="calendario-risultati.html">Calendario</a><a href="news.html">News</a><a href="sponsor.html">Sponsor</a><a href="galleria.html">Galleria</a><a href="sgm-tv.html">SGM TV</a><a href="palmares.html">Palmarès</a><a href="contatti.html">Contatti</a></nav></div></header>
 <main>
-<section class="staff-hero"><div class="container"><p class="section-kicker yellow">ASD SGM SPADAFORA SPORT</p><h1>STAFF<br>SOCIETARIO</h1><p>Direttivo, ufficio economico-amministrativo, dirigenti e staff della stagione sportiva 2026/2027.</p></div></section>
+<section class="staff-hero"><div class="container"><p class="section-kicker yellow">ASD SGM SPADAFORA SPORT</p><h1>STAFF<br>SOCIETARIO</h1><p>Direttivo, ufficio economico-amministrativo, social media manager, dirigenti e staff della stagione sportiva 2026/2027.</p></div></section>
+
 <section class="staff-section"><div class="container"><div class="staff-section-head"><p class="section-kicker yellow">SOCIETÀ</p><h2>Direttivo</h2></div><div class="staff-grid">
-<article class="staff-card"><span>Presidente</span><h3>Mons. Alessandro Lo Nardo</h3><p>Presidente</p></article><article class="staff-card"><span>Vicepresidente</span><h3>Simone Scibilia</h3><p>Vicepresidente</p></article><article class="staff-card"><span>Segreteria</span><h3>Aldo Ciuna</h3><p>Segretario</p></article><article class="staff-card"><span>Tesoreria</span><h3>Maria Ialacqua</h3><p>Tesoriera</p></article><article class="staff-card"><span>Consigliere</span><h3>Luca Scibilia</h3><p>Consigliere e dirigente delegato calcio a 5</p></article><article class="staff-card"><span>Consigliere</span><h3>Carmelo Floridia</h3><p>Consigliere e dirigente pallavolo</p></article><article class="staff-card"><span>Consigliere</span><h3>Adriano Piccione</h3><p>Consigliere e dirigente delegato basket</p></article><article class="staff-card"><span>Consigliere</span><h3>Domenico Cannuli</h3><p>Consigliere</p></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="alessandro-lo-nardo" alt="Mons. Alessandro Lo Nardo"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Presidente</span><h3>Mons. Alessandro Lo Nardo</h3><p>Presidente</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="simone-scibilia" alt="Simone Scibilia"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Vicepresidente</span><h3>Simone Scibilia</h3><p>Vicepresidente</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="aldo-ciuna" alt="Aldo Ciuna"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Segreteria</span><h3>Aldo Ciuna</h3><p>Segretario</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="maria-ialacqua" alt="Maria Ialacqua"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Tesoreria</span><h3>Maria Ialacqua</h3><p>Tesoriera</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="luca-scibilia" alt="Luca Scibilia"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Consigliere</span><h3>Luca Scibilia</h3><p>Consigliere e dirigente delegato calcio a 5</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="carmelo-floridia" alt="Carmelo Floridia"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Consigliere</span><h3>Carmelo Floridia</h3><p>Consigliere e dirigente delegato pallavolo</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="adriano-piccione" alt="Adriano Piccione"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Consigliere</span><h3>Adriano Piccione</h3><p>Consigliere e dirigente delegato basket</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="domenico-cannuli" alt="Domenico Cannuli"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Consigliere</span><h3>Domenico Cannuli</h3><p>Consigliere</p></div></article>
 </div></div></section>
-<section class="staff-section"><div class="container"><div class="staff-section-head"><p class="section-kicker yellow">AMMINISTRAZIONE</p><h2>Ufficio economico-amministrativo</h2></div><div class="staff-grid"><article class="staff-card"><span>Ufficio economico-amministrativo</span><h3>Andrea Scibilia</h3><p>Ufficio economico-amministrativo</p></article></div></div></section>
-<section class="staff-section"><div class="container"><div class="staff-section-head"><p class="section-kicker yellow">AREA SPORTIVA E COMUNICAZIONE</p><h2>Dirigenti e Staff</h2></div><div class="staff-grid">
-<article class="staff-card"><span>Comunicazione</span><h3>Alessandro Scibilia</h3><p>Social Media Manager</p></article><article class="staff-card"><span>Calcio a 5</span><h3>Andrea Giacobbo</h3><p>Allenatore calcio a 5</p></article><article class="staff-card"><span>Calcio a 5</span><h3>Antonio Romeo</h3><p>Vice allenatore calcio a 5</p></article><article class="staff-card"><span>Calcio a 5</span><h3>Antonio Vitale</h3><p>Dirigente calcio a 5</p></article><article class="staff-card"><span>Calcio a 5</span><h3>Giuseppe Arcoraci</h3><p>Dirigente calcio a 5</p></article><article class="staff-card"><span>Pallavolo maschile</span><h3>Gabriele Marchetta</h3><p>Allenatore pallavolo maschile</p></article><article class="staff-card"><span>Pallavolo</span><h3>Dario Alberti</h3><p>Allievo allenatore pallavolo</p></article><article class="staff-card"><span>Pallavolo</span><h3>Giuseppe Cangemi</h3><p>Dirigente pallavolo</p></article><article class="staff-card"><span>Pallavolo</span><h3>Andrea Sapienza</h3><p>Dirigente pallavolo</p></article><article class="staff-card"><span>Basket</span><h3>Antonio Barbera</h3><p>Allenatore basket</p></article><article class="staff-card"><span>Basket</span><h3>Giuliano Anastasi</h3><p>Assistente allenatore basket</p></article>
+
+<section class="staff-section alt"><div class="container"><div class="staff-section-head"><p class="section-kicker yellow">AMMINISTRAZIONE</p><h2>Ufficio economico-amministrativo</h2></div><div class="staff-grid single">
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="andrea-scibilia" alt="Andrea Scibilia"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Amministrazione</span><h3>Andrea Scibilia</h3><p>Ufficio economico-amministrativo</p></div></article>
+</div></div></section>
+
+<section class="staff-section"><div class="container"><div class="staff-section-head"><p class="section-kicker yellow">COMUNICAZIONE</p><h2>Social Media Manager</h2></div><div class="staff-grid single">
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="alessandro-scibilia" alt="Alessandro Scibilia"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Comunicazione</span><h3>Alessandro Scibilia</h3><p>Social Media Manager</p></div></article>
+</div></div></section>
+
+<section class="staff-section alt"><div class="container"><div class="staff-section-head"><p class="section-kicker yellow">AREA SPORTIVA</p><h2>Dirigenti e Staff</h2></div><div class="staff-grid">
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="andrea-giacobbo" alt="Andrea Giacobbo"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Calcio a 5</span><h3>Andrea Giacobbo</h3><p>Allenatore calcio a 5</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="antonio-romeo" alt="Antonio Romeo"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Calcio a 5</span><h3>Antonio Romeo</h3><p>Vice allenatore calcio a 5</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="antonio-vitale" alt="Antonio Vitale"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Calcio a 5</span><h3>Antonio Vitale</h3><p>Dirigente calcio a 5</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="pippo-arcoraci" alt="Pippo Arcoraci"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Calcio a 5</span><h3>Pippo Arcoraci</h3><p>Collaboratore</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="gabriele-marchetta" alt="Gabriele Marchetta"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Pallavolo maschile</span><h3>Gabriele Marchetta</h3><p>Allenatore pallavolo maschile</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="dario-alberti" alt="Dario Alberti"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Pallavolo</span><h3>Dario Alberti</h3><p>Allievo allenatore pallavolo</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="giuseppe-cangemi" alt="Giuseppe Cangemi"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Pallavolo</span><h3>Giuseppe Cangemi</h3><p>Dirigente pallavolo</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="andrea-sapienza" alt="Andrea Sapienza"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Pallavolo</span><h3>Andrea Sapienza</h3><p>Dirigente pallavolo</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="antonio-barbera" alt="Antonio Barbera"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Basket</span><h3>Antonio Barbera</h3><p>Allenatore basket</p></div></article>
+<article class="staff-card"><div class="staff-photo-wrap"><img class="staff-photo" data-photo="giuliano-anastasi" alt="Giuliano Anastasi"><div class="staff-photo-fallback">SGM</div></div><div class="staff-card-body"><span>Basket</span><h3>Giuliano Anastasi</h3><p>Assistente allenatore basket</p></div></article>
 </div></div></section>
 </main>
 <footer class="footer"><div class="container"><img class="footer-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"></div><div class="container footer-wrap"><p>© 2026 ASD SGM Spadafora Sport</p><p>Stagione sportiva 2026/2027 · 🖤💛</p></div><div style="text-align:center;background:#080808;padding:0 0 18px"><a href="admin.html" style="font-size:9px;color:#555">Area amministratore</a></div></footer>
-<script>document.addEventListener('DOMContentLoaded',()=>{const toggle=document.querySelector('.menu-toggle');const menu=document.querySelector('.main-nav');if(!toggle||!menu)return;const closeMenu=()=>{menu.classList.remove('menu-open');toggle.setAttribute('aria-expanded','false')};toggle.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();const open=menu.classList.toggle('menu-open');toggle.setAttribute('aria-expanded',open?'true':'false')});menu.querySelectorAll('a').forEach(link=>link.addEventListener('click',closeMenu));document.addEventListener('click',event=>{if(!menu.contains(event.target)&&!toggle.contains(event.target))closeMenu()});window.addEventListener('resize',()=>{if(window.innerWidth>768)closeMenu()});});</script>
+<script src="supabase-config.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+ const toggle=document.querySelector('.menu-toggle'),menu=document.querySelector('.main-nav');
+ if(toggle&&menu){const close=()=>{menu.classList.remove('menu-open');toggle.setAttribute('aria-expanded','false')};toggle.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const open=menu.classList.toggle('menu-open');toggle.setAttribute('aria-expanded',open?'true':'false')});menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));document.addEventListener('click',e=>{if(!menu.contains(e.target)&&!toggle.contains(e.target))close()})}
+ loadStaffPhotos();
+});
+async function loadStaffPhotos(){
+ const cfg=window.SGM_SUPABASE_CONFIG||{};
+ if(!cfg.url||!cfg.anonKey)return;
+ try{
+  const r=await fetch(cfg.url+'/rest/v1/staff_photos?select=slug,mime_type,data_base64',{headers:{apikey:cfg.anonKey,Authorization:'Bearer '+cfg.anonKey}});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const rows=await r.json();
+  const map={}; rows.forEach(x=>map[x.slug]='data:'+(x.mime_type||'image/jpeg')+';base64,'+x.data_base64);
+  document.querySelectorAll('.staff-photo[data-photo]').forEach(img=>{const src=map[img.dataset.photo];if(src){img.onload=()=>img.classList.add('loaded');img.src=src;}});
+ }catch(e){console.warn('Foto staff non disponibili',e)}
+}
+</script>
 </body></html>

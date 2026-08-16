@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Direttivo, ufficio economico-amministrativo, social media manager e staff sportivo ASD SGM Spadafora Sport.">
 <title>Staff | ASD SGM Spadafora Sport</title>
-<link rel="stylesheet" href="style.css?v=109">
+<link rel="stylesheet" href="style.css?v=110">
 <style>
 .staff-hero{padding:64px 0 38px;background:#111;color:#fff;border-bottom:4px solid var(--yellow)}
 .staff-hero h1{margin:0;font-size:clamp(42px,7vw,76px);line-height:.95;font-weight:900}.staff-hero p:last-child{max-width:760px;color:#c8c8c8;margin-top:16px}
 .staff-section{padding:52px 0;background:#f5f5f5}.staff-section.alt{background:#fff}.staff-section-head{margin-bottom:24px}.staff-section-head h2{margin:0;font-size:clamp(30px,5vw,48px);line-height:1;font-weight:900;text-transform:uppercase}.staff-section-head p{margin:9px 0 0;color:#777}
 .staff-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.staff-grid.single{grid-template-columns:minmax(240px,360px)}
 .staff-card{overflow:hidden;background:#111;color:#fff;border:1px solid #292929;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
-.staff-photo{aspect-ratio:4/5;background-image:url('images/staff/staff-sprite.jpg?v=5');background-repeat:no-repeat;background-size:400% 500%;background-color:#080808}
+.staff-photo{aspect-ratio:4/5;background-image:var(--staff-sprite,none);background-repeat:no-repeat;background-size:400% 500%;background-color:#080808;background-position:center}
 .p0{background-position:0 0}.p1{background-position:33.333% 0}.p2{background-position:66.667% 0}.p3{background-position:100% 0}.p4{background-position:0 25%}.p5{background-position:33.333% 25%}.p6{background-position:66.667% 25%}.p7{background-position:100% 25%}.p8{background-position:0 50%}.p9{background-position:33.333% 50%}.p10{background-position:66.667% 50%}.p11{background-position:100% 50%}.p12{background-position:0 75%}.p13{background-position:33.333% 75%}.p14{background-position:66.667% 75%}.p15{background-position:100% 75%}.p16{background-position:0 100%}.p17{background-position:33.333% 100%}.p18{background-position:66.667% 100%}.p19{background-position:100% 100%}
 .staff-card-body{padding:17px 18px 20px}.staff-card-body span{display:block;color:var(--yellow);font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}.staff-card h3{margin:0 0 7px;font-size:20px;line-height:1.15}.staff-card p{margin:0;color:#aaa;font-size:12px;font-weight:800;text-transform:uppercase;line-height:1.4}
 @media(max-width:1050px){.staff-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:760px){.staff-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.staff-grid,.staff-grid.single{grid-template-columns:1fr}.staff-section{padding:40px 0}}
@@ -52,5 +52,22 @@
 </div></div></section>
 </main>
 <footer class="footer"><div class="container"><img class="footer-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"></div><div class="container footer-wrap"><p>© 2026 ASD SGM Spadafora Sport</p><p>Stagione sportiva 2026/2027 · 🖤💛</p></div><div style="text-align:center;background:#080808;padding:0 0 18px"><a href="admin.html" style="font-size:9px;color:#555">Area amministratore</a></div></footer>
-<script>document.addEventListener('DOMContentLoaded',()=>{const toggle=document.querySelector('.menu-toggle'),menu=document.querySelector('.main-nav');if(!toggle||!menu)return;const close=()=>{menu.classList.remove('menu-open');toggle.setAttribute('aria-expanded','false')};toggle.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const open=menu.classList.toggle('menu-open');toggle.setAttribute('aria-expanded',open?'true':'false')});menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));document.addEventListener('click',e=>{if(!menu.contains(e.target)&&!toggle.contains(e.target))close()})});</script>
+<script src="supabase-config.js"></script>
+<script>
+async function loadStaffSprite(){
+ const cfg=window.SGM_SUPABASE_CONFIG||{};
+ if(!cfg.url||!cfg.anonKey)return;
+ try{
+  const r=await fetch(cfg.url+'/rest/v1/staff_photos?slug=eq.staff-sprite&select=mime_type,data_base64',{headers:{apikey:cfg.anonKey,Authorization:'Bearer '+cfg.anonKey}});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const rows=await r.json();
+  if(rows&&rows[0]&&rows[0].data_base64){document.documentElement.style.setProperty('--staff-sprite',`url("data:${rows[0].mime_type||'image/jpeg'};base64,${rows[0].data_base64}")`)}
+ }catch(e){console.warn('Foto staff non disponibili',e)}
+}
+document.addEventListener('DOMContentLoaded',()=>{
+ const toggle=document.querySelector('.menu-toggle'),menu=document.querySelector('.main-nav');
+ if(toggle&&menu){const close=()=>{menu.classList.remove('menu-open');toggle.setAttribute('aria-expanded','false')};toggle.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const open=menu.classList.toggle('menu-open');toggle.setAttribute('aria-expanded',open?'true':'false')});menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));document.addEventListener('click',e=>{if(!menu.contains(e.target)&&!toggle.contains(e.target))close()})}
+ loadStaffSprite();
+});
+</script>
 </body></html>

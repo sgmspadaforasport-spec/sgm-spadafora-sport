@@ -117,4 +117,14 @@
       return data.publicUrl;
     }
   };
+
+  const page=(location.pathname.split('/').pop()||'').toLowerCase();
+  let extra='';
+  if(page==='admin.html') extra='admin-content.js';
+  if(['news.html','sponsor.html','galleria.html'].includes(page)) extra='content-pages.js';
+  if(extra){
+    const script=document.createElement('script');
+    script.src=extra+'?v=1';
+    document.head.appendChild(script);
+  }
 })();

@@ -3,56 +3,130 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Dirigenza, tecnici e collaboratori della società.">
+  <meta name="description" content="Direttivo, ufficio economico-amministrativo, dirigenti e staff ASD SGM Spadafora Sport.">
   <title>Staff | ASD SGM Spadafora Sport</title>
-  <link rel="stylesheet" href="style.css?v=100">
+  <link rel="stylesheet" href="style.css?v=103">
+  <style>
+    .staff-hero{padding:64px 0 38px;background:#111;color:#fff;border-bottom:4px solid var(--yellow)}
+    .staff-hero h1{margin:0;font-size:clamp(42px,7vw,76px);line-height:.95;font-weight:900}
+    .staff-hero p:last-child{max-width:720px;color:#c8c8c8;margin-top:16px}
+    .staff-section{padding:52px 0;background:#f5f5f5}
+    .staff-section:nth-child(even){background:#fff}
+    .staff-section-head{margin-bottom:24px}
+    .staff-section-head h2{margin:0;font-size:clamp(30px,5vw,48px);line-height:1;font-weight:900;text-transform:uppercase}
+    .staff-section-head p{margin:9px 0 0;color:#777}
+    .staff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .staff-card{background:#111;color:#fff;border:1px solid #292929;border-radius:15px;padding:20px;min-height:118px;display:flex;flex-direction:column;justify-content:center}
+    .staff-card span{color:var(--yellow);font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+    .staff-card h3{margin:0 0 7px;font-size:20px;line-height:1.15}
+    .staff-card p{margin:0;color:#aaa;font-size:12px;font-weight:800;text-transform:uppercase;line-height:1.4}
+    @media(max-width:850px){.staff-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:560px){.staff-grid{grid-template-columns:1fr}.staff-section{padding:40px 0}.staff-card{min-height:105px}}
+  </style>
 </head>
 <body>
-<header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html"><img class="brand-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"><div class="brand-text"><strong>ASD SGM</strong><span>Spadafora Sport</span></div></a><button class="menu-toggle" aria-label="Apri menu" aria-expanded="false"><span></span><span></span><span></span></button><nav class="main-nav"><a href="index.html">Home</a><a href="squadre.html">Squadre</a><a href="rose.html">Rose</a><a href="staff.html">Staff</a><a href="calendario-risultati.html">Calendario</a><a href="news.html">News</a><a href="sponsor.html">Sponsor</a><a href="galleria.html">Galleria</a><a href="sgm-tv.html">SGM TV</a>
-<a href="palmares.html">Palmarès</a>
-<a href="contatti.html">Contatti</a></nav></div></header>
+<header class="site-header">
+  <div class="container nav-wrap">
+    <a class="brand" href="index.html">
+      <img class="brand-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport">
+      <div class="brand-text"><strong>ASD SGM</strong><span>Spadafora Sport</span></div>
+    </a>
+    <button class="menu-toggle" aria-label="Apri menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="squadre.html">Squadre</a>
+      <a href="rose.html">Rose</a>
+      <a href="staff.html">Staff</a>
+      <a href="calendario-risultati.html">Calendario</a>
+      <a href="news.html">News</a>
+      <a href="sponsor.html">Sponsor</a>
+      <a href="galleria.html">Galleria</a>
+      <a href="sgm-tv.html">SGM TV</a>
+      <a href="palmares.html">Palmarès</a>
+      <a href="contatti.html">Contatti</a>
+    </nav>
+  </div>
+</header>
+
 <main>
-  <section class="home-manifesto">
-    <div class="container" style="padding-top:70px;padding-bottom:70px">
+  <section class="staff-hero">
+    <div class="container">
       <p class="section-kicker yellow">ASD SGM SPADAFORA SPORT</p>
-      <h1>STAFF</h1>
-      <p>Dirigenza, tecnici e collaboratori della società.</p>
+      <h1>STAFF<br>SOCIETARIO</h1>
+      <p>Direttivo, ufficio economico-amministrativo, dirigenti e staff della stagione sportiva 2026/2027.</p>
     </div>
   </section>
-  <section class="section">
+
+  <section class="staff-section">
     <div class="container">
-      <div class="home-feature-news-body"><p>Sezione pronta per i contenuti della stagione 2026/2027.</p></div>
+      <div class="staff-section-head">
+        <p class="section-kicker yellow">SOCIETÀ</p>
+        <h2>Direttivo</h2>
+      </div>
+      <div class="staff-grid">
+        <article class="staff-card"><span>Presidente</span><h3>Mons. Alessandro Lo Nardo</h3><p>Presidente</p></article>
+        <article class="staff-card"><span>Vicepresidente</span><h3>Simone Scibilia</h3><p>Vicepresidente</p></article>
+        <article class="staff-card"><span>Segreteria</span><h3>Aldo Ciuna</h3><p>Segretario</p></article>
+        <article class="staff-card"><span>Tesoreria</span><h3>Maria Ialacqua</h3><p>Tesoriera</p></article>
+        <article class="staff-card"><span>Consigliere</span><h3>Luca Scibilia</h3><p>Consigliere e dirigente delegato calcio a 5</p></article>
+        <article class="staff-card"><span>Consigliere</span><h3>Carmelo Floridia</h3><p>Consigliere e dirigente pallavolo</p></article>
+        <article class="staff-card"><span>Consigliere</span><h3>Adriano Piccione</h3><p>Consigliere e dirigente delegato basket</p></article>
+        <article class="staff-card"><span>Consigliere</span><h3>Domenico Cannuli</h3><p>Consigliere</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="staff-section">
+    <div class="container">
+      <div class="staff-section-head">
+        <p class="section-kicker yellow">AMMINISTRAZIONE</p>
+        <h2>Ufficio economico-amministrativo</h2>
+      </div>
+      <div class="staff-grid">
+        <article class="staff-card"><span>Ufficio economico-amministrativo</span><h3>Andrea Scibilia</h3><p>Ufficio economico-amministrativo</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="staff-section">
+    <div class="container">
+      <div class="staff-section-head">
+        <p class="section-kicker yellow">AREA SPORTIVA E COMUNICAZIONE</p>
+        <h2>Dirigenti e Staff</h2>
+      </div>
+      <div class="staff-grid">
+        <article class="staff-card"><span>Comunicazione</span><h3>Alessandro Scibilia</h3><p>Social Media Manager</p></article>
+        <article class="staff-card"><span>Calcio a 5</span><h3>Andrea Giacobbo</h3><p>Allenatore calcio a 5</p></article>
+        <article class="staff-card"><span>Calcio a 5</span><h3>Antonio Romeo</h3><p>Vice allenatore calcio a 5</p></article>
+        <article class="staff-card"><span>Calcio a 5</span><h3>Antonio Vitale</h3><p>Dirigente calcio a 5</p></article>
+        <article class="staff-card"><span>Calcio a 5</span><h3>Giuseppe Arcoraci</h3><p>Dirigente calcio a 5</p></article>
+        <article class="staff-card"><span>Pallavolo</span><h3>Gabriele Marchetta</h3><p>Allenatore pallavolo</p></article>
+        <article class="staff-card"><span>Pallavolo</span><h3>Dario Alberti</h3><p>Allievo allenatore pallavolo</p></article>
+        <article class="staff-card"><span>Pallavolo</span><h3>Giuseppe Cangemi</h3><p>Dirigente pallavolo</p></article>
+        <article class="staff-card"><span>Pallavolo</span><h3>Andrea Sapienza</h3><p>Dirigente pallavolo</p></article>
+        <article class="staff-card"><span>Basket</span><h3>Antonio Barbera</h3><p>Allenatore basket</p></article>
+        <article class="staff-card"><span>Basket</span><h3>Giuliano Anastasi</h3><p>Assistente allenatore basket</p></article>
+      </div>
     </div>
   </section>
 </main>
+
 <footer class="footer">
-<div class="container"><img class="footer-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"></div><div class="container footer-wrap"><p>© 2026 ASD SGM Spadafora Sport</p><p>Stagione sportiva 2026/2027 · 🖤💛</p></div><div style="text-align:center;background:#080808;padding:0 0 18px"><a href="admin.html" style="font-size:9px;color:#555">Area amministratore</a></div></footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
-<script src="supabase-data.js"></script>
-<script src="site-data.js"></script>
+  <div class="container"><img class="footer-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"></div>
+  <div class="container footer-wrap"><p>© 2026 ASD SGM Spadafora Sport</p><p>Stagione sportiva 2026/2027 · 🖤💛</p></div>
+  <div style="text-align:center;background:#080808;padding:0 0 18px"><a href="admin.html" style="font-size:9px;color:#555">Area amministratore</a></div>
+</footer>
+
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const toggle = document.querySelector(".menu-toggle");
-  const menu = document.querySelector(".main-nav");
-  if (!toggle || !menu) return;
-  const closeMenu = () => {
-    menu.classList.remove("menu-open");
-    toggle.setAttribute("aria-expanded", "false");
-  };
-  toggle.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    const open = menu.classList.toggle("menu-open");
-    toggle.setAttribute("aria-expanded", open ? "true" : "false");
-  });
-  menu.querySelectorAll("a").forEach(link => link.addEventListener("click", closeMenu));
-  document.addEventListener("click", (event) => {
-    if (!menu.contains(event.target) && !toggle.contains(event.target)) closeMenu();
-  });
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 768) closeMenu();
-  });
+document.addEventListener('DOMContentLoaded',()=>{
+  const toggle=document.querySelector('.menu-toggle');
+  const menu=document.querySelector('.main-nav');
+  if(!toggle||!menu)return;
+  const closeMenu=()=>{menu.classList.remove('menu-open');toggle.setAttribute('aria-expanded','false')};
+  toggle.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();const open=menu.classList.toggle('menu-open');toggle.setAttribute('aria-expanded',open?'true':'false')});
+  menu.querySelectorAll('a').forEach(link=>link.addEventListener('click',closeMenu));
+  document.addEventListener('click',event=>{if(!menu.contains(event.target)&&!toggle.contains(event.target))closeMenu()});
+  window.addEventListener('resize',()=>{if(window.innerWidth>768)closeMenu()});
 });
 </script>
 </body>

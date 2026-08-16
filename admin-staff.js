@@ -1,0 +1,34 @@
+(function(){
+const defaults=[
+{section:'Direttivo',label:'presidente',name:'Mons. Alessandro Lo Nardo',role:'Presidente',photo:''},
+{section:'Direttivo',label:'vicepresidente',name:'Simone Scibilia',role:'Vicepresidente',photo:''},
+{section:'Direttivo',label:'segretario',name:'Aldo Ciuna',role:'Segretario',photo:''},
+{section:'Direttivo',label:'tesoriere',name:'Maria Ialacqua',role:'Tesoriere',photo:''},
+{section:'Direttivo',label:'consigliere',name:'Luca Scibilia',role:'Consigliere e dirigente delegato calcio a 5',photo:''},
+{section:'Direttivo',label:'consigliere',name:'Carmelo Floridia',role:'Consigliere e dirigente delegato pallavolo',photo:''},
+{section:'Direttivo',label:'consigliere',name:'Adriano Piccione',role:'Consigliere e dirigente delegato basket',photo:''},
+{section:'Direttivo',label:'consigliere',name:'Domenico Cannuli',role:'Consigliere',photo:''},
+{section:'Ufficio economico-amministrativo',label:'amministrazione',name:'Andrea Scibilia',role:'Ufficio economico-amministrativo',photo:''},
+{section:'Social Media Manager',label:'comunicazione',name:'Alessandro Scibilia',role:'Social Media Manager',photo:''},
+{section:'Calcio a 5',label:'calcio a 5',name:'Andrea Giacobbo',role:'Allenatore calcio a 5',photo:''},
+{section:'Calcio a 5',label:'calcio a 5',name:'Antonio Romeo',role:'Allenatore dei portieri calcio a 5',photo:''},
+{section:'Calcio a 5',label:'calcio a 5',name:'Antonio Vitale',role:'Dirigente calcio a 5',photo:''},
+{section:'Calcio a 5',label:'calcio a 5',name:'Pippo Arcoraci',role:'Dirigente calcio a 5',photo:''},
+{section:'Pallavolo',label:'pallavolo',name:'Gabriele Marchetta',role:'Allenatore pallavolo maschile',photo:''},
+{section:'Pallavolo',label:'pallavolo',name:'Giuseppe Cangemi',role:'Dirigente pallavolo maschile',photo:''},
+{section:'Pallavolo',label:'pallavolo',name:'Andrea Sapienza',role:'Dirigente pallavolo maschile',photo:''},
+{section:'Pallavolo',label:'pallavolo',name:'Dario Alberti',role:'Allievo allenatore pallavolo',photo:''},
+{section:'Basket',label:'basket',name:'Antonio Barbera',role:'Allenatore basket',photo:''},
+{section:'Basket',label:'basket',name:'Giuliano Anastasi',role:'Assistente allenatore basket',photo:''}
+];
+function wait(){if(typeof openPanel!=='function'||typeof openModal!=='function'||!document.querySelector('.admin-nav'))return setTimeout(wait,50);install();waitData();}
+function ensure(){if(!Array.isArray(data.general_staff)||!data.general_staff.length){data.general_staff=defaults.map(x=>({...x}));const old=data.generalStaffPhotos||{};data.general_staff.forEach(p=>{const k=slug(p.name);if(old[k])p.photo=old[k];});}}
+function slug(n){return String(n||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
+function install(){if(document.getElementById('generalStaffAdmin'))return;const nav=document.querySelector('.admin-nav');const before=nav.querySelector('[data-panel="standings"]');const b=document.createElement('button');b.className='nav-btn';b.dataset.panel='generalStaffAdmin';b.textContent='👔 Staff societario';b.onclick=()=>openPanel('generalStaffAdmin');nav.insertBefore(b,before);
+const main=document.querySelector('.admin-layout main'),sticky=main.querySelector('.sticky-save');const sec=document.createElement('section');sec.className='admin-panel';sec.id='generalStaffAdmin';sec.innerHTML='<div class="panel-head"><div><h2>Staff societario</h2><p>Gestisci Direttivo, amministrazione, comunicazione e area sportiva.</p></div><button class="btn btn-primary" id="addGeneralStaff">+ Aggiungi componente</button></div><div id="generalStaffList" class="item-list"></div>';main.insertBefore(sec,sticky);document.getElementById('addGeneralStaff').onclick=()=>edit();
+const dash=document.querySelector('#dashboard .item-list');if(dash){dash.insertAdjacentHTML('beforeend','<div class="item-card"><div><h3>👔 Staff societario</h3><p>Gestisci Direttivo, amministrazione, comunicazione, dirigenti e allenatori.</p></div><button class="btn btn-dark btn-small" id="jumpGeneralStaff">Apri</button></div>');document.getElementById('jumpGeneralStaff').onclick=()=>openPanel('generalStaffAdmin');}}
+function waitData(){if(typeof data==='undefined'||!data)return setTimeout(waitData,100);ensure();render();}
+function render(){ensure();const list=document.getElementById('generalStaffList');if(!list)return;list.innerHTML=data.general_staff.map((p,i)=>'<div class="item-card"><div><h3>'+esc(p.name)+'</h3><p>'+esc(p.section)+' · '+esc(p.role)+(p.photo?'<br>✓ Foto inserita':'<br>Foto non inserita')+'</p></div><div class="item-actions"><button class="btn btn-dark btn-small edit-gstaff" data-i="'+i+'">Modifica</button><button class="btn btn-danger btn-small del-gstaff" data-i="'+i+'">Elimina</button></div></div>').join('');list.querySelectorAll('.edit-gstaff').forEach(x=>x.onclick=()=>edit(+x.dataset.i));list.querySelectorAll('.del-gstaff').forEach(x=>x.onclick=()=>{data.general_staff.splice(+x.dataset.i,1);render();status('Modifica pronta. Premi “Salva online” per pubblicarla.');});}
+function edit(i=null){ensure();const p=i===null?{section:'Direttivo',label:'',name:'',role:'',photo:''}:data.general_staff[i];openModal(i===null?'Aggiungi componente staff':'Modifica componente staff','<div class="fields"><div class="field"><label>Sezione</label><select id="gsSection">'+['Direttivo','Ufficio economico-amministrativo','Social Media Manager','Calcio a 5','Pallavolo','Basket'].map(s=>'<option '+(s===p.section?'selected':'')+'>'+s+'</option>').join('')+'</select></div><div class="field"><label>Etichetta</label><input id="gsLabel" value="'+esc(p.label||'')+'" placeholder="es. consigliere"></div><div class="field full"><label>Nome e cognome</label><input id="gsName" value="'+esc(p.name||'')+'"></div><div class="field full"><label>Ruolo</label><input id="gsRole" value="'+esc(p.role||'')+'"></div><div class="field full"><label>Foto</label><input id="gsPhoto" value="'+esc(p.photo||'')+'" placeholder="URL immagine"><input id="gsPhotoFile" type="file" accept="image/jpeg,image/png,image/webp"><small>Carica o sostituisci la fotografia.</small></div></div>',async()=>{const obj={section:document.getElementById('gsSection').value,label:document.getElementById('gsLabel').value.trim(),name:document.getElementById('gsName').value.trim(),role:document.getElementById('gsRole').value.trim(),photo:document.getElementById('gsPhoto').value.trim()};const file=document.getElementById('gsPhotoFile').files[0];try{if(file)obj.photo=await window.SGM_DB.uploadImage(file,'staff');if(i===null)data.general_staff.push(obj);else data.general_staff[i]=obj;render();status('Modifica pronta. Premi “Salva online” per pubblicarla.');}catch(e){alert('Errore caricamento foto: '+e.message);}});}
+window.SGM_GENERAL_STAFF_RENDER=render;window.SGM_GENERAL_STAFF_ENSURE=ensure;wait();
+})();

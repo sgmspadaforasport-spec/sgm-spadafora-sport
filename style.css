@@ -34,6 +34,7 @@ button,input,textarea,select{font:inherit}
 .brand-text span{display:block;margin-top:5px;color:var(--yellow);font-size:12px;font-weight:700}
 .main-nav{display:flex;align-items:center;justify-content:flex-end;gap:4px;flex-wrap:wrap}
 .main-nav a{color:#fff;padding:9px 10px;border-radius:8px;font-size:13px;font-weight:800}
+.main-nav a[href="rose.html"]{display:none!important}
 .main-nav a:hover,.main-nav a:focus-visible{background:var(--yellow);color:#000}
 .menu-toggle{display:none;border:0}
 
@@ -152,7 +153,6 @@ button,input,textarea,select{font:inherit}
   .main-nav{display:none;position:absolute;top:100%;left:0;right:0;width:100%;padding:10px 14px 14px;background:#080808;border-top:1px solid #222;border-bottom:4px solid var(--yellow);z-index:9999}
   .main-nav.menu-open{display:flex;flex-direction:column;align-items:stretch;gap:5px}
   .main-nav a{width:100%;padding:12px;background:#151515;border:1px solid #252525;text-align:left;font-size:14px}
-  .main-nav a[href="rose.html"]{display:none!important}
 
   .home-hero{padding:30px 0 40px}
   .home-hero-logo{width:120px;max-height:120px}

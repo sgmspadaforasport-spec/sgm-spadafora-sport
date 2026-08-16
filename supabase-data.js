@@ -118,14 +118,29 @@
     }
   };
 
+  function installAboutMenuLink(){
+    const menu=document.querySelector('.main-nav');
+    if(!menu || menu.querySelector('a[href="chi-siamo.html"]')) return;
+    const link=document.createElement('a');
+    link.href='chi-siamo.html';
+    link.textContent='Chi siamo';
+    const teams=menu.querySelector('a[href="squadre.html"]');
+    if(teams && teams.nextSibling) menu.insertBefore(link,teams.nextSibling);
+    else if(teams) menu.appendChild(link);
+    else menu.insertBefore(link,menu.firstChild);
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',installAboutMenuLink);
+  else installAboutMenuLink();
+
   const page=(location.pathname.split('/').pop()||'').toLowerCase();
   const extras=[];
-  if(page==='admin.html') extras.push('admin-content.js','admin-staff.js');
+  if(page==='admin.html') extras.push('admin-content.js','admin-staff.js','admin-about.js');
   if(['news.html','sponsor.html','galleria.html'].includes(page)) extras.push('content-pages.js');
   if(page==='staff.html') extras.push('staff-dynamic.js');
-  extras.forEach((src,i)=>{
+  extras.forEach((src)=>{
     const script=document.createElement('script');
-    script.src=src+'?v=2';
+    script.src=src+'?v=3';
     script.defer=true;
     document.head.appendChild(script);
   });

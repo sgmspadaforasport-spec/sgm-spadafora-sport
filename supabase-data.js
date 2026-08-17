@@ -96,7 +96,7 @@
   if(page==='' || page==='index.html') extras.push('home-news.js');
   extras.forEach((src)=>{
     const script=document.createElement('script');
-    script.src=src+'?v=8';
+    script.src=src+'?v=9';
     script.defer=true;
     document.head.appendChild(script);
   });

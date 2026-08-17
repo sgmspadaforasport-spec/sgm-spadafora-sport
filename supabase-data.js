@@ -92,12 +92,13 @@
   const extras=[];
   if(page==='admin.html') extras.push('admin-content.js','admin-staff.js','admin-about.js','admin-youth-staff.js','admin-comunicati.js');
   if(['news.html','sponsor.html','galleria.html'].includes(page)) extras.push('content-pages.js');
+  if(['news.html','sponsor.html','galleria.html','sgm-tv.html','calendario-risultati.html','squadre.html'].includes(page)) extras.push('premium-sections.js');
   if(page==='staff.html') extras.push('staff-dynamic.js');
   if(page==='' || page==='index.html') extras.push('home-news.js');
   extras.forEach((src)=>{
     const script=document.createElement('script');
-    script.src=src+'?v=12';
-    script.defer=true;
+    script.src=src+'?v=13';
+    script.async=false;
     document.head.appendChild(script);
   });
 })();

@@ -40,10 +40,16 @@
 <script src="supabase-data.js?v=5"></script>
 <script>
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+function seasonValue(season){
+  const years=String(season||'').match(/\d{4}/g);
+  if(!years||!years.length) return 0;
+  return Math.max(...years.map(Number));
+}
 function renderPalmares(arr){
   const grid=document.getElementById('palmaresGrid');
   if(!Array.isArray(arr)||!arr.length){grid.innerHTML='<div class="pal-empty">Nessun traguardo ancora pubblicato.</div>';return;}
-  grid.innerHTML=arr.map(x=>{
+  const ordered=[...arr].sort((a,b)=>seasonValue(b.season)-seasonValue(a.season));
+  grid.innerHTML=ordered.map(x=>{
     const imgs=[];
     if(x.trophy_image) imgs.push(`<div class="pal-image"><img src="${esc(x.trophy_image)}" alt="Trofeo - ${esc(x.title||'Palmarès')}"><span>Trofeo</span></div>`);
     if(x.promotion_image) imgs.push(`<div class="pal-image"><img src="${esc(x.promotion_image)}" alt="Promozione - ${esc(x.title||'Palmarès')}"><span>Promozione</span></div>`);

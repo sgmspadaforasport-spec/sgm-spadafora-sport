@@ -63,25 +63,23 @@
     if(!menu) return;
 
     let about=menu.querySelector('a[href="chi-siamo.html"]');
-    if(!about){
-      about=document.createElement('a');
-      about.href='chi-siamo.html';
-      about.textContent='Chi siamo';
-    }
+    if(!about){about=document.createElement('a');about.href='chi-siamo.html';about.textContent='Chi siamo';}
 
     let staff=menu.querySelector('a[href="staff.html"]');
-    if(!staff){
-      staff=document.createElement('a');
-      staff.href='staff.html';
-      staff.textContent='Staff';
-    }
+    if(!staff){staff=document.createElement('a');staff.href='staff.html';staff.textContent='Staff';}
+
+    let comunicati=menu.querySelector('a[href="comunicati-ufficiali.html"]');
+    if(!comunicati){comunicati=document.createElement('a');comunicati.href='comunicati-ufficiali.html';comunicati.textContent='Comunicati ufficiali';}
 
     const contacts=menu.querySelector('a[href="contatti.html"]');
 
     if(contacts){
-      menu.insertBefore(staff, contacts);
-      menu.insertBefore(about, contacts);
+      menu.insertBefore(comunicati,contacts);
+      menu.insertBefore(staff,contacts);
+      menu.insertBefore(about,contacts);
+      menu.insertBefore(comunicati,staff);
     }else{
+      menu.appendChild(comunicati);
       menu.appendChild(staff);
       menu.appendChild(about);
     }
@@ -92,13 +90,13 @@
 
   const page=(location.pathname.split('/').pop()||'').toLowerCase();
   const extras=[];
-  if(page==='admin.html') extras.push('admin-content.js','admin-staff.js','admin-about.js','admin-youth-staff.js');
+  if(page==='admin.html') extras.push('admin-content.js','admin-staff.js','admin-about.js','admin-youth-staff.js','admin-comunicati.js');
   if(['news.html','sponsor.html','galleria.html'].includes(page)) extras.push('content-pages.js');
   if(page==='staff.html') extras.push('staff-dynamic.js');
   if(page==='' || page==='index.html') extras.push('home-news.js');
   extras.forEach((src)=>{
     const script=document.createElement('script');
-    script.src=src+'?v=7';
+    script.src=src+'?v=8';
     script.defer=true;
     document.head.appendChild(script);
   });

@@ -75,9 +75,10 @@
   if(page==='admin.html') extras.push('admin-content.js','admin-staff.js','admin-about.js');
   if(['news.html','sponsor.html','galleria.html'].includes(page)) extras.push('content-pages.js');
   if(page==='staff.html') extras.push('staff-dynamic.js');
+  if(page==='' || page==='index.html') extras.push('home-news.js');
   extras.forEach((src)=>{
     const script=document.createElement('script');
-    script.src=src+'?v=4';
+    script.src=src+'?v=5';
     script.defer=true;
     document.head.appendChild(script);
   });

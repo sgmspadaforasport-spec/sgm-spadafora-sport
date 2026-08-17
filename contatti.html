@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Informazioni e recapiti della società.">
   <title>Contatti | ASD SGM Spadafora Sport</title>
-  <link rel="stylesheet" href="style.css?v=122">
+  <link rel="stylesheet" href="style.css?v=123">
   <style>
     .contacts-hero{padding:72px 0 54px;background:#111;color:#fff;border-bottom:4px solid var(--yellow)}
     .contacts-hero h1{margin:0;font-size:clamp(46px,8vw,84px);line-height:.92;font-weight:900}
@@ -34,39 +34,42 @@
 <footer class="footer"><div class="container"><img class="footer-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"></div><div class="container footer-wrap"><p>© 2026 ASD SGM Spadafora Sport</p><p>Stagione sportiva 2026/2027 · 🖤💛</p></div><div style="text-align:center;background:#080808;padding:0 0 18px"><a href="admin.html" style="font-size:9px;color:#555">Area amministratore</a></div></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="supabase-data.js?v=6"></script>
+<script src="supabase-data.js?v=7"></script>
+<script src="site-data.js?v=7"></script>
 <script>
-const esc=s=>String(s??'').replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]||c));
-function safeUrl(u){return /^https?:\/\//i.test(String(u||''))?String(u):'#';}
-function renderContacts(c){
+function esc(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
+function safeUrl(value){const u=String(value||'').trim();return /^https?:\/\//i.test(u)?u:'#';}
+function getContacts(data){return (data&&data.contacts)||(data&&data.contatti)||(data&&data.contact)||{};}
+function renderContactsFromData(data){
+  const c=getContacts(data);
   const grid=document.getElementById('contactsGrid');
-  c=c||{};
-  const hasAny=c.address||c.email||c.pec||c.facebook||c.instagram||c.tiktok||c.twitch;
+  if(!grid)return;
+  const hasAny=Boolean(c.address||c.email||c.pec||c.facebook||c.instagram||c.tiktok||c.twitch);
   if(!hasAny){grid.innerHTML='<div class="contacts-empty">Nessun contatto ancora pubblicato.</div>';return;}
-  const left=`<article class="contact-card"><h2>Recapiti</h2>
+  const recapiti=`<article class="contact-card"><h2>Recapiti</h2>
     ${c.address?`<div class="contact-row"><span class="contact-label">Sede legale</span><div class="contact-value">${esc(c.address)}</div></div>`:''}
     ${c.email?`<div class="contact-row"><span class="contact-label">Email</span><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></div>`:''}
     ${c.pec?`<div class="contact-row"><span class="contact-label">PEC</span><a href="mailto:${esc(c.pec)}">${esc(c.pec)}</a></div>`:''}
   </article>`;
-  const socials=[['Facebook',c.facebook],['Instagram',c.instagram],['TikTok',c.tiktok],['Twitch',c.twitch]].filter(x=>x[1]);
-  const right=`<article class="contact-card"><h2>Social</h2>${socials.length?`<div class="social-grid">${socials.map(([n,u])=>`<a href="${esc(safeUrl(u))}" target="_blank" rel="noopener noreferrer">${esc(n)}</a>`).join('')}</div>`:'<p>Nessun canale social inserito.</p>'}</article>`;
-  grid.innerHTML=left+right;
+  const socials=[['Facebook',c.facebook],['Instagram',c.instagram],['TikTok',c.tiktok],['Twitch',c.twitch]].filter(item=>item[1]);
+  const social=`<article class="contact-card"><h2>Social</h2>${socials.length?`<div class="social-grid">${socials.map(([name,url])=>`<a href="${esc(safeUrl(url))}" target="_blank" rel="noopener noreferrer">${esc(name)}</a>`).join('')}</div>`:'<p>Nessun canale social inserito.</p>'}</article>`;
+  grid.innerHTML=recapiti+social;
 }
-async function loadContacts(){
+async function fallbackLoadContacts(){
   try{
-    await window.SGM_DB.init();
-    if(!window.SGM_DB.enabled) throw new Error('Supabase non disponibile');
+    if(window.SGM_SITE_DATA){renderContactsFromData(window.SGM_SITE_DATA);return;}
+    if(!window.SGM_DB)return;
+    const ready=await window.SGM_DB.init();
+    if(!ready)return;
     const data=await window.SGM_DB.getSiteData();
-    renderContacts(data.contacts||{});
-  }catch(e){
-    console.warn(e);
-    document.getElementById('contactsGrid').innerHTML='<div class="contacts-empty">Impossibile caricare i contatti in questo momento.</div>';
-  }
+    renderContactsFromData(data||{});
+  }catch(e){console.warn('Errore caricamento contatti',e);}
 }
+document.addEventListener('sgm-data-ready',event=>renderContactsFromData(event.detail||{}));
 document.addEventListener('DOMContentLoaded',()=>{
   const toggle=document.querySelector('.menu-toggle'),menu=document.querySelector('.main-nav');
   if(toggle&&menu){const close=()=>{menu.classList.remove('menu-open');toggle.setAttribute('aria-expanded','false')};toggle.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const open=menu.classList.toggle('menu-open');toggle.setAttribute('aria-expanded',open?'true':'false')});menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));document.addEventListener('click',e=>{if(!menu.contains(e.target)&&!toggle.contains(e.target))close()});window.addEventListener('resize',()=>{if(window.innerWidth>768)close()});}
-  loadContacts();
+  setTimeout(fallbackLoadContacts,250);
 });
 </script>
 </body>

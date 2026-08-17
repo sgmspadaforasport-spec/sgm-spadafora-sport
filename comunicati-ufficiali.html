@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Comunicati ufficiali ASD SGM Spadafora Sport"><title>Comunicati ufficiali | ASD SGM Spadafora Sport</title>
+<link rel="stylesheet" href="style.css?v=124">
+<style>
+.com-hero{padding:72px 0 54px;background:#111;color:#fff;border-bottom:4px solid var(--yellow)}
+.com-hero h1{margin:0;font-size:clamp(42px,7vw,80px);line-height:.94;font-weight:900}
+.com-hero p:last-child{max-width:760px;color:#c7c7c7;font-size:17px;margin-top:16px}
+.com-section{padding:58px 0;background:#f5f5f5}
+.com-list{display:grid;gap:26px}
+.com-card{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);background:#fff;border:1px solid #e0e0e0;border-radius:18px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.06)}
+.com-card.no-image{grid-template-columns:1fr}
+.com-body{padding:30px}
+.com-kicker{display:inline-block;background:var(--yellow);color:#000;font-size:10px;font-weight:900;letter-spacing:.7px;text-transform:uppercase;padding:7px 10px;border-radius:999px;margin-bottom:14px}
+.com-body h2{margin:0 0 16px;font-size:clamp(25px,3vw,36px);line-height:1.05}
+.com-body p{margin:0;color:#555;font-size:16px;line-height:1.7;white-space:pre-line}
+.com-image{min-height:330px;background:#111;overflow:hidden}.com-image img{width:100%;height:100%;object-fit:cover;display:block}
+.com-empty{padding:46px;border:1px dashed #bbb;border-radius:16px;text-align:center;background:#fff;color:#777}
+@media(max-width:820px){.com-card{grid-template-columns:1fr}.com-image{min-height:260px;order:-1}}
+@media(max-width:560px){.com-body{padding:22px}.com-image{min-height:220px}}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html"><img class="brand-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"><div class="brand-text"><strong>ASD SGM</strong><span>Spadafora Sport</span></div></a><button class="menu-toggle" aria-label="Apri menu" aria-expanded="false"><span></span><span></span><span></span></button><nav class="main-nav"><a href="index.html">Home</a><a href="squadre.html">Squadre</a><a href="calendario-risultati.html">Calendario</a><a href="news.html">News</a><a href="sponsor.html">Sponsor</a><a href="galleria.html">Galleria</a><a href="sgm-tv.html">SGM TV</a><a href="palmares.html">Palmarès</a><a href="comunicati-ufficiali.html">Comunicati ufficiali</a><a href="staff.html">Staff</a><a href="chi-siamo.html">Chi siamo</a><a href="contatti.html">Contatti</a></nav></div></header>
+<main>
+<section class="com-hero"><div class="container"><p class="section-kicker yellow">ASD SGM SPADAFORA SPORT</p><h1>COMUNICATI UFFICIALI</h1><p>Le comunicazioni ufficiali della società.</p></div></section>
+<section class="com-section"><div class="container"><div id="comunicatiList" class="com-list"><div class="com-empty">Caricamento comunicati...</div></div></div></section>
+</main>
+<footer class="footer"><div class="container"><img class="footer-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"></div><div class="container footer-wrap"><p>© 2026 ASD SGM Spadafora Sport</p><p>Stagione sportiva 2026/2027 · 🖤💛</p></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="supabase-data.js?v=8"></script>
+<script>
+const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+function renderComunicati(arr){
+ const list=document.getElementById('comunicatiList');
+ if(!Array.isArray(arr)||!arr.length){list.innerHTML='<div class="com-empty">Nessun comunicato ufficiale ancora pubblicato.</div>';return;}
+ list.innerHTML=arr.map(c=>`<article class="com-card ${c.image?'':'no-image'}"><div class="com-body"><span class="com-kicker">Comunicato ufficiale</span><h2>${esc(c.title||'Comunicato ufficiale')}</h2><p>${esc(c.text||'')}</p></div>${c.image?`<div class="com-image"><img src="${esc(c.image)}" alt="${esc(c.title||'Comunicato ufficiale')}"></div>`:''}</article>`).join('');
+}
+async function loadComunicati(){try{await window.SGM_DB.init();if(!window.SGM_DB.enabled)throw new Error('Supabase non disponibile');const data=await window.SGM_DB.getSiteData();renderComunicati(data.comunicati_ufficiali||[]);}catch(e){console.warn(e);document.getElementById('comunicatiList').innerHTML='<div class="com-empty">Impossibile caricare i comunicati in questo momento.</div>';}}
+document.addEventListener('DOMContentLoaded',()=>{const toggle=document.querySelector('.menu-toggle'),menu=document.querySelector('.main-nav');if(toggle&&menu){const close=()=>{menu.classList.remove('menu-open');toggle.setAttribute('aria-expanded','false')};toggle.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const open=menu.classList.toggle('menu-open');toggle.setAttribute('aria-expanded',open?'true':'false')});menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));document.addEventListener('click',e=>{if(!menu.contains(e.target)&&!toggle.contains(e.target))close()});window.addEventListener('resize',()=>{if(window.innerWidth>768)close()});}loadComunicati();});
+</script>
+</body></html>

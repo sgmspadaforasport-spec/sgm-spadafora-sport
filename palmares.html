@@ -3,56 +3,68 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="I traguardi sportivi dell&#x27;ASD SGM Spadafora Sport.">
+  <meta name="description" content="I traguardi sportivi dell'ASD SGM Spadafora Sport.">
   <title>Palmarès | ASD SGM Spadafora Sport</title>
-  <link rel="stylesheet" href="style.css?v=100">
+  <link rel="stylesheet" href="style.css?v=121">
+  <style>
+    .pal-hero{padding:72px 0 54px;background:#111;color:#fff;border-bottom:4px solid var(--yellow)}
+    .pal-hero h1{margin:0;font-size:clamp(46px,8vw,84px);line-height:.92;font-weight:900}
+    .pal-hero p:last-child{max-width:760px;color:#c7c7c7;font-size:17px;margin-top:16px}
+    .pal-section{padding:58px 0;background:#f5f5f5}
+    .pal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+    .pal-card{background:#fff;border:1px solid #e2e2e2;border-radius:18px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.07)}
+    .pal-card-head{background:#111;color:#fff;padding:24px;border-bottom:4px solid var(--yellow)}
+    .pal-season{display:inline-block;color:#000;background:var(--yellow);font-size:11px;font-weight:900;padding:7px 10px;border-radius:999px;margin-bottom:12px}
+    .pal-card h2{margin:0;font-size:28px;line-height:1.05}
+    .pal-sport{margin:8px 0 0;color:#bdbdbd;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px}
+    .pal-card-body{padding:24px}
+    .pal-desc{margin:0;color:#555;font-size:16px;white-space:pre-line}
+    .pal-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}
+    .pal-image{border-radius:12px;overflow:hidden;background:#ececec;aspect-ratio:4/3;position:relative}
+    .pal-image img{width:100%;height:100%;object-fit:cover;display:block}
+    .pal-image span{position:absolute;left:10px;bottom:10px;background:rgba(0,0,0,.72);color:#fff;padding:5px 8px;border-radius:7px;font-size:9px;font-weight:900;text-transform:uppercase}
+    .pal-empty{padding:42px;border:1px dashed #bbb;border-radius:16px;text-align:center;background:#fff;color:#777}
+    @media(max-width:800px){.pal-grid{grid-template-columns:1fr}}
+    @media(max-width:560px){.pal-card-head,.pal-card-body{padding:20px}.pal-images{grid-template-columns:1fr}.pal-card h2{font-size:24px}}
+  </style>
 </head>
 <body>
-<header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html"><img class="brand-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"><div class="brand-text"><strong>ASD SGM</strong><span>Spadafora Sport</span></div></a><button class="menu-toggle" aria-label="Apri menu" aria-expanded="false"><span></span><span></span><span></span></button><nav class="main-nav"><a href="index.html">Home</a><a href="squadre.html">Squadre</a><a href="rose.html">Rose</a><a href="staff.html">Staff</a><a href="calendario-risultati.html">Calendario</a><a href="news.html">News</a><a href="sponsor.html">Sponsor</a><a href="galleria.html">Galleria</a><a href="sgm-tv.html">SGM TV</a>
-<a href="palmares.html">Palmarès</a>
-<a href="contatti.html">Contatti</a></nav></div></header>
+<header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html"><img class="brand-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"><div class="brand-text"><strong>ASD SGM</strong><span>Spadafora Sport</span></div></a><button class="menu-toggle" aria-label="Apri menu" aria-expanded="false"><span></span><span></span><span></span></button><nav class="main-nav"><a href="index.html">Home</a><a href="squadre.html">Squadre</a><a href="rose.html">Rose</a><a href="staff.html">Staff</a><a href="calendario-risultati.html">Calendario</a><a href="news.html">News</a><a href="sponsor.html">Sponsor</a><a href="galleria.html">Galleria</a><a href="sgm-tv.html">SGM TV</a><a href="palmares.html">Palmarès</a><a href="contatti.html">Contatti</a></nav></div></header>
 <main>
-  <section class="home-manifesto">
-    <div class="container" style="padding-top:70px;padding-bottom:70px">
-      <p class="section-kicker yellow">ASD SGM SPADAFORA SPORT</p>
-      <h1>PALMARÈS</h1>
-      <p>I traguardi sportivi dell&#x27;ASD SGM Spadafora Sport.</p>
-    </div>
-  </section>
-  <section class="section">
-    <div class="container">
-      <div class="home-feature-news-body"><p>Sezione pronta per i contenuti della stagione 2026/2027.</p></div>
-    </div>
-  </section>
+  <section class="pal-hero"><div class="container"><p class="section-kicker yellow">ASD SGM SPADAFORA SPORT</p><h1>PALMARÈS</h1><p>I traguardi, le promozioni e i successi sportivi della nostra società.</p></div></section>
+  <section class="pal-section"><div class="container"><div id="palmaresGrid" class="pal-grid"><div class="pal-empty">Caricamento Palmarès...</div></div></div></section>
 </main>
-<footer class="footer">
-<div class="container"><img class="footer-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"></div><div class="container footer-wrap"><p>© 2026 ASD SGM Spadafora Sport</p><p>Stagione sportiva 2026/2027 · 🖤💛</p></div><div style="text-align:center;background:#080808;padding:0 0 18px"><a href="admin.html" style="font-size:9px;color:#555">Area amministratore</a></div></footer>
+<footer class="footer"><div class="container"><img class="footer-logo" src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"></div><div class="container footer-wrap"><p>© 2026 ASD SGM Spadafora Sport</p><p>Stagione sportiva 2026/2027 · 🖤💛</p></div><div style="text-align:center;background:#080808;padding:0 0 18px"><a href="admin.html" style="font-size:9px;color:#555">Area amministratore</a></div></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="supabase-data.js"></script>
-<script src="site-data.js"></script>
+<script src="supabase-data.js?v=5"></script>
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const toggle = document.querySelector(".menu-toggle");
-  const menu = document.querySelector(".main-nav");
-  if (!toggle || !menu) return;
-  const closeMenu = () => {
-    menu.classList.remove("menu-open");
-    toggle.setAttribute("aria-expanded", "false");
-  };
-  toggle.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    const open = menu.classList.toggle("menu-open");
-    toggle.setAttribute("aria-expanded", open ? "true" : "false");
-  });
-  menu.querySelectorAll("a").forEach(link => link.addEventListener("click", closeMenu));
-  document.addEventListener("click", (event) => {
-    if (!menu.contains(event.target) && !toggle.contains(event.target)) closeMenu();
-  });
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 768) closeMenu();
-  });
+const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+function renderPalmares(arr){
+  const grid=document.getElementById('palmaresGrid');
+  if(!Array.isArray(arr)||!arr.length){grid.innerHTML='<div class="pal-empty">Nessun traguardo ancora pubblicato.</div>';return;}
+  grid.innerHTML=arr.map(x=>{
+    const imgs=[];
+    if(x.trophy_image) imgs.push(`<div class="pal-image"><img src="${esc(x.trophy_image)}" alt="Trofeo - ${esc(x.title||'Palmarès')}"><span>Trofeo</span></div>`);
+    if(x.promotion_image) imgs.push(`<div class="pal-image"><img src="${esc(x.promotion_image)}" alt="Promozione - ${esc(x.title||'Palmarès')}"><span>Promozione</span></div>`);
+    return `<article class="pal-card"><div class="pal-card-head">${x.season?`<span class="pal-season">${esc(x.season)}</span>`:''}<h2>${esc(x.title||'Traguardo')}</h2>${x.sport?`<p class="pal-sport">${esc(x.sport)}</p>`:''}</div><div class="pal-card-body">${x.description?`<p class="pal-desc">${esc(x.description)}</p>`:''}${imgs.length?`<div class="pal-images">${imgs.join('')}</div>`:''}</div></article>`;
+  }).join('');
+}
+async function loadPalmares(){
+  try{
+    await window.SGM_DB.init();
+    if(!window.SGM_DB.enabled) throw new Error('Supabase non disponibile');
+    const data=await window.SGM_DB.getSiteData();
+    renderPalmares(data.palmares||[]);
+  }catch(e){
+    console.warn(e);
+    document.getElementById('palmaresGrid').innerHTML='<div class="pal-empty">Impossibile caricare il Palmarès in questo momento.</div>';
+  }
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const toggle=document.querySelector('.menu-toggle'),menu=document.querySelector('.main-nav');
+  if(toggle&&menu){const close=()=>{menu.classList.remove('menu-open');toggle.setAttribute('aria-expanded','false')};toggle.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const open=menu.classList.toggle('menu-open');toggle.setAttribute('aria-expanded',open?'true':'false')});menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));document.addEventListener('click',e=>{if(!menu.contains(e.target)&&!toggle.contains(e.target))close()});window.addEventListener('resize',()=>{if(window.innerWidth>768)close()});}
+  loadPalmares();
 });
 </script>
 </body>

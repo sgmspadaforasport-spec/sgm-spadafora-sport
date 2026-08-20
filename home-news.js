@@ -1,9 +1,9 @@
 (function(){
   const MAX_HOME_NEWS=3;
-  const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt',"'":'&#39;','"':'&quot;'}[c]));
 
-  function removeQuickLinks(){
-    document.querySelectorAll('.home-quick-links').forEach(el=>el.remove());
+  function removeHomeUtilityBlocks(){
+    document.querySelectorAll('.home-quick-links, .home-contact-footer').forEach(el=>el.remove());
   }
 
   function installStyle(){
@@ -29,7 +29,7 @@
   }
 
   async function init(){
-    removeQuickLinks();
+    removeHomeUtilityBlocks();
     try{
       installStyle();
       if(!window.SGM_DB) return;

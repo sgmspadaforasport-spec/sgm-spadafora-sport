@@ -14,12 +14,13 @@
   function arrangeMenu(){const menu=document.querySelector('.main-nav');if(!menu)return;let about=menu.querySelector('a[href="chi-siamo.html"]');if(!about){about=document.createElement('a');about.href='chi-siamo.html';about.textContent='Chi siamo';}let staff=menu.querySelector('a[href="staff.html"]');if(!staff){staff=document.createElement('a');staff.href='staff.html';staff.textContent='Staff';}let comunicati=menu.querySelector('a[href="comunicati-ufficiali.html"]');if(!comunicati){comunicati=document.createElement('a');comunicati.href='comunicati-ufficiali.html';comunicati.textContent='Comunicati ufficiali';}const contacts=menu.querySelector('a[href="contatti.html"]');if(contacts){menu.insertBefore(comunicati,contacts);menu.insertBefore(staff,contacts);menu.insertBefore(about,contacts);menu.insertBefore(comunicati,staff);}else{menu.appendChild(comunicati);menu.appendChild(staff);menu.appendChild(about);}}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arrangeMenu);else arrangeMenu();
   const page=(location.pathname.split('/').pop()||'').toLowerCase();const extras=[];
-  if(page==='admin.html')extras.push('admin-content.js','admin-staff.js','admin-about.js','admin-youth-staff.js','admin-comunicati.js');
+  if(page==='admin.html')extras.push('admin-content.js','admin-staff.js','admin-about.js','admin-youth-staff.js','admin-comunicati.js','admin-leagues.js');
   if(['news.html','sponsor.html','galleria.html'].includes(page))extras.push('content-pages.js');
   if(['news.html','sponsor.html','galleria.html','sgm-tv.html','calendario-risultati.html','squadre.html'].includes(page))extras.push('premium-sections.js');
   if(['calcio-a-5.html','pallavolo-maschile.html','pallavolo-femminile.html','basket.html','giovanile-calcio.html'].includes(page))extras.push('team-section-premium.js');
+  if(page.endsWith('-calendario.html')||page.endsWith('-classifica.html'))extras.push('league-display.js');
   if(page==='staff.html')extras.push('staff-dynamic.js');
   if(page===''||page==='index.html')extras.push('home-news.js','home-layout-cleanup.js');
   if(page!=='admin.html')extras.push('professional-footer.js');
-  extras.forEach(src=>{const script=document.createElement('script');script.src=src+'?v=17';script.async=false;document.head.appendChild(script);});
+  extras.forEach(src=>{const script=document.createElement('script');script.src=src+'?v=19';script.async=false;document.head.appendChild(script);});
 })();

@@ -1,0 +1,4 @@
+(function(){
+function render(d){const c=d?.home_cover;if(!c)return;const main=document.querySelector('main');if(!main)return;const hero=main.querySelector('section');if(!hero)return;hero.classList.add('sgm-editable-home-cover');if(c.image){hero.style.backgroundImage=`linear-gradient(rgba(0,0,0,.48),rgba(0,0,0,.58)),url("${String(c.image).replace(/"/g,'')}")`;hero.style.backgroundSize='cover';hero.style.backgroundPosition='center';hero.style.minHeight='min(72vh,720px)'}const h=hero.querySelector('h1');if(h&&c.title)h.textContent=c.title;const ps=hero.querySelectorAll('p');if(c.subtitle&&ps.length)ps[ps.length-1].textContent=c.subtitle;const logo=hero.querySelector('img');if(logo)logo.style.display=c.show_logo===false?'none':'';}
+document.addEventListener('sgm-data-ready',e=>render(e.detail||{}));if(window.SGM_SITE_DATA)render(window.SGM_SITE_DATA);
+})();

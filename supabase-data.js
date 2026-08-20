@@ -17,9 +17,9 @@
   if(page==='admin.html')extras.push('admin-content.js','admin-staff.js','admin-about.js','admin-youth-staff.js','admin-comunicati.js');
   if(['news.html','sponsor.html','galleria.html'].includes(page))extras.push('content-pages.js');
   if(['news.html','sponsor.html','galleria.html','sgm-tv.html','calendario-risultati.html','squadre.html'].includes(page))extras.push('premium-sections.js');
-  if(['calcio-a-5.html','pallavolo-maschile.html','pallavolo-femminile.html','basket.html'].includes(page))extras.push('team-section-premium.js');
+  if(['calcio-a-5.html','pallavolo-maschile.html','pallavolo-femminile.html','basket.html','giovanile-calcio.html'].includes(page))extras.push('team-section-premium.js');
   if(page==='staff.html')extras.push('staff-dynamic.js');
   if(page===''||page==='index.html')extras.push('home-news.js','home-layout-cleanup.js');
   if(page!=='admin.html')extras.push('professional-footer.js');
-  extras.forEach(src=>{const script=document.createElement('script');script.src=src+'?v=16';script.async=false;document.head.appendChild(script);});
+  extras.forEach(src=>{const script=document.createElement('script');script.src=src+'?v=17';script.async=false;document.head.appendChild(script);});
 })();

@@ -1,51 +1,17 @@
 (function(){
   let uploadPromise=null;
-  function wait(){
-    if(typeof openPanel!=='function'||!document.querySelector('.admin-nav')||typeof data==='undefined'||!data) return setTimeout(wait,100);
-    install();
-  }
+  function wait(){if(typeof openPanel!=='function'||!document.querySelector('.admin-nav')||typeof data==='undefined'||!data)return setTimeout(wait,100);install();}
   function install(){
-    if(document.getElementById('homeHeroAdmin')) return;
+    if(document.getElementById('homeHeroAdmin'))return;
     data.home_hero=data.home_hero||{image:'',title:'UNA SOLA\nPASSIONE.\nSGM.',subtitle:'Calcio a 5, pallavolo, basket e settore giovanile. Una società, una comunità, una famiglia giallonera.',show_logo:true};
-    const nav=document.querySelector('.admin-nav');
-    const btn=document.createElement('button');btn.className='nav-btn';btn.dataset.panel='homeHeroAdmin';btn.textContent='🏠 Home / Copertina';btn.onclick=()=>{openPanel('homeHeroAdmin');load();};
-    nav.insertBefore(btn,nav.firstElementChild?.nextSibling||null);
-    const main=document.querySelector('.admin-layout main');const sticky=main.querySelector('.sticky-save');
-    const sec=document.createElement('section');sec.className='admin-panel';sec.id='homeHeroAdmin';sec.innerHTML=`<div class="panel-head"><div><h2>Home / Copertina</h2><p>Gestisci l'immagine principale della Home.</p></div></div><div class="fields"><div class="field full"><label>Immagine di copertina</label><input id="hhImage" placeholder="URL immagine"><input id="hhImageFile" type="file" accept="image/jpeg,image/png,image/webp"><small id="hhUploadState">Formato consigliato: 1920×1080 px (16:9).</small></div><div class="field full"><label>Titolo</label><textarea id="hhTitle" style="min-height:110px"></textarea></div><div class="field full"><label>Sottotitolo</label><textarea id="hhSubtitle"></textarea></div><div class="field full"><label style="display:flex;align-items:center;gap:9px;text-transform:none"><input id="hhShowLogo" type="checkbox" style="width:auto"> Mostra il logo SGM nella copertina</label></div><div class="field full"><button class="btn btn-primary" id="hhApply">Applica copertina</button><p class="upload-note">Le modifiche vengono sincronizzate automaticamente. Al termine premi “Salva online”.</p></div></div>`;
-    main.insertBefore(sec,sticky);
-
-    ['hhImage','hhTitle','hhSubtitle'].forEach(id=>document.getElementById(id).addEventListener('input',syncFields));
-    document.getElementById('hhShowLogo').addEventListener('change',syncFields);
-    document.getElementById('hhImageFile').addEventListener('change',uploadSelectedFile);
-    document.getElementById('hhApply').onclick=()=>{syncFields();if(typeof status==='function')status('Copertina pronta. Premi “Salva online” per pubblicarla.');};
-
-    const save=document.getElementById('saveOnline');
-    if(save){
-      save.addEventListener('click',async e=>{
-        syncFields();
-        if(uploadPromise){
-          e.preventDefault();e.stopImmediatePropagation();
-          if(typeof status==='function')status('Attendi il completamento del caricamento della copertina...');
-          try{await uploadPromise;syncFields();await window.SGM_DB.saveSiteData(data);if(typeof status==='function')status('Modifiche pubblicate online.');}
-          catch(err){if(typeof status==='function')status('Errore salvataggio copertina: '+err.message,true);}
-        }
-      },true);
-    }
+    const nav=document.querySelector('.admin-nav');const btn=document.createElement('button');btn.className='nav-btn';btn.dataset.panel='homeHeroAdmin';btn.textContent='🏠 Home / Copertina';btn.onclick=()=>{openPanel('homeHeroAdmin');load();};nav.insertBefore(btn,nav.firstElementChild?.nextSibling||null);
+    const main=document.querySelector('.admin-layout main');const sticky=main.querySelector('.sticky-save');const sec=document.createElement('section');sec.className='admin-panel';sec.id='homeHeroAdmin';sec.innerHTML=`<div class="panel-head"><div><h2>Home / Copertina</h2><p>Gestisci l'immagine principale della Home.</p></div></div><div class="fields"><div class="field full"><label>Immagine di copertina</label><input id="hhImage" placeholder="URL immagine"><input id="hhImageFile" type="file" accept="image/jpeg,image/png,image/webp"><small id="hhUploadState">Formato consigliato: 1920×1080 px (16:9).</small></div><div class="field full"><label>Titolo</label><textarea id="hhTitle" style="min-height:110px"></textarea></div><div class="field full"><label>Sottotitolo</label><textarea id="hhSubtitle"></textarea></div><div class="field full"><label style="display:flex;align-items:center;gap:9px;text-transform:none"><input id="hhShowLogo" type="checkbox" style="width:auto"> Mostra il logo SGM nella copertina</label></div><div class="field full"><button class="btn btn-primary" id="hhApply">Applica copertina</button><p class="upload-note">Dopo aver impostato la copertina premi “Salva online”.</p></div></div>`;main.insertBefore(sec,sticky);
+    ['hhImage','hhTitle','hhSubtitle'].forEach(id=>document.getElementById(id).addEventListener('input',syncFields));document.getElementById('hhShowLogo').addEventListener('change',syncFields);document.getElementById('hhImageFile').addEventListener('change',uploadSelectedFile);document.getElementById('hhApply').onclick=()=>{syncFields();if(typeof status==='function')status('Copertina pronta. Premi “Salva online” per pubblicarla.');};
+    const save=document.getElementById('saveOnline');if(save)save.addEventListener('click',async e=>{e.preventDefault();e.stopImmediatePropagation();try{syncFields();if(uploadPromise)await uploadPromise;syncFields();if(typeof saveContacts==='function')saveContacts();await window.SGM_DB.saveSiteData(data);window.SGM_SITE_DATA=data;if(typeof status==='function')status('Modifiche pubblicate online. La Home è stata aggiornata.');}catch(err){if(typeof status==='function')status('Errore salvataggio: '+err.message,true);}},true);
     load();
   }
   function load(){const h=data.home_hero||{};document.getElementById('hhImage').value=h.image||'';document.getElementById('hhTitle').value=h.title||'UNA SOLA\nPASSIONE.\nSGM.';document.getElementById('hhSubtitle').value=h.subtitle||'';document.getElementById('hhShowLogo').checked=h.show_logo!==false;}
-  function syncFields(){
-    const image=document.getElementById('hhImage')?.value.trim()||'';
-    data.home_hero={image,title:document.getElementById('hhTitle')?.value.trim()||'',subtitle:document.getElementById('hhSubtitle')?.value.trim()||'',show_logo:document.getElementById('hhShowLogo')?.checked!==false};
-  }
-  function uploadSelectedFile(){
-    const input=document.getElementById('hhImageFile');const file=input.files[0];if(!file)return;
-    const state=document.getElementById('hhUploadState');state.textContent='Caricamento immagine in corso...';
-    uploadPromise=(async()=>{
-      const url=await window.SGM_DB.uploadImage(file,'home');
-      document.getElementById('hhImage').value=url;input.value='';syncFields();state.textContent='Immagine caricata. Ora premi “Salva online”.';
-    })();
-    uploadPromise.catch(e=>{state.textContent='Errore caricamento: '+e.message;}).finally(()=>{uploadPromise=null;});
-  }
+  function syncFields(){data.home_hero={image:document.getElementById('hhImage')?.value.trim()||'',title:document.getElementById('hhTitle')?.value.trim()||'',subtitle:document.getElementById('hhSubtitle')?.value.trim()||'',show_logo:document.getElementById('hhShowLogo')?.checked!==false};}
+  function uploadSelectedFile(){const input=document.getElementById('hhImageFile'),file=input.files[0];if(!file)return;const state=document.getElementById('hhUploadState');state.textContent='Caricamento immagine in corso...';uploadPromise=(async()=>{const url=await window.SGM_DB.uploadImage(file,'home');document.getElementById('hhImage').value=url;input.value='';syncFields();state.textContent='Immagine caricata. Premi “Salva online”.';return url;})();uploadPromise.catch(e=>{state.textContent='Errore caricamento: '+e.message;}).finally(()=>{setTimeout(()=>{uploadPromise=null;},0);});}
   wait();
 })();

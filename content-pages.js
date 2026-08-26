@@ -43,7 +43,12 @@
   function renderNews(target,news,comunicati){
     const normalNews=(Array.isArray(news)?news:[]).map((n,i)=>({type:'news',order:i,title:n.title||'News',excerpt:n.excerpt||'',body:n.body||'',image:n.image||'',date:n.date||''}));
     const official=(Array.isArray(comunicati)?comunicati:[]).map((c,i)=>({type:'official',order:i,title:c.title||'Comunicato ufficiale',excerpt:'',body:c.text||'',image:c.image||'',date:c.date||''}));
-    const items=[...official,...normalNews];
+    const items=[...normalNews,...official].sort((a,b)=>{
+      const ta=a.date?new Date(a.date+'T12:00:00').getTime():0;
+      const tb=b.date?new Date(b.date+'T12:00:00').getTime():0;
+      if(tb!==ta)return tb-ta;
+      return b.order-a.order;
+    });
     if(!items.length){target.innerHTML='<div class="content-empty">Nessuna news pubblicata al momento.</div>';return;}
     target.innerHTML=`<div class="content-grid">${items.map(n=>`<article class="content-card ${n.type==='official'?'is-official':''}">${n.image?`<div class="content-image" style="background-image:url('${esc(n.image)}')"></div>`:''}<div class="content-body">${n.type==='official'?'<small class="content-label">COMUNICATO UFFICIALE</small>':''}${n.date?`<small>${formatDate(n.date)}</small>`:''}<h3>${esc(n.title)}</h3>${n.excerpt?`<p>${esc(n.excerpt)}</p>`:''}${n.body?`<details><summary style="cursor:pointer;font-weight:900;color:#ffd400">${n.type==='official'?'Leggi il comunicato':'Leggi la news'}</summary><p style="white-space:pre-line">${esc(n.body)}</p></details>`:''}</div></article>`).join('')}</div>`;
   }

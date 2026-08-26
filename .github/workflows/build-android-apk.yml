@@ -37,15 +37,15 @@ jobs:
       - name: Generate Android project
         run: npx expo prebuild --platform android --non-interactive --clean
 
-      - name: Build debug APK
-        run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - name: Build standalone release APK
+        run: cd android && chmod +x gradlew && ./gradlew assembleRelease --no-daemon
 
       - name: Collect APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk ../SGM-Spadafora-Sport.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk ../SGM-Spadafora-Sport-Standalone.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SGM-Spadafora-Sport-APK
-          path: SGM-Spadafora-Sport.apk
+          name: SGM-Spadafora-Sport-Standalone-APK
+          path: SGM-Spadafora-Sport-Standalone.apk
           if-no-files-found: error

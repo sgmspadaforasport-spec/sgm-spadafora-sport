@@ -1,6 +1,8 @@
 name: Build Android APK
 
 on:
+  push:
+    branches: [build/android-apk]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -19,8 +21,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: npm
-          cache-dependency-path: mobile-app/package-lock.json
 
       - name: Setup Java
         uses: actions/setup-java@v4

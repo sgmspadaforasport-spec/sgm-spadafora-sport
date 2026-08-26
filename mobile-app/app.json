@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "SGM Spadafora Sport",
+    "slug": "sgm-spadafora-sport",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "scheme": "sgmspadaforasport",
+    "android": {
+      "package": "it.sgmspadaforasport.app"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "it.sgmspadaforasport.app"
+    },
+    "plugins": ["expo-notifications"],
+    "extra": {
+      "club": "ASD SGM Spadafora Sport",
+      "eas": {
+        "projectId": "REPLACE_AFTER_EAS_INIT"
+      }
+    }
+  }
+}

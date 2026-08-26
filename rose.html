@@ -3,8 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Giocatori e atleti delle squadre SGM.">
-  <title>Rose | ASD SGM Spadafora Sport</title>
+  <title>Rose SGM Spadafora Sport | Atleti 2026/2027</title>
+  <meta name="description" content="Rose e atleti ASD SGM Spadafora Sport per la stagione 2026/2027: calcio a 5, pallavolo maschile e femminile e basket.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://asdsgmspadaforasport.it/rose.html">
+  <meta property="og:type" content="website"><meta property="og:locale" content="it_IT"><meta property="og:site_name" content="ASD SGM Spadafora Sport"><meta property="og:title" content="Rose SGM Spadafora Sport | Atleti 2026/2027"><meta property="og:description" content="Giocatori e atleti delle squadre ASD SGM Spadafora Sport."><meta property="og:url" content="https://asdsgmspadaforasport.it/rose.html"><meta property="og:image" content="https://asdsgmspadaforasport.it/IMG-20250217-WA0006.jpg">
   <link rel="stylesheet" href="style.css?v=100">
 </head>
 <body>
@@ -36,23 +39,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggle = document.querySelector(".menu-toggle");
   const menu = document.querySelector(".main-nav");
   if (!toggle || !menu) return;
-  const closeMenu = () => {
-    menu.classList.remove("menu-open");
-    toggle.setAttribute("aria-expanded", "false");
-  };
-  toggle.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    const open = menu.classList.toggle("menu-open");
-    toggle.setAttribute("aria-expanded", open ? "true" : "false");
-  });
+  const closeMenu = () => { menu.classList.remove("menu-open"); toggle.setAttribute("aria-expanded", "false"); };
+  toggle.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); const open = menu.classList.toggle("menu-open"); toggle.setAttribute("aria-expanded", open ? "true" : "false"); });
   menu.querySelectorAll("a").forEach(link => link.addEventListener("click", closeMenu));
-  document.addEventListener("click", (event) => {
-    if (!menu.contains(event.target) && !toggle.contains(event.target)) closeMenu();
-  });
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 768) closeMenu();
-  });
+  document.addEventListener("click", (event) => { if (!menu.contains(event.target) && !toggle.contains(event.target)) closeMenu(); });
+  window.addEventListener("resize", () => { if (window.innerWidth > 768) closeMenu(); });
 });
 </script>
 </body>

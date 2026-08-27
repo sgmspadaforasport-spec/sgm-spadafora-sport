@@ -4,6 +4,19 @@ window.SGM_SUPABASE_CONFIG = {
   storageBucket: "sgm-media"
 };
 
+/* Favicon ufficiale SGM */
+(function () {
+  const href = "https://asdsgmspadaforasport.it/IMG-20250217-WA0006.jpg";
+  let icon = document.querySelector('link[rel="icon"]');
+  if (!icon) { icon = document.createElement('link'); icon.rel = 'icon'; document.head.appendChild(icon); }
+  icon.type = 'image/jpeg';
+  icon.href = href;
+  let shortcut = document.querySelector('link[rel="shortcut icon"]');
+  if (!shortcut) { shortcut = document.createElement('link'); shortcut.rel = 'shortcut icon'; document.head.appendChild(shortcut); }
+  shortcut.type = 'image/jpeg';
+  shortcut.href = href;
+})();
+
 /* SEO centralizzato per le pagine pubbliche */
 (function () {
   const base = "https://asdsgmspadaforasport.it/";

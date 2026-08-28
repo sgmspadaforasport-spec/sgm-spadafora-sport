@@ -38,7 +38,7 @@
       </div>
       <div class="toolbar" style="margin-top:4px"><button class="btn btn-primary" id="sendPushNotification">🔔 Invia notifica</button><button class="btn btn-dark" id="clearPushNotification">Svuota</button></div>
       <div id="pushStatus" class="status"></div>
-      <div style="margin-top:30px;border-top:1px solid #292929;padding-top:22px"><div class="panel-head" style="margin-bottom:12px"><div><h2 style="font-size:20px">Cronologia</h2><p>Ultime notifiche inviate dall'area amministratore.</p></div><button class="btn btn-dark btn-small" id="refreshPushHistory">Aggiorna</button></div><div id="pushHistory" class="item-list"><div class="empty">Caricamento...</div></div></div>`;
+      <div style="margin-top:30px;border-top:1px solid #292929;padding-top:22px"><div class="panel-head" style="margin-bottom:12px"><div><h2 style="font-size:20px">Cronologia</h2><p>Ultime notifiche inviate. Eliminandone una, sparirà anche dalla sezione Notifiche del sito.</p></div><button class="btn btn-dark btn-small" id="refreshPushHistory">Aggiorna</button></div><div id="pushHistory" class="item-list"><div class="empty">Caricamento...</div></div></div>`;
     main.insertBefore(section,advanced);
 
     navBtn.addEventListener('click',()=>{
@@ -75,6 +75,18 @@
     return window.SGM_DB.client;
   }
 
+  async function deleteNotification(id,title){
+    if(!confirm(`Eliminare definitivamente questa notifica?\n\n${title||''}\n\nSparirà anche dalla sezione Notifiche del sito.`))return;
+    const out=document.getElementById('pushStatus');
+    try{
+      const c=await client();
+      const {error}=await c.from('app_notifications').delete().eq('id',id);
+      if(error)throw error;
+      if(out){out.style.color='#9bd18b';out.textContent='✓ Notifica eliminata dalla cronologia e dalla sezione Notifiche del sito.';}
+      await refreshMeta();
+    }catch(e){if(out){out.style.color='#ff8b8b';out.textContent='Eliminazione non riuscita: '+(e.message||e);}}
+  }
+
   async function refreshMeta(){
     const history=document.getElementById('pushHistory');
     try{
@@ -88,7 +100,10 @@
       const total=(appCount||0)+(webCount||0);
       const badge=document.getElementById('pushDeviceCount');if(badge)badge.textContent=`${total} DISPOSITIV${total===1?'O':'I'}`;
       const breakdown=document.getElementById('pushDeviceBreakdown');if(breakdown)breakdown.textContent=`App: ${appCount||0} · Sito web: ${webCount||0}`;
-      if(history)history.innerHTML=(items||[]).length?(items||[]).map(n=>`<div class="item-card"><div><h3>${esc(n.title)}</h3><p>${esc(n.body)}<br>${fmtDate(n.created_at)} · inviati ${n.sent_count||0}${n.failed_count?` · errori ${n.failed_count}`:''}</p></div><div class="item-actions"><span class="admin-online">${esc((templates[n.type]||{}).label||n.type||'Notifica')}</span></div></div>`).join(''):'<div class="empty">Nessuna notifica inviata.</div>';
+      if(history){
+        history.innerHTML=(items||[]).length?(items||[]).map(n=>`<div class="item-card"><div><h3>${esc(n.title)}</h3><p>${esc(n.body)}<br>${fmtDate(n.created_at)} · inviati ${n.sent_count||0}${n.failed_count?` · errori ${n.failed_count}`:''}</p></div><div class="item-actions"><span class="admin-online">${esc((templates[n.type]||{}).label||n.type||'Notifica')}</span><button type="button" class="btn btn-dark btn-small delete-push" data-id="${esc(n.id)}" data-title="${esc(n.title)}">🗑️ Elimina</button></div></div>`).join(''):'<div class="empty">Nessuna notifica inviata.</div>';
+        history.querySelectorAll('.delete-push').forEach(btn=>btn.addEventListener('click',()=>deleteNotification(btn.dataset.id,btn.dataset.title)));
+      }
     }catch(e){if(history)history.innerHTML=`<div class="empty">${esc(e.message||e)}</div>`;}
   }
 

@@ -3,9 +3,9 @@
   if(page!=='admin.html')return;
 
   const templates={
-    next_match:{label:'Prossima partita',title:'📅 Prossima partita',body:'La prossima gara SGM è in programma a breve. Apri l’app per tutti i dettagli.'},
+    next_match:{label:'Prossima partita',title:'📅 Prossima partita',body:'La prossima gara SGM è in programma a breve. Apri per tutti i dettagli.'},
     match_day:{label:'Match Day',title:'🔥 MATCH DAY',body:'È giorno di gara! Forza SGM 💛🖤'},
-    result:{label:'Risultato',title:'🏆 Risultato finale',body:'È terminata la gara. Apri l’app per scoprire il risultato.'},
+    result:{label:'Risultato',title:'🏆 Risultato finale',body:'È terminata la gara. Apri per scoprire il risultato.'},
     news:{label:'News',title:'📰 Nuova news',body:'È online una nuova notizia dal mondo SGM.'},
     official:{label:'Comunicato ufficiale',title:'📣 Comunicato ufficiale',body:'È stato pubblicato un nuovo comunicato ufficiale ASD SGM Spadafora Sport.'},
     custom:{label:'Personalizzata',title:'',body:''}
@@ -21,19 +21,20 @@
     if(!nav||!main||!advanced||document.getElementById('notificationsAdmin'))return;
 
     const navBtn=document.createElement('button');
-    navBtn.className='nav-btn';navBtn.dataset.panel='notificationsAdmin';navBtn.textContent='🔔 Notifiche App';
+    navBtn.className='nav-btn';navBtn.dataset.panel='notificationsAdmin';navBtn.textContent='🔔 Notifiche';
     const advancedBtn=nav.querySelector('[data-panel="advanced"]');
     nav.insertBefore(navBtn,advancedBtn||null);
 
     const section=document.createElement('section');
     section.className='admin-panel';section.id='notificationsAdmin';
     section.innerHTML=`
-      <div class="panel-head"><div><h2>Notifiche App</h2><p>Invia notifiche push agli utenti che hanno installato l'app SGM.</p></div><div id="pushDeviceCount" class="admin-online">0 DISPOSITIVI</div></div>
+      <div class="panel-head"><div><h2>Notifiche</h2><p>Invia una sola notifica agli utenti registrati dell'app e del sito SGM.</p></div><div id="pushDeviceCount" class="admin-online">0 DISPOSITIVI</div></div>
+      <div id="pushDeviceBreakdown" style="margin:-8px 0 18px;color:#aaa;font-size:12px;font-weight:800"></div>
       <div class="field full"><label>Tipo di notifica</label><div id="pushTemplates" class="toolbar"></div></div>
       <div class="fields" style="margin-top:16px">
         <div class="field full"><label>Titolo notifica</label><input id="pushTitle" maxlength="80" placeholder="Scrivi un titolo nuovo, es. Convocazioni U15"></div>
         <div class="field full"><label>Messaggio</label><textarea id="pushBody" maxlength="220" placeholder="Scrivi il testo della notifica..."></textarea></div>
-        <div class="field full"><label>Collegamento nell'app / sito (facoltativo)</label><input id="pushTarget" placeholder="Es. news.html oppure https://asdsgmspadaforasport.it/news.html"></div>
+        <div class="field full"><label>Pagina da aprire (facoltativa)</label><input id="pushTarget" placeholder="Es. news.html oppure https://asdsgmspadaforasport.it/news.html"></div>
       </div>
       <div class="toolbar" style="margin-top:4px"><button class="btn btn-primary" id="sendPushNotification">🔔 Invia notifica</button><button class="btn btn-dark" id="clearPushNotification">Svuota</button></div>
       <div id="pushStatus" class="status"></div>
@@ -78,12 +79,15 @@
     const history=document.getElementById('pushHistory');
     try{
       const c=await client();
-      const [{count,error:countErr},{data:items,error:histErr}]=await Promise.all([
+      const [{count:appCount,error:appErr},{count:webCount,error:webErr},{data:items,error:histErr}]=await Promise.all([
         c.from('app_push_tokens').select('*',{count:'exact',head:true}),
+        c.from('web_push_subscriptions').select('*',{count:'exact',head:true}),
         c.from('app_notifications').select('id,type,title,body,target_url,sent_count,failed_count,created_at').order('created_at',{ascending:false}).limit(20)
       ]);
-      if(countErr)throw countErr;if(histErr)throw histErr;
-      const badge=document.getElementById('pushDeviceCount');if(badge)badge.textContent=`${count||0} DISPOSITIV${count===1?'O':'I'}`;
+      if(appErr)throw appErr;if(webErr)throw webErr;if(histErr)throw histErr;
+      const total=(appCount||0)+(webCount||0);
+      const badge=document.getElementById('pushDeviceCount');if(badge)badge.textContent=`${total} DISPOSITIV${total===1?'O':'I'}`;
+      const breakdown=document.getElementById('pushDeviceBreakdown');if(breakdown)breakdown.textContent=`App: ${appCount||0} · Sito web: ${webCount||0}`;
       if(history)history.innerHTML=(items||[]).length?(items||[]).map(n=>`<div class="item-card"><div><h3>${esc(n.title)}</h3><p>${esc(n.body)}<br>${fmtDate(n.created_at)} · inviati ${n.sent_count||0}${n.failed_count?` · errori ${n.failed_count}`:''}</p></div><div class="item-actions"><span class="admin-online">${esc((templates[n.type]||{}).label||n.type||'Notifica')}</span></div></div>`).join(''):'<div class="empty">Nessuna notifica inviata.</div>';
     }catch(e){if(history)history.innerHTML=`<div class="empty">${esc(e.message||e)}</div>`;}
   }
@@ -94,13 +98,14 @@
     const target=document.getElementById('pushTarget').value.trim();
     const out=document.getElementById('pushStatus');const btn=document.getElementById('sendPushNotification');
     if(!title||!body){out.textContent='Inserisci titolo e messaggio.';out.style.color='#ff8b8b';return;}
-    if(!confirm(`Inviare questa notifica a tutti i dispositivi registrati?\n\n${title}\n${body}`))return;
+    if(!confirm(`Inviare questa notifica a tutti i dispositivi registrati nell'app e nel sito?\n\n${title}\n${body}`))return;
     try{
       btn.disabled=true;btn.textContent='Invio in corso...';out.textContent='';
       const c=await client();
       const {data,error}=await c.functions.invoke('send-app-notification',{body:{type:currentType,title,body,target_url:target}});
       if(error)throw error;if(data?.error)throw new Error(data.error);
-      out.style.color='#9bd18b';out.textContent=`✓ Notifica elaborata: ${data?.sent||0} inviate${data?.failed?`, ${data.failed} non riuscite`:''}. Dispositivi registrati: ${data?.recipients||0}.`;
+      const app=data?.app||{};const web=data?.web||{};
+      out.style.color='#9bd18b';out.textContent=`✓ Inviate ${data?.sent||0} notifiche. App: ${app.sent||0}/${app.recipients||0} · Sito: ${web.sent||0}/${web.recipients||0}${data?.failed?` · errori: ${data.failed}`:''}.`;
       await refreshMeta();
     }catch(e){out.style.color='#ff8b8b';out.textContent='Invio non riuscito: '+(e.message||e);}
     finally{btn.disabled=false;btn.textContent='🔔 Invia notifica';}

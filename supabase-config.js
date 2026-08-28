@@ -53,7 +53,7 @@ window.SGM_SUPABASE_CONFIG = {
   const page=(location.pathname.split('/').pop()||'index.html').toLowerCase();
   if(page==='admin.html'||document.querySelector('script[data-sgm-web-push]'))return;
   const script=document.createElement('script');
-  script.src='web-notifications.js?v=4';
+  script.src='web-notifications.js?v=6';
   script.defer=true;
   script.setAttribute('data-sgm-web-push','1');
   document.head.appendChild(script);

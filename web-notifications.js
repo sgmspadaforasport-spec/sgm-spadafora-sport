@@ -1,4 +1,6 @@
 (function(){
+  if(window.__SGM_WEB_NOTIFICATIONS_LOADED__)return;
+  window.__SGM_WEB_NOTIFICATIONS_LOADED__=true;
   const page=(location.pathname.split('/').pop()||'index.html').toLowerCase();
   if(page==='admin.html') return;
 
@@ -35,11 +37,38 @@
 
   async function loadHistory(){const box=document.getElementById('sgmPushHistoryList');if(!box)return;const c=getClient();if(!c){box.innerHTML='<div class="sgm-push-empty">Cronologia non disponibile.</div>';return;}try{const{data,error}=await c.from('app_notifications').select('id,title,body,target_url,created_at').order('created_at',{ascending:false}).limit(12);if(error)throw error;box.innerHTML=(data||[]).length?(data||[]).map(n=>{const href=n.target_url?new URL(n.target_url,location.origin).href:'#';const tag=n.target_url?'a':'div';return `<${tag} class="sgm-push-item"${n.target_url?` href="${esc(href)}"`:''}><strong>${esc(n.title)}</strong><span>${esc(n.body)}<br>${fmtDate(n.created_at)}</span></${tag}>`;}).join(''):'<div class="sgm-push-empty">Nessuna notifica disponibile.</div>';}catch(_){box.innerHTML='<div class="sgm-push-empty">Impossibile caricare le notifiche.</div>';}}
 
-  function installUI(){installStyles();const nav=document.querySelector('.main-nav');if(nav&&!nav.querySelector('.sgm-push-nav')){const a=document.createElement('a');a.href='#';a.className='sgm-push-nav';a.textContent='🔔 Notifiche';a.addEventListener('click',e=>{e.preventDefault();openCard(true)});nav.appendChild(a);}if(!document.getElementById('sgmPushCard')){const card=document.createElement('div');card.id='sgmPushCard';card.className='sgm-push-card';card.hidden=true;card.innerHTML=`<div class="sgm-push-top"><div class="sgm-push-icon">🔔</div><div><h3>Resta aggiornato su SGM</h3><p>Ricevi news, comunicati ufficiali, Match Day, risultati e prossime partite direttamente sul tuo dispositivo.</p></div></div><div class="sgm-push-actions"><button type="button" class="sgm-push-enable">ATTIVA NOTIFICHE</button><button type="button" class="sgm-push-disable" hidden>DISATTIVA NOTIFICHE</button><button type="button" class="sgm-push-later">CHIUDI</button></div><div class="sgm-push-status"></div><div class="sgm-push-history"><h4>Ultime notifiche</h4><div id="sgmPushHistoryList"><div class="sgm-push-empty">Caricamento...</div></div></div>`;document.body.appendChild(card);card.querySelector('.sgm-push-enable').addEventListener('click',activate);card.querySelector('.sgm-push-disable').addEventListener('click',async()=>{const btn=card.querySelector('.sgm-push-disable');try{btn.disabled=true;btn.textContent='DISATTIVAZIONE...';await disableNotifications();}catch(e){setStatus(e.message||String(e),'err');}finally{btn.disabled=false;btn.textContent='DISATTIVA NOTIFICHE';}});card.querySelector('.sgm-push-later').addEventListener('click',()=>{localStorage.setItem(DISMISS_KEY,String(Date.now()));card.hidden=true;});}}
+  function installUI(){
+    installStyles();
+    const nav=document.querySelector('.main-nav');
+    if(nav){
+      let a=nav.querySelector('.sgm-push-nav');
+      if(!a){a=document.createElement('a');a.href='#';a.className='sgm-push-nav';a.textContent='🔔 Notifiche';nav.appendChild(a);}
+      if(!a.dataset.sgmPushBound){
+        a.dataset.sgmPushBound='1';
+        a.addEventListener('click',e=>{
+          e.preventDefault();
+          const menu=document.querySelector('.main-nav');
+          const toggle=document.querySelector('.menu-toggle');
+          if(menu)menu.classList.remove('menu-open');
+          if(toggle)toggle.setAttribute('aria-expanded','false');
+          openCard(true);
+        });
+      }
+    }
+    if(!document.getElementById('sgmPushCard')){
+      const card=document.createElement('div');card.id='sgmPushCard';card.className='sgm-push-card';card.hidden=true;
+      card.innerHTML=`<div class="sgm-push-top"><div class="sgm-push-icon">🔔</div><div><h3>Resta aggiornato su SGM</h3><p>Ricevi news, comunicati ufficiali, Match Day, risultati e prossime partite direttamente sul tuo dispositivo.</p></div></div><div class="sgm-push-actions"><button type="button" class="sgm-push-enable">ATTIVA NOTIFICHE</button><button type="button" class="sgm-push-disable" hidden>DISATTIVA NOTIFICHE</button><button type="button" class="sgm-push-later">CHIUDI</button></div><div class="sgm-push-status"></div><div class="sgm-push-history"><h4>Ultime notifiche</h4><div id="sgmPushHistoryList"><div class="sgm-push-empty">Caricamento...</div></div></div>`;
+      document.body.appendChild(card);
+      card.querySelector('.sgm-push-enable').addEventListener('click',activate);
+      card.querySelector('.sgm-push-disable').addEventListener('click',async()=>{const btn=card.querySelector('.sgm-push-disable');try{btn.disabled=true;btn.textContent='DISATTIVAZIONE...';await disableNotifications();}catch(e){setStatus(e.message||String(e),'err');}finally{btn.disabled=false;btn.textContent='DISATTIVA NOTIFICHE';}});
+      card.querySelector('.sgm-push-later').addEventListener('click',()=>{localStorage.setItem(DISMISS_KEY,String(Date.now()));card.hidden=true;});
+    }
+  }
 
   function setStatus(text,type){const el=document.querySelector('#sgmPushCard .sgm-push-status');if(!el)return;el.textContent=text||'';el.className='sgm-push-status '+(type||'');}
   async function refreshControls(){const enable=document.querySelector('#sgmPushCard .sgm-push-enable'),disable=document.querySelector('#sgmPushCard .sgm-push-disable');if(!enable||!disable)return;let active=false;if(supported&&Notification.permission==='granted'){try{const reg=await navigator.serviceWorker.getRegistration('/');active=!!(reg&&await reg.pushManager.getSubscription());}catch(_){}}enable.hidden=active;disable.hidden=!active;if(active)setStatus('Notifiche attive su questo dispositivo.','ok');else if(localStorage.getItem(DISABLED_KEY)==='1')setStatus('Notifiche disattivate su questo dispositivo.','');else if(Notification.permission==='denied')setStatus('Notifiche bloccate: riattivale dalle impostazioni del browser.','err');}
   async function openCard(manual){const card=document.getElementById('sgmPushCard');if(!card)return;card.hidden=false;setStatus('','');loadHistory();await refreshControls();if(!supported)setStatus('Il browser in uso non supporta le notifiche push.','err');if(manual)localStorage.removeItem(DISMISS_KEY);}
+  window.SGM_OPEN_NOTIFICATIONS=()=>openCard(true);
   async function activate(){const btn=document.querySelector('#sgmPushCard .sgm-push-enable');try{if(btn){btn.disabled=true;btn.textContent='ATTIVAZIONE...'}await ensureSubscription(true);setStatus('✓ Notifiche attivate su questo dispositivo.','ok');await refreshControls();}catch(e){setStatus(e.message||String(e),'err');}finally{if(btn){btn.disabled=false;btn.textContent='ATTIVA NOTIFICHE'}}}
   async function init(){installUI();if(!supported)return;if(Notification.permission==='granted'&&localStorage.getItem(DISABLED_KEY)!=='1'){try{await ensureSubscription(false);}catch(_){}return;}if(Notification.permission!=='default'||localStorage.getItem(DISABLED_KEY)==='1')return;const dismissed=Number(localStorage.getItem(DISMISS_KEY)||0),sevenDays=7*24*60*60*1000;if(!dismissed||Date.now()-dismissed>sevenDays)setTimeout(()=>openCard(false),1800);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();

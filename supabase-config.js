@@ -62,3 +62,14 @@ window.SGM_SUPABASE_CONFIG = {
   setProp('og:url',base + data[2]);
   setProp('og:image',base + 'IMG-20250217-WA0006.jpg');
 })();
+
+/* Notifiche push del sito */
+(function () {
+  const page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  if (page === 'admin.html' || document.querySelector('script[data-sgm-web-push]')) return;
+  const script = document.createElement('script');
+  script.src = 'web-notifications.js?v=1';
+  script.defer = true;
+  script.setAttribute('data-sgm-web-push','1');
+  document.head.appendChild(script);
+})();

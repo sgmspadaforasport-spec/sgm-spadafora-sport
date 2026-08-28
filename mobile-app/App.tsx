@@ -1,26 +1,270 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StatusBar as NativeStatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { fetchSiteData, subscribeSiteData } from './src/lib/siteData';
-import { registerForPushNotificationsAsync } from './src/lib/notifications';
-import { C, Card, Hero, ScreenTitle } from './src/components/ui';
-import type { Match, SitePayload, Sport } from './src/types/site';
 
-const sportsOrder=['calcio_a_5','pallavolo_maschile','pallavolo_femminile','basket','settore_giovanile'];
-const sportMeta:Record<string,{label:string;icon:string}>={calcio_a_5:{label:'Calcio a 5',icon:'soccer'},pallavolo_maschile:{label:'Pallavolo M',icon:'volleyball'},pallavolo_femminile:{label:'Pallavolo F',icon:'volleyball'},basket:{label:'Basket',icon:'basketball'},settore_giovanile:{label:'Giovanili',icon:'account-group-outline'}};
-type TabName='Home'|'Squadre'|'News'|'Risultati'|'Altro'; type TeamSection='Rosa'|'Calendario'|'Classifica'|'Staff'; const tabs:TabName[]=['Home','Squadre','News','Risultati','Altro'];
-function useSite(){const [data,setData]=useState<SitePayload|null>(null);const [loading,setLoading]=useState(true);const [refreshing,setRefreshing]=useState(false);const load=useCallback(async()=>{try{setData(await fetchSiteData())}finally{setLoading(false);setRefreshing(false)}},[]);useEffect(()=>{load();const u=subscribeSiteData(load);return u},[load]);return{data,loading,refreshing,refresh:()=>{setRefreshing(true);load()}}}
-function Loader(){return <View style={st.center}><ActivityIndicator size="large" color={C.yellow}/><Text style={st.muted}>Caricamento SGM…</Text></View>}; function Empty({text}:{text:string}){return <Card><Text style={st.muted}>{text}</Text></Card>}
-function MatchCard({m}:{m:Match}){return <View style={st.matchCard}><View style={st.matchTop}><Text style={st.yellow}>{m.sport||'SGM'}</Text><Text style={st.muted}>{[m.date,m.time].filter(Boolean).join(' · ')}</Text></View><View style={st.matchTeams}><Text style={st.matchTeam}>{m.home||'—'}</Text><View style={st.vs}><Text style={st.vsText}>VS</Text></View><Text style={[st.matchTeam,{textAlign:'right'}]}>{m.away||'—'}</Text></View></View>}
-function Home({onOpenSport}:{onOpenSport:(k:string)=>void}){const x=useSite();if(x.loading&&!x.data)return <Loader/>;const d=x.data??{},sports=d.sports??{};return <ScrollView style={st.page} contentContainerStyle={st.scrollContent} refreshControl={<RefreshControl refreshing={x.refreshing} onRefresh={x.refresh} tintColor={C.yellow}/>}><Hero {...d.home_hero} season={d.season}/><ScreenTitle kicker="LE NOSTRE DISCIPLINE" title="Tutta SGM in un tocco"/><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.quickRow}>{sportsOrder.map(k=>{const s=sports[k];if(!s)return null;return <Pressable key={k} onPress={()=>onOpenSport(k)} style={st.quick}><MaterialCommunityIcons name={sportMeta[k].icon as any} size={28} color={C.yellow}/><Text style={st.quickTitle}>{s.name||sportMeta[k].label}</Text><Text style={st.muted} numberOfLines={1}>{s.league_name}</Text></Pressable>})}</ScrollView><ScreenTitle kicker="IN EVIDENZA" title="Prossime gare"/>{(d.next_matches??[]).length?(d.next_matches??[]).slice(0,3).map((m,i)=><View key={i} style={st.wrap}><MatchCard m={m}/></View>):<Empty text="Nessuna gara programmata."/>}<ScreenTitle kicker="DAL CAMPO" title="Ultimi risultati"/>{(d.recent_results??[]).slice(0,3).map((m,i)=><Card key={i}><Text style={st.yellow}>{m.sport}</Text><Text style={st.result}>{m.home}  {m.home_score??'-'} : {m.away_score??'-'}  {m.away}</Text></Card>)}<ScreenTitle kicker="ULTIMI AGGIORNAMENTI" title="News"/>{(d.news??[]).slice(0,3).map((n,i)=><Card key={i}>{n.image?<Image source={{uri:n.image}} style={st.newsImg}/>:null}<Text style={st.newsTitle}>{n.title}</Text><Text style={st.muted}>{n.date}</Text><Text style={st.body} numberOfLines={3}>{n.excerpt}</Text></Card>)}</ScrollView>}
-function Squadre({selectedKey,onSelect,onBack}:{selectedKey:string|null;onSelect:(k:string)=>void;onBack:()=>void}){const x=useSite();if(x.loading&&!x.data)return <Loader/>;const sports=x.data?.sports??{};if(selectedKey&&sports[selectedKey])return <TeamDetail sportKey={selectedKey} sport={sports[selectedKey]} onBack={onBack}/>;return <ScrollView style={st.page} contentContainerStyle={st.scrollContent}><ScreenTitle kicker="ASD SGM SPADAFORA SPORT" title="Le squadre" subtitle="Scegli una disciplina per aprire rosa, calendario, classifica e staff."/>{sportsOrder.map(k=>{const s=sports[k];if(!s)return null;return <Pressable key={k} onPress={()=>onSelect(k)} style={st.teamTile}><MaterialCommunityIcons name={sportMeta[k].icon as any} size={32} color={C.yellow}/><Text style={st.teamName}>{s.name||sportMeta[k].label}</Text><Text style={st.yellow}>{s.league_name}</Text><Text style={st.muted}>{s.roster?.length??0} atleti · {s.staff?.length??0} staff</Text></Pressable>})}</ScrollView>}
-function TeamDetail({sportKey,sport,onBack}:{sportKey:string;sport:Sport;onBack:()=>void}){const [section,setSection]=useState<TeamSection>('Rosa');const sections:TeamSection[]=['Rosa','Calendario','Classifica','Staff'];return <ScrollView style={st.page} contentContainerStyle={st.scrollContent}><View style={st.teamHero}><Pressable onPress={onBack} style={st.back}><MaterialCommunityIcons name="arrow-left" size={22} color={C.white}/><Text style={st.backText}>Squadre</Text></Pressable><MaterialCommunityIcons name={sportMeta[sportKey].icon as any} size={46} color={C.yellow}/><Text style={st.teamHeroTitle}>{sport.name}</Text><Text style={st.yellow}>{sport.league_name}</Text></View><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.segments}>{sections.map(s=><Pressable key={s} onPress={()=>setSection(s)} style={[st.segment,section===s&&st.segmentOn]}><Text style={[st.segmentText,section===s&&st.segmentTextOn]}>{s}</Text></Pressable>)}</ScrollView>{section==='Rosa'?<View>{sport.roster?.map((p,i)=><Card key={i}><Text style={st.player}>{p.number??'—'}  {p.name}</Text><Text style={st.muted}>{p.role}</Text></Card>)}</View>:null}{section==='Calendario'?<View>{sport.calendar?.length?sport.calendar.map((m,i)=><View key={i} style={st.wrap}><MatchCard m={m}/></View>):<Empty text="Calendario in aggiornamento."/>}</View>:null}{section==='Classifica'?<View>{sport.standings?.length?sport.standings.map((r,i)=><Card key={i}><Text style={st.player}>{r.pos||i+1}. {r.team}   {r.points??0} pt</Text></Card>):<Empty text="Classifica non disponibile."/>}</View>:null}{section==='Staff'?<View>{sport.staff?.map((p,i)=><Card key={i}><Text style={st.player}>{p.name}</Text><Text style={st.muted}>{p.role}</Text></Card>)}</View>:null}</ScrollView>}
-function News(){const x=useSite();if(x.loading&&!x.data)return <Loader/>;return <FlatList style={st.page} contentContainerStyle={st.scrollContent} data={x.data?.news??[]} keyExtractor={(_,i)=>String(i)} ListHeaderComponent={<ScreenTitle kicker="MONDO SGM" title="News"/>} renderItem={({item:n})=><Card>{n.image?<Image source={{uri:n.image}} style={st.newsImg}/>:null}<Text style={st.newsTitle}>{n.title}</Text><Text style={st.muted}>{n.date}</Text><Text style={st.body}>{n.body??n.excerpt}</Text></Card>}/>}
-function Risultati(){const x=useSite();if(x.loading&&!x.data)return <Loader/>;return <ScrollView style={st.page} contentContainerStyle={st.scrollContent}><ScreenTitle kicker="STAGIONE SPORTIVA" title="Risultati e classifiche"/>{(x.data?.recent_results??[]).map((m,i)=><Card key={i}><Text style={st.yellow}>{m.sport}</Text><Text style={st.result}>{m.home}  {m.home_score??'-'} : {m.away_score??'-'}  {m.away}</Text></Card>)}</ScrollView>}
-function Altro(){const x=useSite();if(x.loading&&!x.data)return <Loader/>;const d=x.data??{};return <ScrollView style={st.page} contentContainerStyle={st.scrollContent}><ScreenTitle kicker="ASD SGM" title="Altro"/><Card><Text style={st.newsTitle}>Palmarès</Text><Text style={st.muted}>{Array.isArray(d.palmares)?`${d.palmares.length} elementi disponibili`:'Sezione disponibile'}</Text></Card><Card><Text style={st.newsTitle}>SGM TV</Text></Card><Card><Text style={st.newsTitle}>Sponsor</Text></Card></ScrollView>}
-const tabIcons:Record<TabName,string>={Home:'home-variant-outline',Squadre:'account-group-outline',News:'newspaper-variant-outline',Risultati:'trophy-outline',Altro:'menu'};
-function AppContent(){const insets=useSafeAreaInsets();const [active,setActive]=useState<TabName>('Home');const [selectedSport,setSelectedSport]=useState<string|null>(null);useEffect(()=>{registerForPushNotificationsAsync().catch(()=>null)},[]);const changeTab=(tab:TabName)=>{if(tab!=='Squadre')setSelectedSport(null);setActive(tab)};const openSport=(k:string)=>{setSelectedSport(k);setActive('Squadre')};let screen:React.ReactNode=<Home onOpenSport={openSport}/>;if(active==='Squadre')screen=<Squadre selectedKey={selectedSport} onSelect={setSelectedSport} onBack={()=>setSelectedSport(null)}/>;else if(active==='News')screen=<News/>;else if(active==='Risultati')screen=<Risultati/>;else if(active==='Altro')screen=<Altro/>;return <SafeAreaView style={st.app} edges={['top','left','right']}><StatusBar style="light"/><View style={st.header}><View><Text style={st.headerSmall}>ASD</Text><Text style={st.headerTitle}>SGM SPADAFORA SPORT</Text></View><View style={st.dot}/></View><View style={st.content}>{screen}</View><View style={[st.tabBar,{paddingBottom:Math.max(insets.bottom,10)}]}>{tabs.map(tab=>{const on=active===tab;return <Pressable key={tab} accessibilityRole="button" accessibilityLabel={tab} onPress={()=>changeTab(tab)} hitSlop={10} android_ripple={{color:'#333'}} style={({pressed})=>[st.tabButton,on&&st.tabOn,pressed&&st.tabPressed]}><MaterialCommunityIcons name={tabIcons[tab] as any} size={26} color={on?C.yellow:'#8d8d8d'}/><Text style={[st.tabLabel,on&&st.tabLabelOn]}>{tab}</Text></Pressable>})}</View></SafeAreaView>}
-export default function App(){return <SafeAreaProvider><AppContent/></SafeAreaProvider>}
-const st=StyleSheet.create({app:{flex:1,backgroundColor:C.black},content:{flex:1,zIndex:1},page:{flex:1,backgroundColor:C.black},scrollContent:{paddingBottom:28},center:{flex:1,alignItems:'center',justifyContent:'center',backgroundColor:C.black,gap:10},header:{height:58,paddingHorizontal:18,flexDirection:'row',alignItems:'center',justifyContent:'space-between',borderBottomWidth:1,borderBottomColor:C.border},headerSmall:{color:C.yellow,fontSize:8,fontWeight:'900',letterSpacing:2},headerTitle:{color:C.white,fontSize:15,fontWeight:'900'},dot:{width:8,height:8,borderRadius:8,backgroundColor:C.yellow},muted:{color:C.gray,fontSize:13,lineHeight:19},yellow:{color:C.yellow,fontSize:12,fontWeight:'900'},body:{color:C.white,fontSize:14,lineHeight:21,marginTop:8},quickRow:{paddingHorizontal:18,gap:10},quick:{width:155,minHeight:125,padding:15,borderWidth:1,borderColor:C.border,borderRadius:18,backgroundColor:C.black2},quickTitle:{color:C.white,fontWeight:'900',fontSize:16,marginTop:14,marginBottom:4},wrap:{marginHorizontal:18,marginBottom:10},matchCard:{padding:16,borderWidth:1,borderColor:C.border,borderRadius:18,backgroundColor:C.black2},matchTop:{flexDirection:'row',justifyContent:'space-between'},matchTeams:{flexDirection:'row',alignItems:'center',gap:10,marginTop:17},matchTeam:{flex:1,color:C.white,fontWeight:'900',fontSize:14},vs:{width:34,height:27,borderRadius:8,backgroundColor:C.yellow,alignItems:'center',justifyContent:'center'},vsText:{color:C.black,fontWeight:'900',fontSize:10},result:{color:C.white,fontSize:16,fontWeight:'900',marginTop:9},newsImg:{width:'100%',height:190,borderRadius:12,marginBottom:12},newsTitle:{color:C.white,fontSize:20,fontWeight:'900',marginBottom:4},teamTile:{marginHorizontal:18,marginBottom:12,padding:18,borderRadius:20,borderWidth:1,borderColor:C.border,backgroundColor:C.black2,gap:6},teamName:{color:C.white,fontSize:23,fontWeight:'900',marginTop:8},teamHero:{padding:20,gap:8,backgroundColor:'#11100b'},teamHeroTitle:{color:C.white,fontSize:32,fontWeight:'900'},back:{flexDirection:'row',alignItems:'center',gap:6,marginBottom:14},backText:{color:C.white,fontWeight:'800'},segments:{padding:16,gap:8},segment:{paddingHorizontal:15,paddingVertical:10,borderRadius:12,borderWidth:1,borderColor:C.border},segmentOn:{backgroundColor:C.yellow,borderColor:C.yellow},segmentText:{color:C.gray,fontWeight:'900',fontSize:11},segmentTextOn:{color:C.black},player:{color:C.white,fontSize:16,fontWeight:'900'},tabBar:{minHeight:72,flexDirection:'row',backgroundColor:'#080808',borderTopWidth:1,borderTopColor:'#282828',alignItems:'flex-start',zIndex:999,elevation:24},tabButton:{flex:1,minHeight:64,alignItems:'center',justifyContent:'center',paddingTop:7,zIndex:1000,elevation:25},tabOn:{borderTopWidth:3,borderTopColor:C.yellow,backgroundColor:'#101010'},tabPressed:{opacity:.65},tabLabel:{color:'#999',fontSize:10,fontWeight:'800',marginTop:4},tabLabelOn:{color:C.yellow}});
+type TabName = 'Home' | 'Squadre' | 'News' | 'Risultati' | 'Altro';
+
+const SUPABASE_URL = 'https://vgxatjdtawugxkzjkyxw.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_4FuMVey4xj_B55InGcb1uw_pSMZ9Lk_';
+const TABS: TabName[] = ['Home', 'Squadre', 'News', 'Risultati', 'Altro'];
+const SPORT_KEYS = ['calcio_a_5', 'pallavolo_maschile', 'pallavolo_femminile', 'basket', 'settore_giovanile'];
+const SPORT_LABELS: Record<string, string> = {
+  calcio_a_5: 'Calcio a 5',
+  pallavolo_maschile: 'Pallavolo maschile',
+  pallavolo_femminile: 'Pallavolo femminile',
+  basket: 'Basket',
+  settore_giovanile: 'Settore giovanile',
+};
+
+const C = {
+  black: '#080808',
+  panel: '#121212',
+  panel2: '#191919',
+  yellow: '#F3C600',
+  white: '#FFFFFF',
+  gray: '#A7A7A7',
+  border: '#2A2A2A',
+};
+
+function asArray(value: any): any[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function Card({ children }: { children: React.ReactNode }) {
+  return <View style={styles.card}>{children}</View>;
+}
+
+function SectionTitle({ title }: { title: string }) {
+  return <Text style={styles.sectionTitle}>{title}</Text>;
+}
+
+function HomeScreen({ data }: { data: any }) {
+  const nextMatches = asArray(data?.next_matches).slice(0, 3);
+  const results = asArray(data?.recent_results).slice(0, 3);
+  const news = asArray(data?.news).slice(0, 3);
+
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}>
+      <View style={styles.hero}>
+        <Text style={styles.kicker}>ASD SGM SPADAFORA SPORT</Text>
+        <Text style={styles.heroTitle}>Stagione sportiva 2026/2027</Text>
+        <Text style={styles.heroText}>Tutto il mondo SGM in un'unica app.</Text>
+      </View>
+
+      <SectionTitle title="Prossime gare" />
+      {nextMatches.length === 0 ? <Card><Text style={styles.muted}>Nessuna gara programmata.</Text></Card> : null}
+      {nextMatches.map((m, i) => (
+        <Card key={`m-${i}`}>
+          <Text style={styles.yellow}>{m?.sport || 'SGM'}</Text>
+          <Text style={styles.cardTitle}>{m?.home || '—'}  vs  {m?.away || '—'}</Text>
+          <Text style={styles.muted}>{[m?.date, m?.time].filter(Boolean).join(' · ')}</Text>
+        </Card>
+      ))}
+
+      <SectionTitle title="Ultimi risultati" />
+      {results.length === 0 ? <Card><Text style={styles.muted}>Risultati in aggiornamento.</Text></Card> : null}
+      {results.map((m, i) => (
+        <Card key={`r-${i}`}>
+          <Text style={styles.yellow}>{m?.sport || 'SGM'}</Text>
+          <Text style={styles.cardTitle}>{m?.home || '—'} {m?.home_score ?? '-'} : {m?.away_score ?? '-'} {m?.away || '—'}</Text>
+        </Card>
+      ))}
+
+      <SectionTitle title="Ultime news" />
+      {news.length === 0 ? <Card><Text style={styles.muted}>News in aggiornamento.</Text></Card> : null}
+      {news.map((n, i) => (
+        <Card key={`n-${i}`}>
+          <Text style={styles.cardTitle}>{n?.title || 'News SGM'}</Text>
+          <Text style={styles.muted}>{n?.date || ''}</Text>
+          <Text style={styles.body} numberOfLines={3}>{n?.excerpt || n?.body || ''}</Text>
+        </Card>
+      ))}
+    </ScrollView>
+  );
+}
+
+function TeamsScreen({ data }: { data: any }) {
+  const sports = data?.sports || {};
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}>
+      <SectionTitle title="Le nostre squadre" />
+      {SPORT_KEYS.map((key) => {
+        const s = sports?.[key];
+        return (
+          <Card key={key}>
+            <Text style={styles.cardTitle}>{s?.name || SPORT_LABELS[key]}</Text>
+            <Text style={styles.yellow}>{s?.league_name || 'Stagione 2026/2027'}</Text>
+            <Text style={styles.muted}>{asArray(s?.roster).length} atleti · {asArray(s?.staff).length} staff</Text>
+          </Card>
+        );
+      })}
+    </ScrollView>
+  );
+}
+
+function NewsScreen({ data }: { data: any }) {
+  const news = asArray(data?.news);
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}>
+      <SectionTitle title="News" />
+      {news.length === 0 ? <Card><Text style={styles.muted}>News in aggiornamento.</Text></Card> : null}
+      {news.map((n, i) => (
+        <Card key={`news-${i}`}>
+          <Text style={styles.cardTitle}>{n?.title || 'News SGM'}</Text>
+          <Text style={styles.muted}>{n?.date || ''}</Text>
+          <Text style={styles.body}>{n?.body || n?.excerpt || ''}</Text>
+        </Card>
+      ))}
+    </ScrollView>
+  );
+}
+
+function ResultsScreen({ data }: { data: any }) {
+  const results = asArray(data?.recent_results);
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}>
+      <SectionTitle title="Risultati" />
+      {results.length === 0 ? <Card><Text style={styles.muted}>Risultati in aggiornamento.</Text></Card> : null}
+      {results.map((m, i) => (
+        <Card key={`result-${i}`}>
+          <Text style={styles.yellow}>{m?.sport || 'SGM'}</Text>
+          <Text style={styles.cardTitle}>{m?.home || '—'} {m?.home_score ?? '-'} : {m?.away_score ?? '-'} {m?.away || '—'}</Text>
+        </Card>
+      ))}
+    </ScrollView>
+  );
+}
+
+function MoreScreen() {
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}>
+      <SectionTitle title="Altro" />
+      <Card><Text style={styles.cardTitle}>Palmarès</Text><Text style={styles.muted}>Trofei e risultati della società.</Text></Card>
+      <Card><Text style={styles.cardTitle}>SGM TV</Text><Text style={styles.muted}>Video e contenuti multimediali.</Text></Card>
+      <Card><Text style={styles.cardTitle}>Sponsor</Text><Text style={styles.muted}>I partner di ASD SGM Spadafora Sport.</Text></Card>
+    </ScrollView>
+  );
+}
+
+export default function App() {
+  const [active, setActive] = useState<TabName>('Home');
+  const [data, setData] = useState<any>({});
+  const [loading, setLoading] = useState(true);
+  const [online, setOnline] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/site_data?id=eq.1&select=payload`, {
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+          },
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const rows = await response.json();
+        if (alive && Array.isArray(rows) && rows[0]?.payload) {
+          setData(rows[0].payload);
+          setOnline(true);
+        }
+      } catch {
+        if (alive) setOnline(false);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }, 350);
+
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+    };
+  }, []);
+
+  const screen = useMemo(() => {
+    if (active === 'Squadre') return <TeamsScreen data={data} />;
+    if (active === 'News') return <NewsScreen data={data} />;
+    if (active === 'Risultati') return <ResultsScreen data={data} />;
+    if (active === 'Altro') return <MoreScreen />;
+    return <HomeScreen data={data} />;
+  }, [active, data]);
+
+  return (
+    <SafeAreaView style={styles.app}>
+      <StatusBar style="light" backgroundColor={C.black} />
+      <View style={styles.androidTopPad} />
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.headerKicker}>ASD</Text>
+          <Text style={styles.headerTitle}>SGM SPADAFORA SPORT</Text>
+        </View>
+        <View style={[styles.statusDot, online && styles.statusDotOnline]} />
+      </View>
+
+      <View style={styles.content}>
+        {loading ? (
+          <View style={styles.loader}>
+            <ActivityIndicator size="large" color={C.yellow} />
+            <Text style={styles.muted}>Caricamento SGM…</Text>
+          </View>
+        ) : screen}
+      </View>
+
+      <View style={styles.tabBar}>
+        {TABS.map((tab) => {
+          const selected = active === tab;
+          return (
+            <Pressable
+              key={tab}
+              onPress={() => setActive(tab)}
+              style={({ pressed }) => [styles.tabButton, selected && styles.tabButtonActive, pressed && styles.pressed]}
+            >
+              <Text style={[styles.tabSymbol, selected && styles.tabTextActive]}>{tab === 'Home' ? '⌂' : tab === 'Squadre' ? '●' : tab === 'News' ? '▤' : tab === 'Risultati' ? '★' : '☰'}</Text>
+              <Text style={[styles.tabText, selected && styles.tabTextActive]}>{tab}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  app: { flex: 1, backgroundColor: C.black },
+  androidTopPad: { height: NativeStatusBar.currentHeight || 0 },
+  header: { height: 58, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: C.border },
+  headerKicker: { color: C.yellow, fontSize: 8, fontWeight: '900', letterSpacing: 2 },
+  headerTitle: { color: C.white, fontSize: 15, fontWeight: '900' },
+  statusDot: { width: 9, height: 9, borderRadius: 9, backgroundColor: '#666' },
+  statusDotOnline: { backgroundColor: C.yellow },
+  content: { flex: 1 },
+  screen: { flex: 1, backgroundColor: C.black },
+  scrollContent: { paddingTop: 12, paddingBottom: 24 },
+  loader: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
+  hero: { margin: 16, padding: 22, borderRadius: 22, backgroundColor: C.panel2, borderWidth: 1, borderColor: '#3A3210' },
+  kicker: { color: C.yellow, fontSize: 10, fontWeight: '900', letterSpacing: 1.4 },
+  heroTitle: { color: C.white, fontSize: 29, lineHeight: 34, fontWeight: '900', marginTop: 8 },
+  heroText: { color: C.gray, fontSize: 14, marginTop: 8 },
+  sectionTitle: { color: C.white, fontSize: 24, fontWeight: '900', marginHorizontal: 18, marginTop: 16, marginBottom: 10 },
+  card: { marginHorizontal: 16, marginBottom: 10, padding: 16, borderRadius: 17, backgroundColor: C.panel, borderWidth: 1, borderColor: C.border },
+  cardTitle: { color: C.white, fontSize: 17, fontWeight: '900', marginBottom: 5 },
+  yellow: { color: C.yellow, fontSize: 12, fontWeight: '900', marginBottom: 5 },
+  muted: { color: C.gray, fontSize: 13, lineHeight: 19 },
+  body: { color: C.white, fontSize: 14, lineHeight: 21, marginTop: 8 },
+  tabBar: { height: 78, paddingBottom: 10, flexDirection: 'row', backgroundColor: '#0A0A0A', borderTopWidth: 1, borderTopColor: C.border },
+  tabButton: { flex: 1, minWidth: 0, alignItems: 'center', justifyContent: 'center', paddingTop: 4 },
+  tabButtonActive: { borderTopWidth: 3, borderTopColor: C.yellow, backgroundColor: '#111111' },
+  tabSymbol: { color: '#8C8C8C', fontSize: 18, fontWeight: '900', lineHeight: 20 },
+  tabText: { color: '#8C8C8C', fontSize: 9, fontWeight: '800', marginTop: 3 },
+  tabTextActive: { color: C.yellow },
+  pressed: { opacity: 0.6 },
+});

@@ -4,108 +4,43 @@
 
   const VAPID_PUBLIC_KEY='BLZ6RXPVYdN1T_AE3Y5W2JyDhoizUjXX5so0nLXjoUfrVLPCpW8G8Gv2DmFL7SipSLK2tMFPjlPafDUBCo5pP5I';
   const DISMISS_KEY='sgm_web_push_dismissed_at';
+  const DISABLED_KEY='sgm_web_push_disabled';
   const supported='serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
   let client=null;
 
-  function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+  function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;')}
   function fmtDate(v){try{return new Date(v).toLocaleString('it-IT',{dateStyle:'short',timeStyle:'short'})}catch{return v||''}}
-  function b64ToUint8Array(base64String){
-    const padding='='.repeat((4-base64String.length%4)%4);
-    const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
-    const rawData=atob(base64);
-    return Uint8Array.from([...rawData].map(c=>c.charCodeAt(0)));
-  }
+  function b64ToUint8Array(base64String){const padding='='.repeat((4-base64String.length%4)%4);const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');const rawData=atob(base64);return Uint8Array.from([...rawData].map(c=>c.charCodeAt(0)));}
+  function getClient(){if(client)return client;if(window.supabase?.createClient&&window.SGM_SUPABASE_CONFIG)client=window.supabase.createClient(window.SGM_SUPABASE_CONFIG.url,window.SGM_SUPABASE_CONFIG.anonKey);return client;}
 
-  function getClient(){
-    if(client) return client;
-    if(window.supabase?.createClient && window.SGM_SUPABASE_CONFIG){
-      client=window.supabase.createClient(window.SGM_SUPABASE_CONFIG.url,window.SGM_SUPABASE_CONFIG.anonKey);
+  async function saveSubscription(sub){const json=sub.toJSON();const payload={endpoint:json.endpoint,p256dh:json.keys?.p256dh||'',auth:json.keys?.auth||'',user_agent:navigator.userAgent||''};const c=getClient();if(!c)throw new Error('Servizio notifiche non disponibile');const{error}=await c.from('web_push_subscriptions').insert(payload);if(error&&error.code!=='23505')throw error;}
+  async function ensureSubscription(requestPermission){if(!supported)throw new Error('Questo browser non supporta le notifiche push.');let permission=Notification.permission;if(permission==='default'&&requestPermission)permission=await Notification.requestPermission();if(permission==='denied')throw new Error('Le notifiche sono bloccate nelle impostazioni del browser.');if(permission!=='granted')throw new Error('Autorizzazione alle notifiche non concessa.');const reg=await navigator.serviceWorker.register('/sgm-sw.js',{scope:'/'});await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64ToUint8Array(VAPID_PUBLIC_KEY)});await saveSubscription(sub);localStorage.removeItem(DISMISS_KEY);localStorage.removeItem(DISABLED_KEY);return sub;}
+
+  async function disableNotifications(){
+    if(!supported)throw new Error('Questo browser non supporta la gestione delle notifiche.');
+    const reg=await navigator.serviceWorker.getRegistration('/');
+    const sub=reg?await reg.pushManager.getSubscription():null;
+    if(sub){
+      const endpoint=sub.endpoint;
+      try{const c=getClient();if(c)await c.from('web_push_subscriptions').delete().eq('endpoint',endpoint);}catch(_){}
+      await sub.unsubscribe();
     }
-    return client;
+    localStorage.setItem(DISABLED_KEY,'1');
+    localStorage.setItem(DISMISS_KEY,String(Date.now()));
+    setStatus('✓ Notifiche disattivate su questo dispositivo.','ok');
+    await refreshControls();
   }
 
-  async function saveSubscription(sub){
-    const json=sub.toJSON();
-    const payload={endpoint:json.endpoint,p256dh:json.keys?.p256dh||'',auth:json.keys?.auth||'',user_agent:navigator.userAgent||''};
-    const c=getClient();if(!c)throw new Error('Servizio notifiche non disponibile');
-    const {error}=await c.from('web_push_subscriptions').insert(payload);
-    if(error&&error.code!=='23505')throw error;
-  }
+  function installStyles(){if(document.getElementById('sgmPushStyles'))return;const s=document.createElement('style');s.id='sgmPushStyles';s.textContent=`.sgm-push-nav{cursor:pointer}.sgm-push-card{position:fixed;left:18px;right:18px;bottom:18px;z-index:99999;max-width:520px;margin:auto;background:#0b0b0b;color:#fff;border:1px solid #2b2b2b;border-top:3px solid #ffd400;border-radius:16px;padding:18px;box-shadow:0 18px 50px rgba(0,0,0,.45);font-family:inherit;max-height:78vh;overflow:auto}.sgm-push-card[hidden]{display:none}.sgm-push-top{display:flex;gap:13px;align-items:flex-start}.sgm-push-icon{width:44px;height:44px;border-radius:12px;background:#ffd400;color:#080808;display:grid;place-items:center;font-size:22px;flex:0 0 44px}.sgm-push-card h3{margin:0 0 5px;font-size:18px}.sgm-push-card p{margin:0;color:#bbb;line-height:1.45;font-size:13px}.sgm-push-actions{display:flex;gap:9px;margin-top:16px;flex-wrap:wrap}.sgm-push-actions button{border:0;border-radius:9px;padding:11px 14px;font-weight:900;cursor:pointer}.sgm-push-enable{background:#ffd400;color:#080808}.sgm-push-disable{background:#391515;color:#ffb4b4;border:1px solid #713333!important}.sgm-push-later{background:#1d1d1d;color:#ddd}.sgm-push-status{margin-top:10px;font-size:12px;font-weight:700}.sgm-push-status.ok{color:#9bd18b}.sgm-push-status.err{color:#ff9b9b}.sgm-push-history{margin-top:18px;padding-top:16px;border-top:1px solid #292929}.sgm-push-history h4{margin:0 0 10px;font-size:15px}.sgm-push-item{display:block;text-decoration:none;color:#fff;background:#151515;border:1px solid #292929;border-radius:11px;padding:12px;margin-top:8px}.sgm-push-item strong{display:block;font-size:13px}.sgm-push-item span{display:block;color:#aaa;font-size:11px;line-height:1.4;margin-top:4px}.sgm-push-empty{color:#888;font-size:12px;padding:8px 0}@media(min-width:720px){.sgm-push-card{left:auto;right:24px;margin:0;width:430px}}`;document.head.appendChild(s);}
 
-  async function ensureSubscription(requestPermission){
-    if(!supported)throw new Error('Questo browser non supporta le notifiche push.');
-    let permission=Notification.permission;
-    if(permission==='default'&&requestPermission)permission=await Notification.requestPermission();
-    if(permission==='denied')throw new Error('Le notifiche sono bloccate nelle impostazioni del browser.');
-    if(permission!=='granted')throw new Error('Autorizzazione alle notifiche non concessa.');
-    const reg=await navigator.serviceWorker.register('/sgm-sw.js',{scope:'/'});
-    await navigator.serviceWorker.ready;
-    let sub=await reg.pushManager.getSubscription();
-    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64ToUint8Array(VAPID_PUBLIC_KEY)});
-    await saveSubscription(sub);localStorage.removeItem(DISMISS_KEY);return sub;
-  }
+  async function loadHistory(){const box=document.getElementById('sgmPushHistoryList');if(!box)return;const c=getClient();if(!c){box.innerHTML='<div class="sgm-push-empty">Cronologia non disponibile.</div>';return;}try{const{data,error}=await c.from('app_notifications').select('id,title,body,target_url,created_at').order('created_at',{ascending:false}).limit(12);if(error)throw error;box.innerHTML=(data||[]).length?(data||[]).map(n=>{const href=n.target_url?new URL(n.target_url,location.origin).href:'#';const tag=n.target_url?'a':'div';return `<${tag} class="sgm-push-item"${n.target_url?` href="${esc(href)}"`:''}><strong>${esc(n.title)}</strong><span>${esc(n.body)}<br>${fmtDate(n.created_at)}</span></${tag}>`;}).join(''):'<div class="sgm-push-empty">Nessuna notifica disponibile.</div>';}catch(_){box.innerHTML='<div class="sgm-push-empty">Impossibile caricare le notifiche.</div>';}}
 
-  function installStyles(){
-    if(document.getElementById('sgmPushStyles'))return;
-    const s=document.createElement('style');s.id='sgmPushStyles';
-    s.textContent=`.sgm-push-nav{cursor:pointer}.sgm-push-card{position:fixed;left:18px;right:18px;bottom:18px;z-index:99999;max-width:520px;margin:auto;background:#0b0b0b;color:#fff;border:1px solid #2b2b2b;border-top:3px solid #ffd400;border-radius:16px;padding:18px;box-shadow:0 18px 50px rgba(0,0,0,.45);font-family:inherit;max-height:78vh;overflow:auto}.sgm-push-card[hidden]{display:none}.sgm-push-top{display:flex;gap:13px;align-items:flex-start}.sgm-push-icon{width:44px;height:44px;border-radius:12px;background:#ffd400;color:#080808;display:grid;place-items:center;font-size:22px;flex:0 0 44px}.sgm-push-card h3{margin:0 0 5px;font-size:18px}.sgm-push-card p{margin:0;color:#bbb;line-height:1.45;font-size:13px}.sgm-push-actions{display:flex;gap:9px;margin-top:16px;flex-wrap:wrap}.sgm-push-actions button{border:0;border-radius:9px;padding:11px 14px;font-weight:900;cursor:pointer}.sgm-push-enable{background:#ffd400;color:#080808}.sgm-push-later{background:#1d1d1d;color:#ddd}.sgm-push-status{margin-top:10px;font-size:12px;font-weight:700}.sgm-push-status.ok{color:#9bd18b}.sgm-push-status.err{color:#ff9b9b}.sgm-push-history{margin-top:18px;padding-top:16px;border-top:1px solid #292929}.sgm-push-history h4{margin:0 0 10px;font-size:15px}.sgm-push-item{display:block;text-decoration:none;color:#fff;background:#151515;border:1px solid #292929;border-radius:11px;padding:12px;margin-top:8px}.sgm-push-item strong{display:block;font-size:13px}.sgm-push-item span{display:block;color:#aaa;font-size:11px;line-height:1.4;margin-top:4px}.sgm-push-empty{color:#888;font-size:12px;padding:8px 0}@media(min-width:720px){.sgm-push-card{left:auto;right:24px;margin:0;width:430px}}`;
-    document.head.appendChild(s);
-  }
-
-  async function loadHistory(){
-    const box=document.getElementById('sgmPushHistoryList');if(!box)return;
-    const c=getClient();if(!c){box.innerHTML='<div class="sgm-push-empty">Cronologia non disponibile.</div>';return;}
-    try{
-      const {data,error}=await c.from('app_notifications').select('id,title,body,target_url,created_at').order('created_at',{ascending:false}).limit(12);
-      if(error)throw error;
-      box.innerHTML=(data||[]).length?(data||[]).map(n=>{
-        const href=n.target_url?new URL(n.target_url,location.origin).href:'#';
-        const tag=n.target_url?'a':'div';
-        return `<${tag} class="sgm-push-item"${n.target_url?` href="${esc(href)}"`:''}><strong>${esc(n.title)}</strong><span>${esc(n.body)}<br>${fmtDate(n.created_at)}</span></${tag}>`;
-      }).join(''):'<div class="sgm-push-empty">Nessuna notifica disponibile.</div>';
-    }catch(_){box.innerHTML='<div class="sgm-push-empty">Impossibile caricare le notifiche.</div>';}
-  }
-
-  function installUI(){
-    installStyles();
-    const nav=document.querySelector('.main-nav');
-    if(nav&&!nav.querySelector('.sgm-push-nav')){
-      const a=document.createElement('a');a.href='#';a.className='sgm-push-nav';a.textContent='🔔 Notifiche';
-      a.addEventListener('click',e=>{e.preventDefault();openCard(true)});nav.appendChild(a);
-    }
-    if(!document.getElementById('sgmPushCard')){
-      const card=document.createElement('div');card.id='sgmPushCard';card.className='sgm-push-card';card.hidden=true;
-      card.innerHTML=`<div class="sgm-push-top"><div class="sgm-push-icon">🔔</div><div><h3>Resta aggiornato su SGM</h3><p>Ricevi news, comunicati ufficiali, Match Day, risultati e prossime partite direttamente sul tuo dispositivo.</p></div></div><div class="sgm-push-actions"><button type="button" class="sgm-push-enable">ATTIVA NOTIFICHE</button><button type="button" class="sgm-push-later">CHIUDI</button></div><div class="sgm-push-status"></div><div class="sgm-push-history"><h4>Ultime notifiche</h4><div id="sgmPushHistoryList"><div class="sgm-push-empty">Caricamento...</div></div></div>`;
-      document.body.appendChild(card);
-      card.querySelector('.sgm-push-enable').addEventListener('click',activate);
-      card.querySelector('.sgm-push-later').addEventListener('click',()=>{localStorage.setItem(DISMISS_KEY,String(Date.now()));card.hidden=true;});
-    }
-  }
+  function installUI(){installStyles();const nav=document.querySelector('.main-nav');if(nav&&!nav.querySelector('.sgm-push-nav')){const a=document.createElement('a');a.href='#';a.className='sgm-push-nav';a.textContent='🔔 Notifiche';a.addEventListener('click',e=>{e.preventDefault();openCard(true)});nav.appendChild(a);}if(!document.getElementById('sgmPushCard')){const card=document.createElement('div');card.id='sgmPushCard';card.className='sgm-push-card';card.hidden=true;card.innerHTML=`<div class="sgm-push-top"><div class="sgm-push-icon">🔔</div><div><h3>Resta aggiornato su SGM</h3><p>Ricevi news, comunicati ufficiali, Match Day, risultati e prossime partite direttamente sul tuo dispositivo.</p></div></div><div class="sgm-push-actions"><button type="button" class="sgm-push-enable">ATTIVA NOTIFICHE</button><button type="button" class="sgm-push-disable" hidden>DISATTIVA NOTIFICHE</button><button type="button" class="sgm-push-later">CHIUDI</button></div><div class="sgm-push-status"></div><div class="sgm-push-history"><h4>Ultime notifiche</h4><div id="sgmPushHistoryList"><div class="sgm-push-empty">Caricamento...</div></div></div>`;document.body.appendChild(card);card.querySelector('.sgm-push-enable').addEventListener('click',activate);card.querySelector('.sgm-push-disable').addEventListener('click',async()=>{const btn=card.querySelector('.sgm-push-disable');try{btn.disabled=true;btn.textContent='DISATTIVAZIONE...';await disableNotifications();}catch(e){setStatus(e.message||String(e),'err');}finally{btn.disabled=false;btn.textContent='DISATTIVA NOTIFICHE';}});card.querySelector('.sgm-push-later').addEventListener('click',()=>{localStorage.setItem(DISMISS_KEY,String(Date.now()));card.hidden=true;});}}
 
   function setStatus(text,type){const el=document.querySelector('#sgmPushCard .sgm-push-status');if(!el)return;el.textContent=text||'';el.className='sgm-push-status '+(type||'');}
-  function openCard(manual){
-    const card=document.getElementById('sgmPushCard');if(!card)return;card.hidden=false;setStatus('','');loadHistory();
-    if(!supported)return setStatus('Il browser in uso non supporta le notifiche push.','err');
-    if(Notification.permission==='granted')setStatus('Notifiche già attive su questo dispositivo.','ok');
-    if(Notification.permission==='denied')setStatus('Notifiche bloccate: riattivale dalle impostazioni del browser.','err');
-    if(manual)localStorage.removeItem(DISMISS_KEY);
-  }
-
-  async function activate(){
-    const btn=document.querySelector('#sgmPushCard .sgm-push-enable');
-    try{if(btn){btn.disabled=true;btn.textContent='ATTIVAZIONE...'}await ensureSubscription(true);setStatus('✓ Notifiche attivate su questo dispositivo.','ok');}
-    catch(e){setStatus(e.message||String(e),'err');}
-    finally{if(btn){btn.disabled=false;btn.textContent='ATTIVA NOTIFICHE'}}
-  }
-
-  async function init(){
-    installUI();
-    if(!supported)return;
-    if(Notification.permission==='granted'){try{await ensureSubscription(false);}catch(_){ }return;}
-    if(Notification.permission!=='default')return;
-    const dismissed=Number(localStorage.getItem(DISMISS_KEY)||0),sevenDays=7*24*60*60*1000;
-    if(!dismissed||Date.now()-dismissed>sevenDays)setTimeout(()=>openCard(false),1800);
-  }
-
+  async function refreshControls(){const enable=document.querySelector('#sgmPushCard .sgm-push-enable'),disable=document.querySelector('#sgmPushCard .sgm-push-disable');if(!enable||!disable)return;let active=false;if(supported&&Notification.permission==='granted'){try{const reg=await navigator.serviceWorker.getRegistration('/');active=!!(reg&&await reg.pushManager.getSubscription());}catch(_){}}enable.hidden=active;disable.hidden=!active;if(active)setStatus('Notifiche attive su questo dispositivo.','ok');else if(localStorage.getItem(DISABLED_KEY)==='1')setStatus('Notifiche disattivate su questo dispositivo.','');else if(Notification.permission==='denied')setStatus('Notifiche bloccate: riattivale dalle impostazioni del browser.','err');}
+  async function openCard(manual){const card=document.getElementById('sgmPushCard');if(!card)return;card.hidden=false;setStatus('','');loadHistory();await refreshControls();if(!supported)setStatus('Il browser in uso non supporta le notifiche push.','err');if(manual)localStorage.removeItem(DISMISS_KEY);}
+  async function activate(){const btn=document.querySelector('#sgmPushCard .sgm-push-enable');try{if(btn){btn.disabled=true;btn.textContent='ATTIVAZIONE...'}await ensureSubscription(true);setStatus('✓ Notifiche attivate su questo dispositivo.','ok');await refreshControls();}catch(e){setStatus(e.message||String(e),'err');}finally{if(btn){btn.disabled=false;btn.textContent='ATTIVA NOTIFICHE'}}}
+  async function init(){installUI();if(!supported)return;if(Notification.permission==='granted'&&localStorage.getItem(DISABLED_KEY)!=='1'){try{await ensureSubscription(false);}catch(_){}return;}if(Notification.permission!=='default'||localStorage.getItem(DISABLED_KEY)==='1')return;const dismissed=Number(localStorage.getItem(DISMISS_KEY)||0),sevenDays=7*24*60*60*1000;if(!dismissed||Date.now()-dismissed>sevenDays)setTimeout(()=>openCard(false),1800);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

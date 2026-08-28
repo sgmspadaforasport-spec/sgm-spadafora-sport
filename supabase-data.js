@@ -11,7 +11,19 @@
     async getSession(){if(!this.enabled)return null;const{data}=await this.client.auth.getSession();return data?.session||null;},
     async uploadImage(file,folder="uploads"){if(!this.enabled)throw new Error("Supabase non configurato");const clean=(file.name||"image").toLowerCase().replace(/[^a-z0-9._-]+/g,"-");const path=`${folder}/${Date.now()}-${clean}`;const{error}=await this.client.storage.from(cfg.storageBucket||"sgm-media").upload(path,file,{upsert:false});if(error)throw error;const{data}=this.client.storage.from(cfg.storageBucket||"sgm-media").getPublicUrl(path);return data.publicUrl;}
   };
-  function arrangeMenu(){const menu=document.querySelector('.main-nav');if(!menu)return;let about=menu.querySelector('a[href="chi-siamo.html"]');if(!about){about=document.createElement('a');about.href='chi-siamo.html';about.textContent='Chi siamo';}let staff=menu.querySelector('a[href="staff.html"]');if(!staff){staff=document.createElement('a');staff.href='staff.html';staff.textContent='Staff';}let comunicati=menu.querySelector('a[href="comunicati-ufficiali.html"]');if(!comunicati){comunicati=document.createElement('a');comunicati.href='comunicati-ufficiali.html';comunicati.textContent='Comunicati ufficiali';}const contacts=menu.querySelector('a[href="contatti.html"]');if(contacts){menu.insertBefore(comunicati,contacts);menu.insertBefore(staff,contacts);menu.insertBefore(about,contacts);menu.insertBefore(comunicati,staff);}else{menu.appendChild(comunicati);menu.appendChild(staff);menu.appendChild(about);}}
+  function arrangeMenu(){
+    const menu=document.querySelector('.main-nav');if(!menu)return;
+    let about=menu.querySelector('a[href="chi-siamo.html"]');if(!about){about=document.createElement('a');about.href='chi-siamo.html';}
+    let staff=menu.querySelector('a[href="staff.html"]');if(!staff){staff=document.createElement('a');staff.href='staff.html';}
+    let comunicati=menu.querySelector('a[href="comunicati-ufficiali.html"]');if(!comunicati){comunicati=document.createElement('a');comunicati.href='comunicati-ufficiali.html';}
+    const contacts=menu.querySelector('a[href="contatti.html"]');
+    if(contacts){menu.insertBefore(comunicati,contacts);menu.insertBefore(staff,contacts);menu.insertBefore(about,contacts);menu.insertBefore(comunicati,staff);}else{menu.appendChild(comunicati);menu.appendChild(staff);menu.appendChild(about);}
+    const labels={
+      'index.html':'Home 🏠','':'Home 🏠','squadre.html':'Squadre 👥','calendario-risultati.html':'Calendario 🗓️','news.html':'News 📰','sponsor.html':'Sponsor 🤝','galleria.html':'Galleria 📷','sgm-tv.html':'SGM TV 🎥','palmares.html':'Palmares 🏆','comunicati-ufficiali.html':'Comunicati ufficiali 📢','staff.html':'Staff 💼','chi-siamo.html':'Chi siamo 🤝','contatti.html':'Contatti 📞'
+    };
+    menu.querySelectorAll('a').forEach(a=>{const href=(a.getAttribute('href')||'').split('/').pop();if(labels[href]!==undefined)a.textContent=labels[href];});
+    const push=menu.querySelector('.sgm-push-nav');if(push)push.textContent='Notifiche 🔔';
+  }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arrangeMenu);else arrangeMenu();
   const page=(location.pathname.split('/').pop()||'').toLowerCase();const extras=[];
   if(page==='admin.html')extras.push('admin-content.js','admin-staff.js','admin-about.js','admin-youth-staff.js','admin-comunicati.js','admin-leagues.js','admin-home.js','admin-notifications.js');
@@ -22,5 +34,5 @@
   if(page==='staff.html')extras.push('staff-dynamic.js');
   if(page===''||page==='index.html')extras.push('home-news.js','home-layout-cleanup.js','home-hero-dynamic.js','home-admin-access.js');
   if(page!=='admin.html')extras.push('professional-footer.js','web-notifications.js');
-  extras.forEach(src=>{const script=document.createElement('script');script.src=src+'?v=27';script.async=false;document.head.appendChild(script);});
+  extras.forEach(src=>{const script=document.createElement('script');script.src=src+'?v=28';script.async=false;document.head.appendChild(script);});
 })();

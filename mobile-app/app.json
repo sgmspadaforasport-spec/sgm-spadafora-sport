@@ -13,12 +13,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "it.sgmspadaforasport.app"
     },
-    "plugins": ["expo-notifications"],
     "extra": {
-      "club": "ASD SGM Spadafora Sport",
-      "eas": {
-        "projectId": "REPLACE_AFTER_EAS_INIT"
-      }
+      "club": "ASD SGM Spadafora Sport"
     }
   }
 }

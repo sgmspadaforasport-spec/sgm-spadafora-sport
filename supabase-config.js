@@ -6,13 +6,13 @@ window.SGM_SUPABASE_CONFIG = {
 
 /* Favicon ufficiale SGM */
 (function () {
-  const href = "https://asdsgmspadaforasport.it/IMG-20250217-WA0006.jpg";
+  const href = "https://asdsgmspadaforasport.it/favicon.svg?v=1";
   let icon = document.querySelector('link[rel="icon"]');
   if (!icon) { icon = document.createElement('link'); icon.rel = 'icon'; document.head.appendChild(icon); }
-  icon.type = 'image/jpeg'; icon.href = href;
+  icon.type = 'image/svg+xml'; icon.href = href;
   let shortcut = document.querySelector('link[rel="shortcut icon"]');
   if (!shortcut) { shortcut = document.createElement('link'); shortcut.rel = 'shortcut icon'; document.head.appendChild(shortcut); }
-  shortcut.type = 'image/jpeg'; shortcut.href = href;
+  shortcut.type = 'image/svg+xml'; shortcut.href = href;
 })();
 
 /* SEO centralizzato per le pagine pubbliche */

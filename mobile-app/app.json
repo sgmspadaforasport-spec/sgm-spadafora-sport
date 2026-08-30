@@ -6,8 +6,10 @@
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "scheme": "sgmspadaforasport",
+    "plugins": ["expo-notifications"],
     "android": {
-      "package": "it.sgmspadaforasport.app"
+      "package": "it.sgmspadaforasport.app",
+      "permissions": ["POST_NOTIFICATIONS"]
     },
     "ios": {
       "supportsTablet": true,

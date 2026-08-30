@@ -4,15 +4,18 @@ window.SGM_SUPABASE_CONFIG = {
   storageBucket: "sgm-media"
 };
 
-/* Favicon ufficiale SGM */
+/* Favicon ufficiale SGM - formato supportato da Google Search */
 (function () {
-  const href = "https://asdsgmspadaforasport.it/favicon.svg?v=1";
+  const href = "https://asdsgmspadaforasport.it/IMG-20250217-WA0006.jpg";
   let icon = document.querySelector('link[rel="icon"]');
   if (!icon) { icon = document.createElement('link'); icon.rel = 'icon'; document.head.appendChild(icon); }
-  icon.type = 'image/svg+xml'; icon.href = href;
+  icon.type = 'image/jpeg'; icon.setAttribute('sizes','500x500'); icon.href = href;
   let shortcut = document.querySelector('link[rel="shortcut icon"]');
   if (!shortcut) { shortcut = document.createElement('link'); shortcut.rel = 'shortcut icon'; document.head.appendChild(shortcut); }
-  shortcut.type = 'image/svg+xml'; shortcut.href = href;
+  shortcut.type = 'image/jpeg'; shortcut.href = href;
+  let apple = document.querySelector('link[rel="apple-touch-icon"]');
+  if (!apple) { apple = document.createElement('link'); apple.rel = 'apple-touch-icon'; document.head.appendChild(apple); }
+  apple.href = href;
 })();
 
 /* SEO centralizzato per le pagine pubbliche */

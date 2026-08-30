@@ -14,7 +14,7 @@
     wrap.className='field full';
     wrap.dataset.kind=kind;
     wrap.style.marginTop='10px';
-    wrap.innerHTML=`<label style="display:flex;align-items:center;gap:10px;background:#171717;border:2px solid #ffd400;border-radius:12px;padding:14px;cursor:pointer;text-transform:none;font-size:13px;color:#fff;font-weight:800"><input id="sgmNotifyFlag" type="checkbox" style="width:20px;height:20px;accent-color:#ffd400;flex:0 0 auto"> <span>🔔 Invia una notifica agli utenti dell'app</span></label><small style="display:block;color:#999;margin-top:7px">Facoltativo: se selezionato, la notifica partirà dopo “Salva online”.</small>`;
+    wrap.innerHTML=`<label style="display:flex;align-items:center;gap:10px;background:#171717;border:2px solid #ffd400;border-radius:12px;padding:14px;cursor:pointer;text-transform:none;font-size:13px;color:#fff;font-weight:800"><input id="sgmNotifyFlag" type="checkbox" style="width:20px;height:20px;accent-color:#ffd400;flex:0 0 auto"> <span>🔔 Invia una notifica agli utenti dell'app e del sito</span></label><small style="display:block;color:#999;margin-top:7px">Facoltativo: se selezionato, la notifica partirà dopo “Salva online” sia sull'app sia sul sito.</small>`;
     body.appendChild(wrap);
   }
 
@@ -48,14 +48,14 @@
     if(kind==='news'){
       const title=(document.getElementById('cnTitle')?.value||'').trim();
       const excerpt=(document.getElementById('cnExcerpt')?.value||'').trim();
-      pending.push({type:'news',title:'📰 Nuova news SGM',body:title||excerpt||'È stata pubblicata una nuova news SGM.',target_url:'news.html',channel:'app'});
+      pending.push({type:'news',title:'📰 Nuova news SGM',body:title||excerpt||'È stata pubblicata una nuova news SGM.',target_url:'news.html',channel:'all'});
     }else if(kind==='result'){
       const sport=(document.getElementById('rSport')?.value||'').trim();
       const home=(document.getElementById('rHome')?.value||'').trim();
       const hs=(document.getElementById('rHomeScore')?.value||'').trim();
       const as=(document.getElementById('rAwayScore')?.value||'').trim();
       const away=(document.getElementById('rAway')?.value||'').trim();
-      pending.push({type:'result',title:'🏆 Risultato finale'+(sport?` · ${sport}`:''),body:`${home||'SGM'} ${hs||'-'} - ${as||'-'} ${away||''}`.trim(),target_url:'calendario-risultati.html',channel:'app'});
+      pending.push({type:'result',title:'🏆 Risultato finale'+(sport?` · ${sport}`:''),body:`${home||'SGM'} ${hs||'-'} - ${as||'-'} ${away||''}`.trim(),target_url:'calendario-risultati.html',channel:'all'});
     }
   },true);
 
@@ -75,7 +75,7 @@
         sent++;
       }catch(err){console.error('Invio notifica automatica fallito',err);}
     }
-    if(sent&&typeof status==='function')setTimeout(()=>status(`✓ Modifiche salvate online · ${sent} notifica${sent===1?'':'he'} app inviata${sent===1?'':'e'}.`),0);
+    if(sent&&typeof status==='function')setTimeout(()=>status(`✓ Modifiche salvate online · ${sent} notifica${sent===1?'':'he'} inviata${sent===1?'':'e'} ad app e sito.`),0);
     if(sent<jobs.length)alert(`Contenuti salvati, ma ${jobs.length-sent} notifica${jobs.length-sent===1?' non è stata inviata':'he non sono state inviate'}.`);
   }
 

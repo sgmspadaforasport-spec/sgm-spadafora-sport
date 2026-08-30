@@ -3,16 +3,19 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Platform,
   Pressable,
   SafeAreaView,
   ScrollView,
   StatusBar as NativeStatusBar,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 
 type TabName = 'Home' | 'Squadre' | 'News' | 'Risultati' | 'Altro';
 
@@ -40,11 +43,9 @@ const TAB_ICONS: Record<TabName, string> = {
 
 const C = {
   black: '#050505',
-  black2: '#0C0C0C',
   panel: '#111111',
   panel2: '#171717',
   yellow: '#F3C600',
-  yellowSoft: '#D7AF00',
   white: '#FFFFFF',
   gray: '#A2A2A2',
   gray2: '#737373',
@@ -53,6 +54,55 @@ const C = {
 
 function asArray(value: any): any[] { return Array.isArray(value) ? value : []; }
 function compactDate(value: any) { return typeof value === 'string' ? value : ''; }
+
+async function savePushToken(token: string) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/app_push_tokens?on_conflict=expo_push_token`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'resolution=merge-duplicates,return=minimal',
+    },
+    body: JSON.stringify({
+      expo_push_token: token,
+      platform: Platform.OS,
+      app_version: Constants.expoConfig?.version ?? '1.0.0',
+      updated_at: new Date().toISOString(),
+    }),
+  });
+  if (!response.ok) throw new Error(`Registrazione dispositivo non riuscita (${response.status}).`);
+}
+
+async function activatePushNotifications() {
+  if (!Device.isDevice) throw new Error('Le notifiche push funzionano su un dispositivo reale.');
+
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'Notifiche SGM',
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#F3C600',
+      sound: 'default',
+    });
+  }
+
+  const current = await Notifications.getPermissionsAsync();
+  let status = current.status;
+  if (status !== 'granted') {
+    const requested = await Notifications.requestPermissionsAsync();
+    status = requested.status;
+  }
+  if (status !== 'granted') throw new Error('Permesso notifiche non concesso. Puoi abilitarlo dalle impostazioni del telefono.');
+
+  const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
+  const expoToken = projectId
+    ? await Notifications.getExpoPushTokenAsync({ projectId })
+    : await Notifications.getExpoPushTokenAsync();
+
+  await savePushToken(expoToken.data);
+  return expoToken.data;
+}
 
 function SectionHeader({ eyebrow, title, action }: { eyebrow: string; title: string; action?: string }) {
   return (
@@ -166,7 +216,7 @@ function TeamsScreen({ data }: { data: any }) {
             <View style={styles.teamInfo}>
               <Text style={styles.teamCardName}>{s?.name || SPORT_LABELS[key]}</Text>
               <Text style={styles.teamLeague}>{s?.league_name || 'Stagione 2026/2027'}</Text>
-              <Text style={styles.teamStats}>{asArray(s?.roster).length} ATLETI  ·  {asArray(s?.staff).length} STAFF</Text>
+              <Text style={styles.teamStats}>{asArray(s?.roster).length} ATLETI · {asArray(s?.staff).length} STAFF</Text>
             </View>
             <Text style={styles.chevron}>›</Text>
           </View>
@@ -214,50 +264,20 @@ function ResultsScreen({ data }: { data: any }) {
 }
 
 function MoreScreen() {
-  const [showNotify, setShowNotify] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [sending, setSending] = useState(false);
+  const [activating, setActivating] = useState(false);
+  const [notificationsActive, setNotificationsActive] = useState(false);
 
-  const sendNotification = async () => {
-    if (!email.trim() || !password || !title.trim() || !message.trim()) {
-      Alert.alert('Dati mancanti', 'Inserisci email, password, titolo e testo della notifica.');
-      return;
-    }
-    setSending(true);
+  const activate = async () => {
+    if (activating) return;
+    setActivating(true);
     try {
-      const loginRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-        method: 'POST',
-        headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password }),
-      });
-      const loginData = await loginRes.json().catch(() => ({}));
-      if (!loginRes.ok || !loginData?.access_token) {
-        throw new Error(loginData?.error_description || loginData?.msg || 'Credenziali amministratore non valide.');
-      }
-
-      const notifyRes = await fetch(`${SUPABASE_URL}/functions/v1/send-app-notification`, {
-        method: 'POST',
-        headers: {
-          apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${loginData.access_token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ type: 'custom', title: title.trim(), body: message.trim() }),
-      });
-      const result = await notifyRes.json().catch(() => ({}));
-      if (!notifyRes.ok || result?.error) throw new Error(result?.error || 'Invio non riuscito.');
-
-      setTitle('');
-      setMessage('');
-      setPassword('');
-      Alert.alert('Notifica inviata', `Invio completato. Destinatari: ${result?.recipients ?? 0} · Inviate: ${result?.sent ?? 0}.`);
+      await activatePushNotifications();
+      setNotificationsActive(true);
+      Alert.alert('Notifiche attivate', 'Da ora riceverai gli aggiornamenti dell’ASD SGM Spadafora Sport.');
     } catch (e: any) {
-      Alert.alert('Errore', e?.message || 'Impossibile inviare la notifica.');
+      Alert.alert('Notifiche', e?.message || 'Non è stato possibile attivare le notifiche.');
     } finally {
-      setSending(false);
+      setActivating(false);
     }
   };
 
@@ -269,66 +289,21 @@ function MoreScreen() {
   ];
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+    <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
       <View style={styles.pageIntroCompact}>
         <Text style={styles.pageEyebrow}>ASD SGM SPADAFORA SPORT</Text>
         <Text style={styles.pageTitle}>ALTRO</Text>
       </View>
 
-      <Pressable onPress={() => setShowNotify((v) => !v)} style={({ pressed }) => [styles.notifyButton, pressed && styles.pressed]}>
-        <View style={styles.notifyButtonIcon}><Text style={styles.notifyButtonIconText}>🔔</Text></View>
+      <Pressable disabled={activating || notificationsActive} onPress={activate} style={({ pressed }) => [styles.notifyButton, notificationsActive && styles.notifyButtonActive, (pressed || activating) && styles.pressed]}>
+        <View style={styles.notifyButtonIcon}><Text style={styles.notifyButtonIconText}>{notificationsActive ? '✓' : '🔔'}</Text></View>
         <View style={styles.notifyButtonCopy}>
-          <Text style={styles.notifyButtonEyebrow}>AREA AMMINISTRATORE</Text>
-          <Text style={styles.notifyButtonTitle}>INVIA NOTIFICA</Text>
+          <Text style={styles.notifyButtonEyebrow}>{notificationsActive ? 'AGGIORNAMENTI SGM' : 'RESTA SEMPRE AGGIORNATO'}</Text>
+          <Text style={styles.notifyButtonTitle}>{notificationsActive ? 'NOTIFICHE ATTIVE' : 'ATTIVA NOTIFICHE'}</Text>
+          <Text style={styles.notifyButtonText}>{notificationsActive ? 'Questo dispositivo è registrato.' : 'Ricevi news, risultati e comunicazioni sul telefono.'}</Text>
         </View>
-        <Text style={styles.notifyButtonArrow}>{showNotify ? '⌃' : '›'}</Text>
+        {activating ? <ActivityIndicator size="small" color={C.black} /> : <Text style={styles.notifyButtonArrow}>{notificationsActive ? '✓' : '›'}</Text>}
       </Pressable>
-
-      {showNotify ? (
-        <View style={styles.notifyPanel}>
-          <Text style={styles.notifyPanelTitle}>Notifica push</Text>
-          <Text style={styles.notifyPanelText}>Accedi con l'account amministratore e invia un messaggio agli utenti registrati.</Text>
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Email amministratore"
-            placeholderTextColor={C.gray2}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            style={styles.input}
-          />
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Password"
-            placeholderTextColor={C.gray2}
-            secureTextEntry
-            style={styles.input}
-          />
-          <TextInput
-            value={title}
-            onChangeText={setTitle}
-            placeholder="Titolo notifica"
-            placeholderTextColor={C.gray2}
-            maxLength={80}
-            style={styles.input}
-          />
-          <TextInput
-            value={message}
-            onChangeText={setMessage}
-            placeholder="Scrivi il messaggio..."
-            placeholderTextColor={C.gray2}
-            multiline
-            maxLength={500}
-            textAlignVertical="top"
-            style={[styles.input, styles.messageInput]}
-          />
-          <Pressable disabled={sending} onPress={sendNotification} style={({ pressed }) => [styles.sendButton, (pressed || sending) && styles.pressed]}>
-            {sending ? <ActivityIndicator size="small" color={C.black} /> : <Text style={styles.sendButtonText}>INVIA A TUTTI</Text>}
-          </Pressable>
-          <Text style={styles.notifySecurity}>Accesso protetto dalle credenziali amministratore.</Text>
-        </View>
-      ) : null}
 
       {items.map(([icon, itemTitle, text]) => (
         <View style={styles.moreCard} key={itemTitle}>
@@ -493,21 +468,15 @@ const styles = StyleSheet.create({
   teamLeague: { color: C.yellow, fontSize: 10, fontWeight: '900', marginBottom: 7 },
   teamStats: { color: C.gray2, fontSize: 8, fontWeight: '900', letterSpacing: 0.8 },
   chevron: { color: C.gray2, fontSize: 30, fontWeight: '300', marginLeft: 5, zIndex: 2 },
-  notifyButton: { marginHorizontal: 14, marginBottom: 12, minHeight: 92, borderRadius: 22, backgroundColor: C.yellow, padding: 14, flexDirection: 'row', alignItems: 'center' },
+  notifyButton: { marginHorizontal: 14, marginBottom: 16, minHeight: 108, borderRadius: 22, backgroundColor: C.yellow, padding: 14, flexDirection: 'row', alignItems: 'center' },
+  notifyButtonActive: { backgroundColor: '#D7AF00' },
   notifyButtonIcon: { width: 56, height: 56, borderRadius: 17, backgroundColor: C.black, alignItems: 'center', justifyContent: 'center' },
-  notifyButtonIconText: { fontSize: 23 },
-  notifyButtonCopy: { flex: 1, marginLeft: 13 },
+  notifyButtonIconText: { color: C.yellow, fontSize: 23, fontWeight: '900' },
+  notifyButtonCopy: { flex: 1, marginLeft: 13, marginRight: 8 },
   notifyButtonEyebrow: { color: '#594900', fontSize: 8, fontWeight: '900', letterSpacing: 1.3, marginBottom: 4 },
   notifyButtonTitle: { color: C.black, fontSize: 20, fontWeight: '900', letterSpacing: -0.4 },
+  notifyButtonText: { color: '#4B3D00', fontSize: 10, lineHeight: 14, fontWeight: '700', marginTop: 4 },
   notifyButtonArrow: { color: C.black, fontSize: 32, fontWeight: '900', marginHorizontal: 4 },
-  notifyPanel: { marginHorizontal: 14, marginBottom: 15, padding: 17, borderRadius: 22, backgroundColor: C.panel, borderWidth: 1, borderColor: '#453A0B' },
-  notifyPanelTitle: { color: C.white, fontSize: 21, fontWeight: '900', marginBottom: 5 },
-  notifyPanelText: { color: C.gray, fontSize: 12, lineHeight: 18, marginBottom: 13 },
-  input: { minHeight: 50, borderRadius: 14, borderWidth: 1, borderColor: C.border, backgroundColor: '#0A0A0A', color: C.white, paddingHorizontal: 14, fontSize: 14, marginBottom: 10 },
-  messageInput: { minHeight: 105, paddingTop: 14, paddingBottom: 14 },
-  sendButton: { height: 52, borderRadius: 14, backgroundColor: C.yellow, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
-  sendButtonText: { color: C.black, fontSize: 13, fontWeight: '900', letterSpacing: 1.1 },
-  notifySecurity: { color: C.gray2, fontSize: 9, lineHeight: 13, textAlign: 'center', marginTop: 10 },
   moreCard: { marginHorizontal: 14, marginBottom: 10, minHeight: 84, borderRadius: 20, borderWidth: 1, borderColor: C.border, backgroundColor: C.panel, padding: 13, flexDirection: 'row', alignItems: 'center' },
   moreIcon: { width: 50, height: 50, borderRadius: 15, backgroundColor: '#1D1A0B', borderWidth: 1, borderColor: '#3A320D', alignItems: 'center', justifyContent: 'center' },
   moreIconText: { color: C.yellow, fontSize: 20, fontWeight: '900' },

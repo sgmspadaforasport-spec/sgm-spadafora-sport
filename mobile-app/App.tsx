@@ -1,16 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  Platform,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StatusBar as NativeStatusBar,
-  StyleSheet,
-  Text,
-  View,
+  ActivityIndicator, Alert, Image, Linking, Platform, Pressable, SafeAreaView,
+  ScrollView, StatusBar as NativeStatusBar, StyleSheet, Text, View
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Device from 'expo-device';
@@ -18,509 +9,78 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 
 type TabName = 'Home' | 'Squadre' | 'News' | 'Risultati' | 'Altro';
+const SUPABASE_URL='https://vgxatjdtawugxkzjkyxw.supabase.co';
+const SUPABASE_KEY='sb_publishable_4FuMVey4xj_B55InGcb1uw_pSMZ9Lk_';
+const SITE='https://asdsgmspadaforasport.it';
+const TABS:TabName[]=['Home','Squadre','News','Risultati','Altro'];
+const SPORT_KEYS=['calcio_a_5','pallavolo_maschile','pallavolo_femminile','basket','settore_giovanile'];
+const SPORT_LABELS:any={calcio_a_5:'Calcio a 5',pallavolo_maschile:'Pallavolo M',pallavolo_femminile:'Pallavolo F',basket:'Basket',settore_giovanile:'Giovanili'};
+const SPORT_ICONS:any={calcio_a_5:'⚽',pallavolo_maschile:'🏐',pallavolo_femminile:'🏐',basket:'🏀',settore_giovanile:'★'};
+const TAB_ICONS:any={Home:'⌂',Squadre:'♟',News:'▤',Risultati:'🏆',Altro:'☰'};
+const C={black:'#050505',panel:'#111111',panel2:'#171717',yellow:'#F3C600',white:'#FFFFFF',gray:'#A2A2A2',gray2:'#737373',border:'#272727'};
+const asArray=(v:any)=>Array.isArray(v)?v:[];
+const compactDate=(v:any)=>typeof v==='string'?v:'';
 
-const SUPABASE_URL = 'https://vgxatjdtawugxkzjkyxw.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_4FuMVey4xj_B55InGcb1uw_pSMZ9Lk_';
-const TABS: TabName[] = ['Home', 'Squadre', 'News', 'Risultati', 'Altro'];
-const SPORT_KEYS = ['calcio_a_5', 'pallavolo_maschile', 'pallavolo_femminile', 'basket', 'settore_giovanile'];
-const SPORT_LABELS: Record<string, string> = {
-  calcio_a_5: 'Calcio a 5',
-  pallavolo_maschile: 'Pallavolo M',
-  pallavolo_femminile: 'Pallavolo F',
-  basket: 'Basket',
-  settore_giovanile: 'Giovanili',
-};
-const SPORT_ICONS: Record<string, string> = {
-  calcio_a_5: '⚽',
-  pallavolo_maschile: '🏐',
-  pallavolo_femminile: '🏐',
-  basket: '🏀',
-  settore_giovanile: '★',
-};
-const TAB_ICONS: Record<TabName, string> = {
-  Home: '⌂', Squadre: '♟', News: '▤', Risultati: '🏆', Altro: '☰',
-};
-
-const C = {
-  black: '#050505',
-  panel: '#111111',
-  panel2: '#171717',
-  yellow: '#F3C600',
-  white: '#FFFFFF',
-  gray: '#A2A2A2',
-  gray2: '#737373',
-  border: '#272727',
-};
-
-function asArray(value: any): any[] { return Array.isArray(value) ? value : []; }
-function compactDate(value: any) { return typeof value === 'string' ? value : ''; }
-
-async function savePushToken(token: string) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/app_push_tokens?on_conflict=expo_push_token`, {
-    method: 'POST',
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      Prefer: 'resolution=merge-duplicates,return=minimal',
-    },
-    body: JSON.stringify({
-      expo_push_token: token,
-      platform: Platform.OS,
-      app_version: Constants.expoConfig?.version ?? '1.0.0',
-      updated_at: new Date().toISOString(),
-    }),
-  });
-  if (!response.ok) throw new Error(`Registrazione dispositivo non riuscita (${response.status}).`);
+async function savePushToken(token:string){
+ const r=await fetch(`${SUPABASE_URL}/rest/v1/app_push_tokens?on_conflict=expo_push_token`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({expo_push_token:token,platform:Platform.OS,app_version:Constants.expoConfig?.version??'1.0.0',updated_at:new Date().toISOString()})});
+ if(!r.ok)throw new Error(`Registrazione dispositivo non riuscita (${r.status}).`);
+}
+async function activatePushNotifications(){
+ if(!Device.isDevice)throw new Error('Le notifiche push funzionano su un dispositivo reale.');
+ if(Platform.OS==='android')await Notifications.setNotificationChannelAsync('default',{name:'Notifiche SGM',importance:Notifications.AndroidImportance.HIGH,vibrationPattern:[0,250,250,250],lightColor:'#F3C600',sound:'default'});
+ let p=await Notifications.getPermissionsAsync();let status=p.status;if(status!=='granted')status=(await Notifications.requestPermissionsAsync()).status;
+ if(status!=='granted')throw new Error('Permesso notifiche non concesso. Puoi abilitarlo dalle impostazioni del telefono.');
+ const projectId=Constants.expoConfig?.extra?.eas?.projectId??Constants.easConfig?.projectId;
+ const token=projectId?await Notifications.getExpoPushTokenAsync({projectId}):await Notifications.getExpoPushTokenAsync();
+ await savePushToken(token.data);return token.data;
+}
+async function deactivatePushNotifications(token:string){
+ const r=await fetch(`${SUPABASE_URL}/functions/v1/unregister-app-push-token`,{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({expo_push_token:token})});
+ const d=await r.json().catch(()=>({}));if(!r.ok||d?.error)throw new Error(d?.error||'Disattivazione non riuscita.');
 }
 
-async function activatePushNotifications() {
-  if (!Device.isDevice) throw new Error('Le notifiche push funzionano su un dispositivo reale.');
+function MatchCard({m,result=false,onPress}:{m:any;result?:boolean;onPress?:()=>void}){
+ return <Pressable onPress={onPress} style={({pressed})=>[styles.matchCard,pressed&&styles.pressed]}>
+  <View style={styles.matchAccent}/><View style={styles.matchBody}>
+   <View style={styles.matchMetaRow}><Text style={styles.matchSport}>{m?.sport||'SGM'}</Text><Text style={styles.matchDate}>{[m?.date,m?.time].filter(Boolean).join(' · ')}</Text></View>
+   <View style={styles.teamsRow}><Text style={styles.teamName}>{m?.home||'—'}</Text>{result?<View style={styles.scoreBox}><Text style={styles.scoreText}>{m?.home_score??'-'} : {m?.away_score??'-'}</Text></View>:<View style={styles.vsBox}><Text style={styles.vsText}>VS</Text></View>}<Text style={[styles.teamName,styles.teamAway]}>{m?.away||'—'}</Text></View>
+  </View>
+ </Pressable>;
+}
+function NewsCard({n,onPress}:{n:any;onPress:()=>void}){
+ return <Pressable onPress={onPress} style={({pressed})=>[styles.newsCard,pressed&&styles.pressed]}>
+  {n?.image?<Image source={{uri:n.image}} style={styles.newsImage}/>:<View style={styles.newsImageFallback}><Text style={styles.newsFallbackText}>SGM</Text></View>}
+  <View style={styles.newsContent}><Text style={styles.newsDate}>{compactDate(n?.date)||'NEWS'}</Text><Text style={styles.newsTitle}>{n?.title||'News SGM'}</Text><Text style={styles.newsExcerpt} numberOfLines={3}>{n?.excerpt||n?.body||''}</Text><Text style={styles.openHint}>APRI ›</Text></View>
+ </Pressable>;
+}
+function SectionHeader({eyebrow,title}:{eyebrow:string;title:string}){return <View style={styles.sectionHead}><View><Text style={styles.eyebrow}>{eyebrow}</Text><Text style={styles.sectionTitle}>{title}</Text></View></View>}
 
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'Notifiche SGM',
-      importance: Notifications.AndroidImportance.HIGH,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#F3C600',
-      sound: 'default',
-    });
-  }
+function HomeScreen({data,onTab,onTeam,onNews}:{data:any;onTab:(t:TabName)=>void;onTeam:(k:string)=>void;onNews:(n:any)=>void}){
+ const next=asArray(data?.next_matches).slice(0,3),results=asArray(data?.recent_results).slice(0,3),news=asArray(data?.news).slice(0,3),sports=data?.sports||{};
+ return <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}>
+  <View style={styles.hero}><Text style={styles.heroKicker}>ASD SGM SPADAFORA SPORT</Text><Text style={styles.heroTitle}>PASSIONE.{`\n`}SQUADRA.{`\n`}TERRITORIO.</Text><Text style={styles.heroText}>Il mondo giallonero sempre con te.</Text></View>
+  <SectionHeader eyebrow="LE NOSTRE DISCIPLINE" title="Tutto SGM"/>
+  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.sportsRow}>{SPORT_KEYS.map(k=><Pressable key={k} onPress={()=>onTeam(k)} style={({pressed})=>[styles.sportTile,pressed&&styles.pressed]}><View style={styles.sportIconCircle}><Text style={styles.sportIcon}>{SPORT_ICONS[k]}</Text></View><Text style={styles.sportName}>{sports?.[k]?.name||SPORT_LABELS[k]}</Text><Text style={styles.sportLeague}>{sports?.[k]?.league_name||'SGM'}</Text><Text style={styles.openHint}>APRI ›</Text></Pressable>)}</ScrollView>
+  <SectionHeader eyebrow="MATCH CENTER" title="Prossime gare"/>{next.map((m,i)=><MatchCard key={i} m={m} onPress={()=>onTab('Risultati')}/>) }
+  <SectionHeader eyebrow="DAL CAMPO" title="Ultimi risultati"/>{results.map((m,i)=><MatchCard key={i} m={m} result onPress={()=>onTab('Risultati')}/>) }
+  <SectionHeader eyebrow="MONDO SGM" title="Ultime news"/>{news.map((n,i)=><NewsCard key={i} n={n} onPress={()=>onNews(n)}/>) }
+ </ScrollView>;
+}
+function TeamsScreen({data,onTeam}:{data:any;onTeam:(k:string)=>void}){const sports=data?.sports||{};return <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}><View style={styles.pageIntro}><Text style={styles.pageEyebrow}>STAGIONE 2026/2027</Text><Text style={styles.pageTitle}>LE NOSTRE{`\n`}SQUADRE</Text></View>{SPORT_KEYS.map((k,i)=><Pressable key={k} onPress={()=>onTeam(k)} style={({pressed})=>[styles.teamCard,pressed&&styles.pressed]}><Text style={styles.teamIndex}>0{i+1}</Text><View style={styles.teamIconWrap}><Text style={styles.teamIcon}>{SPORT_ICONS[k]}</Text></View><View style={styles.teamInfo}><Text style={styles.teamCardName}>{sports?.[k]?.name||SPORT_LABELS[k]}</Text><Text style={styles.teamLeague}>{sports?.[k]?.league_name||'Stagione 2026/2027'}</Text><Text style={styles.teamStats}>{asArray(sports?.[k]?.roster).length} ATLETI · {asArray(sports?.[k]?.staff).length} STAFF</Text></View><Text style={styles.chevron}>›</Text></Pressable>)}</ScrollView>}
+function TeamDetail({data,teamKey,onBack}:{data:any;teamKey:string;onBack:()=>void}){const s=data?.sports?.[teamKey]||{};return <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}><Pressable onPress={onBack} style={styles.backBtn}><Text style={styles.backText}>‹ SQUADRE</Text></Pressable><View style={styles.pageIntroCompact}><Text style={styles.pageEyebrow}>{SPORT_ICONS[teamKey]} STAGIONE 2026/2027</Text><Text style={styles.pageTitle}>{s?.name||SPORT_LABELS[teamKey]}</Text><Text style={styles.pageSubtitle}>{s?.league_name||''}</Text></View><SectionHeader eyebrow="ROSA" title="Atleti"/>{asArray(s?.roster).length?asArray(s.roster).map((p:any,i:number)=><View key={i} style={styles.listCard}><Text style={styles.listNum}>{p?.number??'•'}</Text><View><Text style={styles.listTitle}>{p?.name||'Atleta'}</Text><Text style={styles.listText}>{p?.role||''}</Text></View></View>):<View style={styles.emptyCard}><Text style={styles.muted}>Rosa in aggiornamento.</Text></View>}<SectionHeader eyebrow="AREA TECNICA" title="Staff"/>{asArray(s?.staff).length?asArray(s.staff).map((p:any,i:number)=><View key={i} style={styles.listCard}><Text style={styles.listNum}>◆</Text><View><Text style={styles.listTitle}>{p?.name||'Staff'}</Text><Text style={styles.listText}>{p?.role||''}</Text></View></View>):<View style={styles.emptyCard}><Text style={styles.muted}>Staff in aggiornamento.</Text></View>}</ScrollView>}
+function NewsScreen({data,onNews}:{data:any;onNews:(n:any)=>void}){const news=asArray(data?.news);return <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}><View style={styles.pageIntroCompact}><Text style={styles.pageEyebrow}>DAL MONDO GIALLONERO</Text><Text style={styles.pageTitle}>NEWS</Text></View>{news.map((n,i)=><NewsCard key={i} n={n} onPress={()=>onNews(n)}/>)}</ScrollView>}
+function NewsDetail({n,onBack}:{n:any;onBack:()=>void}){return <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}><Pressable onPress={onBack} style={styles.backBtn}><Text style={styles.backText}>‹ NEWS</Text></Pressable>{n?.image?<Image source={{uri:n.image}} style={styles.detailImage}/>:null}<View style={styles.detailBox}><Text style={styles.newsDate}>{compactDate(n?.date)||'NEWS'}</Text><Text style={styles.detailTitle}>{n?.title||'News SGM'}</Text><Text style={styles.detailBody}>{n?.body||n?.excerpt||''}</Text></View></ScrollView>}
+function ResultsScreen({data}:{data:any}){const r=asArray(data?.recent_results);return <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}><View style={styles.pageIntroCompact}><Text style={styles.pageEyebrow}>MATCH CENTER</Text><Text style={styles.pageTitle}>RISULTATI</Text></View>{r.map((m,i)=><MatchCard key={i} m={m} result onPress={()=>Alert.alert(m?.sport||'Risultato',`${m?.home||''} ${m?.home_score??'-'} - ${m?.away_score??'-'} ${m?.away||''}\n${m?.date||''}`)}/>)}</ScrollView>}
+function MoreScreen(){const[busy,setBusy]=useState(false),[active,setActive]=useState(false),[token,setToken]=useState('');const toggle=async()=>{if(busy)return;setBusy(true);try{if(active){await deactivatePushNotifications(token);setActive(false);setToken('');Alert.alert('Notifiche disattivate','Non riceverai più le notifiche SGM.');}else{const t=await activatePushNotifications();setToken(t);setActive(true);Alert.alert('Notifiche attivate','Da ora riceverai gli aggiornamenti SGM.');}}catch(e:any){Alert.alert('Notifiche',e?.message||'Operazione non riuscita.')}finally{setBusy(false)}};const items=[['🏆','Palmarès','palmares.html'],['▶','SGM TV','sgm-tv.html'],['◆','Sponsor','sponsor.html'],['◎','Contatti','contatti.html']];return <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent}><View style={styles.pageIntroCompact}><Text style={styles.pageEyebrow}>ASD SGM SPADAFORA SPORT</Text><Text style={styles.pageTitle}>ALTRO</Text></View><Pressable disabled={busy} onPress={toggle} style={({pressed})=>[styles.notifyButton,pressed&&styles.pressed]}><Text style={styles.notifyIcon}>{active?'🔕':'🔔'}</Text><View style={{flex:1}}><Text style={styles.notifyTitle}>{active?'DISATTIVA NOTIFICHE':'ATTIVA NOTIFICHE'}</Text><Text style={styles.notifyText}>{active?'Tocca per non riceverle più.':'Ricevi news, risultati e comunicazioni.'}</Text></View>{busy?<ActivityIndicator color={C.black}/>:<Text style={styles.chevronDark}>›</Text>}</Pressable>{items.map(([ic,t,p])=><Pressable key={t} onPress={()=>Linking.openURL(`${SITE}/${p}`)} style={({pressed})=>[styles.moreCard,pressed&&styles.pressed]}><View style={styles.moreIcon}><Text style={styles.moreIconText}>{ic}</Text></View><View style={styles.moreInfo}><Text style={styles.moreTitle}>{t}</Text><Text style={styles.moreText}>Apri la sezione</Text></View><Text style={styles.chevron}>›</Text></Pressable>)}</ScrollView>}
 
-  const current = await Notifications.getPermissionsAsync();
-  let status = current.status;
-  if (status !== 'granted') {
-    const requested = await Notifications.requestPermissionsAsync();
-    status = requested.status;
-  }
-  if (status !== 'granted') throw new Error('Permesso notifiche non concesso. Puoi abilitarlo dalle impostazioni del telefono.');
-
-  const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
-  const expoToken = projectId
-    ? await Notifications.getExpoPushTokenAsync({ projectId })
-    : await Notifications.getExpoPushTokenAsync();
-
-  await savePushToken(expoToken.data);
-  return expoToken.data;
+export default function App(){
+ const[active,setActive]=useState<TabName>('Home'),[data,setData]=useState<any>({}),[loading,setLoading]=useState(true),[online,setOnline]=useState(false),[team,setTeam]=useState<string|null>(null),[news,setNews]=useState<any|null>(null);
+ useEffect(()=>{let alive=true;setTimeout(async()=>{try{const r=await fetch(`${SUPABASE_URL}/rest/v1/site_data?id=eq.1&select=payload`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});const rows=await r.json();if(alive&&rows?.[0]?.payload){setData(rows[0].payload);setOnline(true)}}catch{if(alive)setOnline(false)}finally{if(alive)setLoading(false)}},250);return()=>{alive=false}},[]);
+ const goTab=(t:TabName)=>{setTeam(null);setNews(null);setActive(t)};const openTeam=(k:string)=>{setNews(null);setTeam(k);setActive('Squadre')};const openNews=(n:any)=>{setTeam(null);setNews(n);setActive('News')};
+ const screen=useMemo(()=>{if(team)return <TeamDetail data={data} teamKey={team} onBack={()=>setTeam(null)}/>;if(news)return <NewsDetail n={news} onBack={()=>setNews(null)}/>;if(active==='Squadre')return <TeamsScreen data={data} onTeam={openTeam}/>;if(active==='News')return <NewsScreen data={data} onNews={openNews}/>;if(active==='Risultati')return <ResultsScreen data={data}/>;if(active==='Altro')return <MoreScreen/>;return <HomeScreen data={data} onTab={goTab} onTeam={openTeam} onNews={openNews}/>},[active,data,team,news]);
+ return <SafeAreaView style={styles.app}><StatusBar style="light" backgroundColor={C.black}/><View style={styles.androidTopPad}/><View style={styles.header}><View style={styles.brandMark}><Text style={styles.brandMarkText}>SGM</Text></View><View style={styles.brandCopy}><Text style={styles.headerKicker}>ASD</Text><Text style={styles.headerTitle}>SPADAFORA SPORT</Text></View><View style={styles.liveWrap}><View style={[styles.statusDot,online&&styles.statusDotOnline]}/><Text style={styles.liveText}>{online?'LIVE':'APP'}</Text></View></View><View style={styles.content}>{loading?<View style={styles.loader}><ActivityIndicator color={C.yellow}/><Text style={styles.muted}>Caricamento mondo giallonero…</Text></View>:screen}</View><View style={styles.tabBar}>{TABS.map(t=><Pressable key={t} onPress={()=>goTab(t)} style={({pressed})=>[styles.tabButton,pressed&&styles.pressed]}><View style={[styles.tabIconWrap,active===t&&!team&&!news&&styles.tabIconWrapActive]}><Text style={[styles.tabSymbol,active===t&&!team&&!news&&styles.tabSymbolActive]}>{TAB_ICONS[t]}</Text></View><Text style={[styles.tabText,active===t&&styles.tabTextActive]}>{t}</Text></Pressable>)}</View></SafeAreaView>;
 }
 
-async function deactivatePushNotifications(token: string) {
-  const response = await fetch(`${SUPABASE_URL}/functions/v1/unregister-app-push-token`, {
-    method: 'POST',
-    headers: {
-      apikey: SUPABASE_KEY,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ expo_push_token: token }),
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok || data?.error) throw new Error(data?.error || 'Disattivazione non riuscita.');
-}
-
-function SectionHeader({ eyebrow, title, action }: { eyebrow: string; title: string; action?: string }) {
-  return (
-    <View style={styles.sectionHead}>
-      <View>
-        <Text style={styles.eyebrow}>{eyebrow}</Text>
-        <Text style={styles.sectionTitle}>{title}</Text>
-      </View>
-      {action ? <Text style={styles.sectionAction}>{action}</Text> : null}
-    </View>
-  );
-}
-
-function MatchCard({ m, result = false }: { m: any; result?: boolean }) {
-  return (
-    <View style={styles.matchCard}>
-      <View style={styles.matchAccent} />
-      <View style={styles.matchBody}>
-        <View style={styles.matchMetaRow}>
-          <Text style={styles.matchSport}>{m?.sport || 'SGM'}</Text>
-          <Text style={styles.matchDate}>{[m?.date, m?.time].filter(Boolean).join(' · ')}</Text>
-        </View>
-        <View style={styles.teamsRow}>
-          <Text style={styles.teamName} numberOfLines={2}>{m?.home || '—'}</Text>
-          {result ? (
-            <View style={styles.scoreBox}><Text style={styles.scoreText}>{m?.home_score ?? '-'} : {m?.away_score ?? '-'}</Text></View>
-          ) : (
-            <View style={styles.vsBox}><Text style={styles.vsText}>VS</Text></View>
-          )}
-          <Text style={[styles.teamName, styles.teamAway]} numberOfLines={2}>{m?.away || '—'}</Text>
-        </View>
-      </View>
-    </View>
-  );
-}
-
-function HomeScreen({ data }: { data: any }) {
-  const nextMatches = asArray(data?.next_matches).slice(0, 3);
-  const results = asArray(data?.recent_results).slice(0, 3);
-  const news = asArray(data?.news).slice(0, 3);
-  const sports = data?.sports || {};
-
-  return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-      <View style={styles.hero}>
-        <View style={styles.heroSlashOne} />
-        <View style={styles.heroSlashTwo} />
-        <View style={styles.heroSeason}><Text style={styles.heroSeasonText}>2026 / 2027</Text></View>
-        <Text style={styles.heroKicker}>ASD SGM SPADAFORA SPORT</Text>
-        <Text style={styles.heroTitle}>PASSIONE.{`\n`}SQUADRA.{`\n`}TERRITORIO.</Text>
-        <Text style={styles.heroText}>Il mondo giallonero sempre con te.</Text>
-        <View style={styles.heroBottom}>
-          <View style={styles.heroLine} />
-          <Text style={styles.heroBottomText}>NOI SIAMO SGM</Text>
-        </View>
-      </View>
-
-      <SectionHeader eyebrow="LE NOSTRE DISCIPLINE" title="Tutto SGM" />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.sportsRow}>
-        {SPORT_KEYS.map((key) => {
-          const s = sports?.[key];
-          return (
-            <View style={styles.sportTile} key={key}>
-              <View style={styles.sportIconCircle}><Text style={styles.sportIcon}>{SPORT_ICONS[key]}</Text></View>
-              <Text style={styles.sportName}>{s?.name || SPORT_LABELS[key]}</Text>
-              <Text style={styles.sportLeague} numberOfLines={1}>{s?.league_name || 'SGM'}</Text>
-            </View>
-          );
-        })}
-      </ScrollView>
-
-      <SectionHeader eyebrow="MATCH CENTER" title="Prossime gare" action="SGM LIVE" />
-      {nextMatches.length === 0 ? <View style={styles.emptyCard}><Text style={styles.muted}>Nessuna gara programmata.</Text></View> : null}
-      {nextMatches.map((m, i) => <MatchCard key={`m-${i}`} m={m} />)}
-
-      <SectionHeader eyebrow="DAL CAMPO" title="Ultimi risultati" />
-      {results.length === 0 ? <View style={styles.emptyCard}><Text style={styles.muted}>Risultati in aggiornamento.</Text></View> : null}
-      {results.map((m, i) => <MatchCard key={`r-${i}`} m={m} result />)}
-
-      <SectionHeader eyebrow="MONDO SGM" title="Ultime news" />
-      {news.length === 0 ? <View style={styles.emptyCard}><Text style={styles.muted}>News in aggiornamento.</Text></View> : null}
-      {news.map((n, i) => (
-        <View style={styles.newsCard} key={`n-${i}`}>
-          {n?.image ? <Image source={{ uri: n.image }} style={styles.newsImage} /> : <View style={styles.newsImageFallback}><Text style={styles.newsFallbackText}>SGM</Text></View>}
-          <View style={styles.newsContent}>
-            <Text style={styles.newsDate}>{compactDate(n?.date) || 'NEWS'}</Text>
-            <Text style={styles.newsTitle} numberOfLines={2}>{n?.title || 'News SGM'}</Text>
-            <Text style={styles.newsExcerpt} numberOfLines={3}>{n?.excerpt || n?.body || ''}</Text>
-          </View>
-        </View>
-      ))}
-    </ScrollView>
-  );
-}
-
-function TeamsScreen({ data }: { data: any }) {
-  const sports = data?.sports || {};
-  return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-      <View style={styles.pageIntro}>
-        <Text style={styles.pageEyebrow}>STAGIONE 2026/2027</Text>
-        <Text style={styles.pageTitle}>LE NOSTRE{`\n`}SQUADRE</Text>
-        <Text style={styles.pageSubtitle}>Cinque anime, un solo stemma.</Text>
-      </View>
-      {SPORT_KEYS.map((key, index) => {
-        const s = sports?.[key];
-        return (
-          <View style={styles.teamCard} key={key}>
-            <Text style={styles.teamIndex}>0{index + 1}</Text>
-            <View style={styles.teamIconWrap}><Text style={styles.teamIcon}>{SPORT_ICONS[key]}</Text></View>
-            <View style={styles.teamInfo}>
-              <Text style={styles.teamCardName}>{s?.name || SPORT_LABELS[key]}</Text>
-              <Text style={styles.teamLeague}>{s?.league_name || 'Stagione 2026/2027'}</Text>
-              <Text style={styles.teamStats}>{asArray(s?.roster).length} ATLETI · {asArray(s?.staff).length} STAFF</Text>
-            </View>
-            <Text style={styles.chevron}>›</Text>
-          </View>
-        );
-      })}
-    </ScrollView>
-  );
-}
-
-function NewsScreen({ data }: { data: any }) {
-  const news = asArray(data?.news);
-  return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-      <View style={styles.pageIntroCompact}>
-        <Text style={styles.pageEyebrow}>DAL MONDO GIALLONERO</Text>
-        <Text style={styles.pageTitle}>NEWS</Text>
-      </View>
-      {news.length === 0 ? <View style={styles.emptyCard}><Text style={styles.muted}>News in aggiornamento.</Text></View> : null}
-      {news.map((n, i) => (
-        <View style={styles.newsCard} key={`news-${i}`}>
-          {n?.image ? <Image source={{ uri: n.image }} style={styles.newsImage} /> : <View style={styles.newsImageFallback}><Text style={styles.newsFallbackText}>SGM</Text></View>}
-          <View style={styles.newsContent}>
-            <Text style={styles.newsDate}>{compactDate(n?.date) || 'NEWS'}</Text>
-            <Text style={styles.newsTitle}>{n?.title || 'News SGM'}</Text>
-            <Text style={styles.newsExcerpt}>{n?.body || n?.excerpt || ''}</Text>
-          </View>
-        </View>
-      ))}
-    </ScrollView>
-  );
-}
-
-function ResultsScreen({ data }: { data: any }) {
-  const results = asArray(data?.recent_results);
-  return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-      <View style={styles.pageIntroCompact}>
-        <Text style={styles.pageEyebrow}>MATCH CENTER</Text>
-        <Text style={styles.pageTitle}>RISULTATI</Text>
-      </View>
-      {results.length === 0 ? <View style={styles.emptyCard}><Text style={styles.muted}>Risultati in aggiornamento.</Text></View> : null}
-      {results.map((m, i) => <MatchCard key={`result-${i}`} m={m} result />)}
-    </ScrollView>
-  );
-}
-
-function MoreScreen() {
-  const [busy, setBusy] = useState(false);
-  const [notificationsActive, setNotificationsActive] = useState(false);
-  const [pushToken, setPushToken] = useState('');
-
-  const activate = async () => {
-    if (busy) return;
-    setBusy(true);
-    try {
-      const token = await activatePushNotifications();
-      setPushToken(token);
-      setNotificationsActive(true);
-      Alert.alert('Notifiche attivate', 'Da ora riceverai gli aggiornamenti dell’ASD SGM Spadafora Sport.');
-    } catch (e: any) {
-      Alert.alert('Notifiche', e?.message || 'Non è stato possibile attivare le notifiche.');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const deactivate = async () => {
-    if (busy || !pushToken) return;
-    setBusy(true);
-    try {
-      await deactivatePushNotifications(pushToken);
-      setNotificationsActive(false);
-      setPushToken('');
-      Alert.alert('Notifiche disattivate', 'Non riceverai più le notifiche SGM su questo dispositivo. Potrai riattivarle quando vuoi.');
-    } catch (e: any) {
-      Alert.alert('Notifiche', e?.message || 'Non è stato possibile disattivare le notifiche.');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const items = [
-    ['🏆', 'Palmarès', 'Trofei e traguardi della società'],
-    ['▶', 'SGM TV', 'Video, interviste e contenuti'],
-    ['◆', 'Sponsor', 'I partner che credono nel progetto'],
-    ['◎', 'Contatti', 'Rimani in contatto con SGM'],
-  ];
-
-  return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-      <View style={styles.pageIntroCompact}>
-        <Text style={styles.pageEyebrow}>ASD SGM SPADAFORA SPORT</Text>
-        <Text style={styles.pageTitle}>ALTRO</Text>
-      </View>
-
-      <Pressable disabled={busy} onPress={notificationsActive ? deactivate : activate} style={({ pressed }) => [styles.notifyButton, notificationsActive && styles.notifyButtonActive, (pressed || busy) && styles.pressed]}>
-        <View style={styles.notifyButtonIcon}><Text style={styles.notifyButtonIconText}>{notificationsActive ? '🔕' : '🔔'}</Text></View>
-        <View style={styles.notifyButtonCopy}>
-          <Text style={styles.notifyButtonEyebrow}>{notificationsActive ? 'NOTIFICHE SGM ATTIVE' : 'RESTA SEMPRE AGGIORNATO'}</Text>
-          <Text style={styles.notifyButtonTitle}>{notificationsActive ? 'DISATTIVA NOTIFICHE' : 'ATTIVA NOTIFICHE'}</Text>
-          <Text style={styles.notifyButtonText}>{notificationsActive ? 'Tocca qui per non ricevere più gli aggiornamenti su questo telefono.' : 'Ricevi news, risultati e comunicazioni sul telefono.'}</Text>
-        </View>
-        {busy ? <ActivityIndicator size="small" color={C.black} /> : <Text style={styles.notifyButtonArrow}>›</Text>}
-      </Pressable>
-
-      {items.map(([icon, itemTitle, text]) => (
-        <View style={styles.moreCard} key={itemTitle}>
-          <View style={styles.moreIcon}><Text style={styles.moreIconText}>{icon}</Text></View>
-          <View style={styles.moreInfo}><Text style={styles.moreTitle}>{itemTitle}</Text><Text style={styles.moreText}>{text}</Text></View>
-          <Text style={styles.chevron}>›</Text>
-        </View>
-      ))}
-    </ScrollView>
-  );
-}
-
-export default function App() {
-  const [active, setActive] = useState<TabName>('Home');
-  const [data, setData] = useState<any>({});
-  const [loading, setLoading] = useState(true);
-  const [online, setOnline] = useState(false);
-
-  useEffect(() => {
-    let alive = true;
-    const timer = setTimeout(async () => {
-      try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/site_data?id=eq.1&select=payload`, {
-          headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
-        });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const rows = await response.json();
-        if (alive && Array.isArray(rows) && rows[0]?.payload) {
-          setData(rows[0].payload);
-          setOnline(true);
-        }
-      } catch {
-        if (alive) setOnline(false);
-      } finally {
-        if (alive) setLoading(false);
-      }
-    }, 300);
-    return () => { alive = false; clearTimeout(timer); };
-  }, []);
-
-  const screen = useMemo(() => {
-    if (active === 'Squadre') return <TeamsScreen data={data} />;
-    if (active === 'News') return <NewsScreen data={data} />;
-    if (active === 'Risultati') return <ResultsScreen data={data} />;
-    if (active === 'Altro') return <MoreScreen />;
-    return <HomeScreen data={data} />;
-  }, [active, data]);
-
-  return (
-    <SafeAreaView style={styles.app}>
-      <StatusBar style="light" backgroundColor={C.black} />
-      <View style={styles.androidTopPad} />
-      <View style={styles.header}>
-        <View style={styles.brandMark}><Text style={styles.brandMarkText}>SGM</Text></View>
-        <View style={styles.brandCopy}>
-          <Text style={styles.headerKicker}>ASD</Text>
-          <Text style={styles.headerTitle}>SPADAFORA SPORT</Text>
-        </View>
-        <View style={styles.liveWrap}><View style={[styles.statusDot, online && styles.statusDotOnline]} /><Text style={styles.liveText}>{online ? 'LIVE' : 'APP'}</Text></View>
-      </View>
-
-      <View style={styles.content}>
-        {loading ? (
-          <View style={styles.loader}>
-            <View style={styles.loaderBadge}><Text style={styles.loaderBadgeText}>SGM</Text></View>
-            <ActivityIndicator size="small" color={C.yellow} />
-            <Text style={styles.muted}>Caricamento mondo giallonero…</Text>
-          </View>
-        ) : screen}
-      </View>
-
-      <View style={styles.tabBar}>
-        {TABS.map((tab) => {
-          const selected = active === tab;
-          return (
-            <Pressable key={tab} onPress={() => setActive(tab)} style={({ pressed }) => [styles.tabButton, pressed && styles.pressed]}>
-              <View style={[styles.tabIconWrap, selected && styles.tabIconWrapActive]}>
-                <Text style={[styles.tabSymbol, selected && styles.tabSymbolActive]}>{TAB_ICONS[tab]}</Text>
-              </View>
-              <Text style={[styles.tabText, selected && styles.tabTextActive]}>{tab}</Text>
-            </Pressable>
-          );
-        })}
-      </View>
-    </SafeAreaView>
-  );
-}
-
-const styles = StyleSheet.create({
-  app: { flex: 1, backgroundColor: C.black },
-  androidTopPad: { height: NativeStatusBar.currentHeight || 0 },
-  header: { height: 64, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#1D1D1D', backgroundColor: C.black },
-  brandMark: { width: 42, height: 42, borderRadius: 10, backgroundColor: C.yellow, alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-3deg' }] },
-  brandMarkText: { color: C.black, fontSize: 13, fontWeight: '900', letterSpacing: -0.5 },
-  brandCopy: { flex: 1, marginLeft: 11 },
-  headerKicker: { color: C.yellow, fontSize: 8, fontWeight: '900', letterSpacing: 2.3 },
-  headerTitle: { color: C.white, fontSize: 14, fontWeight: '900', letterSpacing: 0.5, marginTop: 1 },
-  liveWrap: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: C.border, borderRadius: 20, paddingHorizontal: 9, paddingVertical: 6, gap: 5 },
-  statusDot: { width: 6, height: 6, borderRadius: 6, backgroundColor: '#666' },
-  statusDotOnline: { backgroundColor: C.yellow },
-  liveText: { color: C.gray, fontSize: 8, fontWeight: '900', letterSpacing: 1 },
-  content: { flex: 1 },
-  screen: { flex: 1, backgroundColor: C.black },
-  scrollContent: { paddingBottom: 28 },
-  loader: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
-  loaderBadge: { width: 72, height: 72, borderRadius: 20, backgroundColor: C.yellow, alignItems: 'center', justifyContent: 'center', marginBottom: 4, transform: [{ rotate: '-4deg' }] },
-  loaderBadgeText: { color: C.black, fontSize: 22, fontWeight: '900' },
-  hero: { margin: 14, height: 300, borderRadius: 28, backgroundColor: '#14120A', padding: 24, overflow: 'hidden', borderWidth: 1, borderColor: '#332C0A', justifyContent: 'center' },
-  heroSlashOne: { position: 'absolute', width: 120, height: 430, backgroundColor: C.yellow, right: -80, top: -70, transform: [{ rotate: '18deg' }] },
-  heroSlashTwo: { position: 'absolute', width: 20, height: 430, backgroundColor: '#6C5900', right: 52, top: -60, transform: [{ rotate: '18deg' }], opacity: 0.55 },
-  heroSeason: { position: 'absolute', right: 18, top: 18, backgroundColor: C.black, paddingHorizontal: 11, paddingVertical: 7, borderRadius: 8 },
-  heroSeasonText: { color: C.yellow, fontSize: 9, fontWeight: '900', letterSpacing: 1.2 },
-  heroKicker: { color: C.yellow, fontSize: 9, fontWeight: '900', letterSpacing: 1.7, marginBottom: 11 },
-  heroTitle: { color: C.white, fontSize: 39, lineHeight: 40, fontWeight: '900', letterSpacing: -1.8, maxWidth: '82%' },
-  heroText: { color: '#D0D0D0', fontSize: 14, marginTop: 13, fontWeight: '600' },
-  heroBottom: { flexDirection: 'row', alignItems: 'center', marginTop: 24 },
-  heroLine: { width: 28, height: 3, backgroundColor: C.yellow, marginRight: 9 },
-  heroBottomText: { color: C.white, fontSize: 9, fontWeight: '900', letterSpacing: 1.5 },
-  sectionHead: { marginHorizontal: 17, marginTop: 22, marginBottom: 11, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
-  eyebrow: { color: C.yellow, fontSize: 8, fontWeight: '900', letterSpacing: 1.8, marginBottom: 4 },
-  sectionTitle: { color: C.white, fontSize: 25, fontWeight: '900', letterSpacing: -0.7 },
-  sectionAction: { color: C.gray2, fontSize: 8, fontWeight: '900', letterSpacing: 1.2, marginBottom: 4 },
-  sportsRow: { paddingHorizontal: 14, paddingRight: 24, gap: 10 },
-  sportTile: { width: 142, height: 150, borderRadius: 22, backgroundColor: C.panel, borderWidth: 1, borderColor: C.border, padding: 15, justifyContent: 'flex-end' },
-  sportIconCircle: { position: 'absolute', top: 14, left: 14, width: 45, height: 45, borderRadius: 14, backgroundColor: C.yellow, alignItems: 'center', justifyContent: 'center' },
-  sportIcon: { fontSize: 21 },
-  sportName: { color: C.white, fontSize: 15, fontWeight: '900', marginBottom: 4 },
-  sportLeague: { color: C.gray2, fontSize: 10, fontWeight: '700' },
-  matchCard: { marginHorizontal: 14, marginBottom: 10, minHeight: 122, flexDirection: 'row', borderRadius: 20, backgroundColor: C.panel, borderWidth: 1, borderColor: C.border, overflow: 'hidden' },
-  matchAccent: { width: 5, backgroundColor: C.yellow },
-  matchBody: { flex: 1, padding: 15 },
-  matchMetaRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 },
-  matchSport: { color: C.yellow, fontSize: 9, fontWeight: '900', letterSpacing: 1 },
-  matchDate: { color: C.gray2, fontSize: 10, fontWeight: '700' },
-  teamsRow: { flexDirection: 'row', alignItems: 'center', gap: 9 },
-  teamName: { flex: 1, color: C.white, fontSize: 14, fontWeight: '900', lineHeight: 18 },
-  teamAway: { textAlign: 'right' },
-  vsBox: { width: 36, height: 30, borderRadius: 9, backgroundColor: C.yellow, alignItems: 'center', justifyContent: 'center' },
-  vsText: { color: C.black, fontSize: 9, fontWeight: '900' },
-  scoreBox: { minWidth: 58, height: 34, borderRadius: 10, backgroundColor: C.yellow, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
-  scoreText: { color: C.black, fontSize: 15, fontWeight: '900' },
-  emptyCard: { marginHorizontal: 14, marginBottom: 10, padding: 18, borderRadius: 18, backgroundColor: C.panel, borderWidth: 1, borderColor: C.border },
-  newsCard: { marginHorizontal: 14, marginBottom: 13, borderRadius: 22, backgroundColor: C.panel, borderWidth: 1, borderColor: C.border, overflow: 'hidden' },
-  newsImage: { width: '100%', height: 190, backgroundColor: C.panel2 },
-  newsImageFallback: { height: 145, backgroundColor: '#17150B', alignItems: 'center', justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: '#302A0D' },
-  newsFallbackText: { color: C.yellow, fontSize: 52, fontWeight: '900', letterSpacing: -4, transform: [{ rotate: '-4deg' }] },
-  newsContent: { padding: 17 },
-  newsDate: { color: C.yellow, fontSize: 9, fontWeight: '900', letterSpacing: 1.2, marginBottom: 7 },
-  newsTitle: { color: C.white, fontSize: 20, lineHeight: 24, fontWeight: '900', letterSpacing: -0.35 },
-  newsExcerpt: { color: C.gray, fontSize: 13, lineHeight: 20, marginTop: 8 },
-  pageIntro: { minHeight: 190, paddingHorizontal: 18, paddingTop: 28, paddingBottom: 22, backgroundColor: '#111008', borderBottomWidth: 1, borderBottomColor: '#2B2509' },
-  pageIntroCompact: { paddingHorizontal: 18, paddingTop: 26, paddingBottom: 20, marginBottom: 4 },
-  pageEyebrow: { color: C.yellow, fontSize: 9, fontWeight: '900', letterSpacing: 1.8, marginBottom: 8 },
-  pageTitle: { color: C.white, fontSize: 38, lineHeight: 39, fontWeight: '900', letterSpacing: -1.5 },
-  pageSubtitle: { color: C.gray, fontSize: 13, marginTop: 10, fontWeight: '600' },
-  teamCard: { marginHorizontal: 14, marginTop: 11, minHeight: 118, borderRadius: 22, borderWidth: 1, borderColor: C.border, backgroundColor: C.panel, flexDirection: 'row', alignItems: 'center', padding: 15, overflow: 'hidden' },
-  teamIndex: { position: 'absolute', right: 38, top: -11, color: '#202020', fontSize: 58, fontWeight: '900' },
-  teamIconWrap: { width: 52, height: 52, borderRadius: 16, backgroundColor: C.yellow, alignItems: 'center', justifyContent: 'center', zIndex: 2 },
-  teamIcon: { fontSize: 24 },
-  teamInfo: { flex: 1, marginLeft: 14, zIndex: 2 },
-  teamCardName: { color: C.white, fontSize: 17, fontWeight: '900', marginBottom: 4 },
-  teamLeague: { color: C.yellow, fontSize: 10, fontWeight: '900', marginBottom: 7 },
-  teamStats: { color: C.gray2, fontSize: 8, fontWeight: '900', letterSpacing: 0.8 },
-  chevron: { color: C.gray2, fontSize: 30, fontWeight: '300', marginLeft: 5, zIndex: 2 },
-  notifyButton: { marginHorizontal: 14, marginBottom: 16, minHeight: 108, borderRadius: 22, backgroundColor: C.yellow, padding: 14, flexDirection: 'row', alignItems: 'center' },
-  notifyButtonActive: { backgroundColor: '#D7AF00' },
-  notifyButtonIcon: { width: 56, height: 56, borderRadius: 17, backgroundColor: C.black, alignItems: 'center', justifyContent: 'center' },
-  notifyButtonIconText: { color: C.yellow, fontSize: 23, fontWeight: '900' },
-  notifyButtonCopy: { flex: 1, marginLeft: 13, marginRight: 8 },
-  notifyButtonEyebrow: { color: '#594900', fontSize: 8, fontWeight: '900', letterSpacing: 1.3, marginBottom: 4 },
-  notifyButtonTitle: { color: C.black, fontSize: 20, fontWeight: '900', letterSpacing: -0.4 },
-  notifyButtonText: { color: '#4B3D00', fontSize: 10, lineHeight: 14, fontWeight: '700', marginTop: 4 },
-  notifyButtonArrow: { color: C.black, fontSize: 32, fontWeight: '900', marginHorizontal: 4 },
-  moreCard: { marginHorizontal: 14, marginBottom: 10, minHeight: 84, borderRadius: 20, borderWidth: 1, borderColor: C.border, backgroundColor: C.panel, padding: 13, flexDirection: 'row', alignItems: 'center' },
-  moreIcon: { width: 50, height: 50, borderRadius: 15, backgroundColor: '#1D1A0B', borderWidth: 1, borderColor: '#3A320D', alignItems: 'center', justifyContent: 'center' },
-  moreIconText: { color: C.yellow, fontSize: 20, fontWeight: '900' },
-  moreInfo: { flex: 1, marginLeft: 13 },
-  moreTitle: { color: C.white, fontSize: 16, fontWeight: '900', marginBottom: 3 },
-  moreText: { color: C.gray2, fontSize: 11, lineHeight: 16 },
-  muted: { color: C.gray, fontSize: 13, lineHeight: 19 },
-  tabBar: { height: 82, paddingBottom: 9, flexDirection: 'row', alignItems: 'center', backgroundColor: '#090909', borderTopWidth: 1, borderTopColor: '#202020' },
-  tabButton: { flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 66 },
-  tabIconWrap: { width: 36, height: 30, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  tabIconWrapActive: { backgroundColor: C.yellow },
-  tabSymbol: { color: '#858585', fontSize: 17, fontWeight: '900' },
-  tabSymbolActive: { color: C.black },
-  tabText: { color: '#777', fontSize: 8, fontWeight: '900', marginTop: 4 },
-  tabTextActive: { color: C.yellow },
-  pressed: { opacity: 0.58 },
+const styles=StyleSheet.create({
+ app:{flex:1,backgroundColor:C.black},androidTopPad:{height:NativeStatusBar.currentHeight||0},header:{height:64,paddingHorizontal:15,flexDirection:'row',alignItems:'center',borderBottomWidth:1,borderBottomColor:'#1D1D1D'},brandMark:{width:42,height:42,borderRadius:10,backgroundColor:C.yellow,alignItems:'center',justifyContent:'center'},brandMarkText:{color:C.black,fontWeight:'900'},brandCopy:{flex:1,marginLeft:11},headerKicker:{color:C.yellow,fontSize:8,fontWeight:'900',letterSpacing:2},headerTitle:{color:C.white,fontSize:14,fontWeight:'900'},liveWrap:{flexDirection:'row',alignItems:'center',gap:5,borderWidth:1,borderColor:C.border,borderRadius:20,paddingHorizontal:9,paddingVertical:6},statusDot:{width:6,height:6,borderRadius:6,backgroundColor:'#666'},statusDotOnline:{backgroundColor:C.yellow},liveText:{color:C.gray,fontSize:8,fontWeight:'900'},content:{flex:1},screen:{flex:1,backgroundColor:C.black},scrollContent:{paddingBottom:28},loader:{flex:1,alignItems:'center',justifyContent:'center',gap:12},muted:{color:C.gray},hero:{margin:14,borderRadius:28,backgroundColor:'#14120A',padding:24,borderWidth:1,borderColor:'#332C0A'},heroKicker:{color:C.yellow,fontSize:9,fontWeight:'900',letterSpacing:1.5,marginBottom:11},heroTitle:{color:C.white,fontSize:38,lineHeight:40,fontWeight:'900'},heroText:{color:'#D0D0D0',fontSize:14,marginTop:13},sectionHead:{marginHorizontal:17,marginTop:22,marginBottom:11},eyebrow:{color:C.yellow,fontSize:8,fontWeight:'900',letterSpacing:1.8,marginBottom:4},sectionTitle:{color:C.white,fontSize:25,fontWeight:'900'},sportsRow:{paddingHorizontal:14,gap:10},sportTile:{width:142,height:160,borderRadius:22,backgroundColor:C.panel,borderWidth:1,borderColor:C.border,padding:15,justifyContent:'flex-end'},sportIconCircle:{position:'absolute',top:14,left:14,width:42,height:42,borderRadius:21,backgroundColor:C.yellow,alignItems:'center',justifyContent:'center'},sportIcon:{fontSize:21},sportName:{color:C.white,fontSize:14,fontWeight:'900'},sportLeague:{color:C.gray,fontSize:10,marginTop:4},openHint:{color:C.yellow,fontSize:9,fontWeight:'900',marginTop:8},matchCard:{marginHorizontal:14,marginBottom:10,borderRadius:18,backgroundColor:C.panel,borderWidth:1,borderColor:C.border,overflow:'hidden',flexDirection:'row'},matchAccent:{width:5,backgroundColor:C.yellow},matchBody:{flex:1,padding:15},matchMetaRow:{flexDirection:'row',justifyContent:'space-between'},matchSport:{color:C.yellow,fontSize:9,fontWeight:'900'},matchDate:{color:C.gray,fontSize:9},teamsRow:{flexDirection:'row',alignItems:'center',marginTop:15,gap:10},teamName:{flex:1,color:C.white,fontSize:12,fontWeight:'900'},teamAway:{textAlign:'right'},vsBox:{width:34,height:34,borderRadius:17,backgroundColor:C.yellow,alignItems:'center',justifyContent:'center'},vsText:{color:C.black,fontSize:10,fontWeight:'900'},scoreBox:{paddingHorizontal:10,paddingVertical:8,borderRadius:9,backgroundColor:C.yellow},scoreText:{color:C.black,fontSize:14,fontWeight:'900'},newsCard:{marginHorizontal:14,marginBottom:12,borderRadius:20,overflow:'hidden',backgroundColor:C.panel,borderWidth:1,borderColor:C.border},newsImage:{width:'100%',height:180},newsImageFallback:{height:120,alignItems:'center',justifyContent:'center',backgroundColor:'#1A1708'},newsFallbackText:{color:C.yellow,fontSize:24,fontWeight:'900'},newsContent:{padding:15},newsDate:{color:C.yellow,fontSize:9,fontWeight:'900'},newsTitle:{color:C.white,fontSize:18,fontWeight:'900',marginTop:5},newsExcerpt:{color:C.gray,fontSize:12,lineHeight:18,marginTop:7},pageIntro:{padding:20,paddingBottom:10},pageIntroCompact:{padding:20,paddingBottom:12},pageEyebrow:{color:C.yellow,fontSize:9,fontWeight:'900',letterSpacing:1.8},pageTitle:{color:C.white,fontSize:34,fontWeight:'900',lineHeight:36,marginTop:5},pageSubtitle:{color:C.gray,fontSize:12,marginTop:7},teamCard:{marginHorizontal:14,marginBottom:10,borderRadius:18,backgroundColor:C.panel,borderWidth:1,borderColor:C.border,padding:15,flexDirection:'row',alignItems:'center',gap:12},teamIndex:{color:C.yellow,fontSize:11,fontWeight:'900'},teamIconWrap:{width:46,height:46,borderRadius:23,backgroundColor:C.yellow,alignItems:'center',justifyContent:'center'},teamIcon:{fontSize:22},teamInfo:{flex:1},teamCardName:{color:C.white,fontSize:15,fontWeight:'900'},teamLeague:{color:C.gray,fontSize:10,marginTop:3},teamStats:{color:C.yellow,fontSize:9,fontWeight:'900',marginTop:6},chevron:{color:C.yellow,fontSize:28},chevronDark:{color:C.black,fontSize:28},backBtn:{margin:14,alignSelf:'flex-start',padding:10,borderRadius:10,backgroundColor:C.panel},backText:{color:C.yellow,fontWeight:'900'},listCard:{marginHorizontal:14,marginBottom:8,padding:14,borderRadius:14,backgroundColor:C.panel,borderWidth:1,borderColor:C.border,flexDirection:'row',alignItems:'center',gap:12},listNum:{width:30,color:C.yellow,fontWeight:'900'},listTitle:{color:C.white,fontWeight:'900'},listText:{color:C.gray,fontSize:11,marginTop:3},emptyCard:{marginHorizontal:14,padding:18,borderRadius:15,backgroundColor:C.panel},detailImage:{width:'100%',height:240},detailBox:{padding:20},detailTitle:{color:C.white,fontSize:28,fontWeight:'900',lineHeight:31,marginTop:7},detailBody:{color:'#DDD',fontSize:14,lineHeight:22,marginTop:16},notifyButton:{marginHorizontal:14,marginBottom:16,padding:16,borderRadius:18,backgroundColor:C.yellow,flexDirection:'row',alignItems:'center',gap:12},notifyIcon:{fontSize:24},notifyTitle:{color:C.black,fontSize:14,fontWeight:'900'},notifyText:{color:'#272000',fontSize:11,marginTop:3},moreCard:{marginHorizontal:14,marginBottom:10,padding:15,borderRadius:16,backgroundColor:C.panel,borderWidth:1,borderColor:C.border,flexDirection:'row',alignItems:'center'},moreIcon:{width:44,height:44,borderRadius:22,backgroundColor:C.panel2,alignItems:'center',justifyContent:'center'},moreIconText:{fontSize:20},moreInfo:{flex:1,marginLeft:12},moreTitle:{color:C.white,fontSize:14,fontWeight:'900'},moreText:{color:C.gray,fontSize:10,marginTop:3},tabBar:{height:72,flexDirection:'row',borderTopWidth:1,borderTopColor:C.border,backgroundColor:'#090909'},tabButton:{flex:1,alignItems:'center',justifyContent:'center'},tabIconWrap:{width:32,height:28,borderRadius:9,alignItems:'center',justifyContent:'center'},tabIconWrapActive:{backgroundColor:C.yellow},tabSymbol:{color:C.gray,fontSize:16,fontWeight:'900'},tabSymbolActive:{color:C.black},tabText:{color:C.gray,fontSize:8,fontWeight:'900',marginTop:4},tabTextActive:{color:C.yellow},pressed:{opacity:.58}
 });

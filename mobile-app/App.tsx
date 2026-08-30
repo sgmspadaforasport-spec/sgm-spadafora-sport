@@ -104,6 +104,19 @@ async function activatePushNotifications() {
   return expoToken.data;
 }
 
+async function deactivatePushNotifications(token: string) {
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/unregister-app-push-token`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_KEY,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ expo_push_token: token }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || data?.error) throw new Error(data?.error || 'Disattivazione non riuscita.');
+}
+
 function SectionHeader({ eyebrow, title, action }: { eyebrow: string; title: string; action?: string }) {
   return (
     <View style={styles.sectionHead}>
@@ -264,20 +277,37 @@ function ResultsScreen({ data }: { data: any }) {
 }
 
 function MoreScreen() {
-  const [activating, setActivating] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [notificationsActive, setNotificationsActive] = useState(false);
+  const [pushToken, setPushToken] = useState('');
 
   const activate = async () => {
-    if (activating) return;
-    setActivating(true);
+    if (busy) return;
+    setBusy(true);
     try {
-      await activatePushNotifications();
+      const token = await activatePushNotifications();
+      setPushToken(token);
       setNotificationsActive(true);
       Alert.alert('Notifiche attivate', 'Da ora riceverai gli aggiornamenti dell’ASD SGM Spadafora Sport.');
     } catch (e: any) {
       Alert.alert('Notifiche', e?.message || 'Non è stato possibile attivare le notifiche.');
     } finally {
-      setActivating(false);
+      setBusy(false);
+    }
+  };
+
+  const deactivate = async () => {
+    if (busy || !pushToken) return;
+    setBusy(true);
+    try {
+      await deactivatePushNotifications(pushToken);
+      setNotificationsActive(false);
+      setPushToken('');
+      Alert.alert('Notifiche disattivate', 'Non riceverai più le notifiche SGM su questo dispositivo. Potrai riattivarle quando vuoi.');
+    } catch (e: any) {
+      Alert.alert('Notifiche', e?.message || 'Non è stato possibile disattivare le notifiche.');
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -295,14 +325,14 @@ function MoreScreen() {
         <Text style={styles.pageTitle}>ALTRO</Text>
       </View>
 
-      <Pressable disabled={activating || notificationsActive} onPress={activate} style={({ pressed }) => [styles.notifyButton, notificationsActive && styles.notifyButtonActive, (pressed || activating) && styles.pressed]}>
-        <View style={styles.notifyButtonIcon}><Text style={styles.notifyButtonIconText}>{notificationsActive ? '✓' : '🔔'}</Text></View>
+      <Pressable disabled={busy} onPress={notificationsActive ? deactivate : activate} style={({ pressed }) => [styles.notifyButton, notificationsActive && styles.notifyButtonActive, (pressed || busy) && styles.pressed]}>
+        <View style={styles.notifyButtonIcon}><Text style={styles.notifyButtonIconText}>{notificationsActive ? '🔕' : '🔔'}</Text></View>
         <View style={styles.notifyButtonCopy}>
-          <Text style={styles.notifyButtonEyebrow}>{notificationsActive ? 'AGGIORNAMENTI SGM' : 'RESTA SEMPRE AGGIORNATO'}</Text>
-          <Text style={styles.notifyButtonTitle}>{notificationsActive ? 'NOTIFICHE ATTIVE' : 'ATTIVA NOTIFICHE'}</Text>
-          <Text style={styles.notifyButtonText}>{notificationsActive ? 'Questo dispositivo è registrato.' : 'Ricevi news, risultati e comunicazioni sul telefono.'}</Text>
+          <Text style={styles.notifyButtonEyebrow}>{notificationsActive ? 'NOTIFICHE SGM ATTIVE' : 'RESTA SEMPRE AGGIORNATO'}</Text>
+          <Text style={styles.notifyButtonTitle}>{notificationsActive ? 'DISATTIVA NOTIFICHE' : 'ATTIVA NOTIFICHE'}</Text>
+          <Text style={styles.notifyButtonText}>{notificationsActive ? 'Tocca qui per non ricevere più gli aggiornamenti su questo telefono.' : 'Ricevi news, risultati e comunicazioni sul telefono.'}</Text>
         </View>
-        {activating ? <ActivityIndicator size="small" color={C.black} /> : <Text style={styles.notifyButtonArrow}>{notificationsActive ? '✓' : '›'}</Text>}
+        {busy ? <ActivityIndicator size="small" color={C.black} /> : <Text style={styles.notifyButtonArrow}>›</Text>}
       </Pressable>
 
       {items.map(([icon, itemTitle, text]) => (

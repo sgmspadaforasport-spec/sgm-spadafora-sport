@@ -1,18 +1,18 @@
 (function(){
   function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function wait(){
-    if(typeof window.openModal!=='function'||typeof window.data==='undefined'||typeof window.currentCalendarSport==='undefined') return setTimeout(wait,80);
+    if(typeof openModal!=='function'||typeof data==='undefined'||typeof currentCalendarSport==='undefined') return setTimeout(wait,80);
     install();
   }
   function install(){
     if(window.__SGM_CALENDAR_DETAILS_ADMIN__)return;
     window.__SGM_CALENDAR_DETAILS_ADMIN__=true;
-    const original=window.openModal;
+    const original=openModal;
     window.openModal=function(title,html,onSave){
       const isCalendar=String(title||'').toLowerCase().includes('gara calendario');
       if(!isCalendar)return original.apply(this,arguments);
-      const sport=window.currentCalendarSport;
-      const arr=window.data?.sports?.[sport]?.calendar||[];
+      const sport=currentCalendarSport;
+      const arr=data?.sports?.[sport]?.calendar||[];
       let current=null;
       if(String(title).toLowerCase().startsWith('modifica')){
         const home=(String(html).match(/id="cHome" value="([^"]*)"/)||[])[1]||'';
@@ -31,6 +31,8 @@
       const beforeLen=arr.length;
       const wrapped=function(){
         const details={};
+        const home=document.getElementById('cHome')?.value||'';
+        const away=document.getElementById('cAway')?.value||'';
         if(sport==='calcio_a_5')details.scorers=document.getElementById('cScorers')?.value.trim()||'';
         if(sport==='pallavolo_maschile'||sport==='pallavolo_femminile'){
           ['1','2','3','4','5'].forEach(n=>details['set'+n]=document.getElementById('cSet'+n)?.value.trim()||'');
@@ -40,16 +42,16 @@
           details.ot=document.getElementById('cOT')?.value.trim()||'';
         }
         onSave&&onSave();
-        const list=window.data?.sports?.[sport]?.calendar||[];
-        let target=null;
-        if(current) target=list.find(g=>String(g.home||'')===String(document.getElementById('cHome')?.value||'')&&String(g.away||'')===String(document.getElementById('cAway')?.value||''));
+        const list=data?.sports?.[sport]?.calendar||[];
+        let target=list.find(g=>String(g.home||'')===String(home)&&String(g.away||'')===String(away));
         if(!target&&list.length>beforeLen)target=list[list.length-1];
         if(!target&&list.length)target=list[list.length-1];
         if(target)Object.assign(target,details);
-        if(typeof window.renderCalendarList==='function')window.renderCalendarList();
+        if(typeof renderCalendarList==='function')renderCalendarList();
       };
       return original.call(this,title,html,wrapped);
     };
+    openModal=window.openModal;
   }
   wait();
 })();

@@ -27,7 +27,7 @@
       }else if(sport==='basket'){
         extra=`<div class="field full"><label>Punteggio dei quarti</label><div class="fields"><div class="field"><label>1° quarto</label><input id="cQ1" value="${esc(current?.q1||'')}" placeholder="18-15"></div><div class="field"><label>2° quarto</label><input id="cQ2" value="${esc(current?.q2||'')}" placeholder="20-17"></div><div class="field"><label>3° quarto</label><input id="cQ3" value="${esc(current?.q3||'')}" placeholder="16-19"></div><div class="field"><label>4° quarto</label><input id="cQ4" value="${esc(current?.q4||'')}" placeholder="22-18"></div><div class="field"><label>Supplementare</label><input id="cOT" value="${esc(current?.ot||'')}" placeholder="10-8"></div></div></div>`;
       }
-      html=String(html).replace('</div>',extra+'</div>');
+      html=String(html).replace(/<\/div>\s*$/,extra+'</div>');
       const beforeLen=arr.length;
       const wrapped=function(){
         const details={};
@@ -39,13 +39,10 @@
           ['1','2','3','4'].forEach(n=>details['q'+n]=document.getElementById('cQ'+n)?.value.trim()||'');
           details.ot=document.getElementById('cOT')?.value.trim()||'';
         }
-        const old=current;
         onSave&&onSave();
         const list=window.data?.sports?.[sport]?.calendar||[];
         let target=null;
-        if(old){
-          target=list.find(g=>g===old)||list.find(g=>String(g.home||'')===String(document.getElementById('cHome')?.value||'')&&String(g.away||'')===String(document.getElementById('cAway')?.value||''));
-        }
+        if(current) target=list.find(g=>String(g.home||'')===String(document.getElementById('cHome')?.value||'')&&String(g.away||'')===String(document.getElementById('cAway')?.value||''));
         if(!target&&list.length>beforeLen)target=list[list.length-1];
         if(!target&&list.length)target=list[list.length-1];
         if(target)Object.assign(target,details);

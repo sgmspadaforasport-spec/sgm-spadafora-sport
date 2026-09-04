@@ -409,24 +409,65 @@ $('addVideo').onclick=()=>editVideo();
 
 let currentCalendarSport='calcio_a_5';
 
+function resultExtraSummary(r){
+ const sport=String(r.sport||'').toLowerCase();
+ if(sport.includes('calcio')) return r.scorers?'<br>Marcatori: '+esc(r.scorers):'';
+ if(sport.includes('pallavolo')){
+   const sets=[r.set1,r.set2,r.set3,r.set4,r.set5].filter(Boolean);
+   return sets.length?'<br>Set: '+sets.map((x,i)=>(i+1)+'° '+esc(x)).join(' · '):'';
+ }
+ if(sport.includes('basket')){
+   const qs=[r.q1,r.q2,r.q3,r.q4].filter(Boolean);
+   return qs.length?'<br>Quarti: '+qs.map((x,i)=>(i+1)+'° '+esc(x)).join(' · '):'';
+ }
+ return '';
+}
 function renderResults(){
  const arr=data.recent_results||[];const list=$('resultsList');
  if(!arr.length){list.innerHTML='<div class="empty">Nessun risultato inserito.</div>';return;}
- list.innerHTML=arr.map((r,i)=>`<div class="item-card"><div><h3>${esc(r.sport)}</h3><p>${esc(r.date||'')}<br>${esc(r.home)} ${esc(r.home_score)} - ${esc(r.away_score)} ${esc(r.away)}</p></div><div class="item-actions"><button class="btn btn-dark btn-small edit-result" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-result" data-i="${i}">Elimina</button></div></div>`).join('');
+ list.innerHTML=arr.map((r,i)=>`<div class="item-card"><div><h3>${esc(r.sport)}</h3><p>${esc(r.date||'')}<br>${esc(r.home)} ${esc(r.home_score)} - ${esc(r.away_score)} ${esc(r.away)}${resultExtraSummary(r)}</p></div><div class="item-actions"><button class="btn btn-dark btn-small edit-result" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-result" data-i="${i}">Elimina</button></div></div>`).join('');
  list.querySelectorAll('.edit-result').forEach(b=>b.onclick=()=>editResult(+b.dataset.i));
  list.querySelectorAll('.del-result').forEach(b=>b.onclick=()=>{data.recent_results.splice(+b.dataset.i,1);renderResults();});
 }
+function resultExtraFields(r,sport){
+ const s=String(sport||'');
+ if(s==='Calcio a 5') return `<div class="field full result-extra"><label>Marcatori</label><textarea id="rScorers" placeholder="Es. Rossi (2), Bianchi, Verdi">${esc(r.scorers||'')}</textarea><small style="color:#888">Inserisci i nomi dei marcatori, eventualmente con il numero di gol.</small></div>`;
+ if(s.includes('Pallavolo')) return `
+ <div class="field result-extra"><label>1° set</label><input id="rSet1" placeholder="Es. 25-21" value="${esc(r.set1||'')}"></div>
+ <div class="field result-extra"><label>2° set</label><input id="rSet2" placeholder="Es. 22-25" value="${esc(r.set2||'')}"></div>
+ <div class="field result-extra"><label>3° set</label><input id="rSet3" placeholder="Es. 25-18" value="${esc(r.set3||'')}"></div>
+ <div class="field result-extra"><label>4° set</label><input id="rSet4" placeholder="Facoltativo" value="${esc(r.set4||'')}"></div>
+ <div class="field result-extra"><label>5° set</label><input id="rSet5" placeholder="Facoltativo" value="${esc(r.set5||'')}"></div>`;
+ if(s==='Basket') return `
+ <div class="field result-extra"><label>1° quarto</label><input id="rQ1" placeholder="Es. 18-22" value="${esc(r.q1||'')}"></div>
+ <div class="field result-extra"><label>2° quarto</label><input id="rQ2" placeholder="Es. 20-19" value="${esc(r.q2||'')}"></div>
+ <div class="field result-extra"><label>3° quarto</label><input id="rQ3" placeholder="Es. 17-21" value="${esc(r.q3||'')}"></div>
+ <div class="field result-extra"><label>4° quarto</label><input id="rQ4" placeholder="Es. 24-20" value="${esc(r.q4||'')}"></div>`;
+ return '';
+}
 function editResult(i=null){
- const r=i===null?{sport:'Calcio a 5',date:'',home:'ASD SGM Spadafora Sport',home_score:'',away_score:'',away:''}:data.recent_results[i];
+ const r=i===null?{sport:'Calcio a 5',date:'',home:'ASD SGM Spadafora Sport',home_score:'',away_score:'',away:'',scorers:'',set1:'',set2:'',set3:'',set4:'',set5:'',q1:'',q2:'',q3:'',q4:''}:data.recent_results[i];
  openModal(i===null?'Aggiungi risultato':'Modifica risultato',`
- <div class="fields">
+ <div class="fields" id="resultFields">
  <div class="field"><label>Disciplina</label><select id="rSport">${Object.values(sportLabels).map(x=>`<option ${x===r.sport?'selected':''}>${x}</option>`).join('')}</select></div>
  <div class="field"><label>Data</label><input id="rDate" value="${esc(r.date)}"></div>
  <div class="field"><label>Casa</label><input id="rHome" value="${esc(r.home)}"></div>
  <div class="field"><label>Gol/Punti casa</label><input id="rHomeScore" value="${esc(r.home_score)}"></div>
  <div class="field"><label>Gol/Punti ospite</label><input id="rAwayScore" value="${esc(r.away_score)}"></div>
- <div class="field"><label>Ospite</label><input id="rAway" value="${esc(r.away)}"></div></div>`,
- ()=>{const obj={sport:$('rSport').value,date:$('rDate').value,home:$('rHome').value,home_score:$('rHomeScore').value,away_score:$('rAwayScore').value,away:$('rAway').value,page:r.page||''};if(i===null)data.recent_results.push(obj);else data.recent_results[i]=obj;renderResults();});
+ <div class="field"><label>Ospite</label><input id="rAway" value="${esc(r.away)}"></div>
+ <div id="resultExtraFields" style="display:contents">${resultExtraFields(r,r.sport)}</div></div>`,
+ ()=>{
+   const sport=$('rSport').value;
+   const obj={sport,date:$('rDate').value,home:$('rHome').value,home_score:$('rHomeScore').value,away_score:$('rAwayScore').value,away:$('rAway').value,page:r.page||''};
+   if(sport==='Calcio a 5') obj.scorers=$('rScorers')?.value.trim()||'';
+   if(sport.includes('Pallavolo')){obj.set1=$('rSet1')?.value.trim()||'';obj.set2=$('rSet2')?.value.trim()||'';obj.set3=$('rSet3')?.value.trim()||'';obj.set4=$('rSet4')?.value.trim()||'';obj.set5=$('rSet5')?.value.trim()||'';}
+   if(sport==='Basket'){obj.q1=$('rQ1')?.value.trim()||'';obj.q2=$('rQ2')?.value.trim()||'';obj.q3=$('rQ3')?.value.trim()||'';obj.q4=$('rQ4')?.value.trim()||'';}
+   if(i===null)data.recent_results.push(obj);else data.recent_results[i]=obj;renderResults();
+ });
+ setTimeout(()=>{
+   const sel=$('rSport'),box=$('resultExtraFields'); if(!sel||!box)return;
+   sel.onchange=()=>{box.innerHTML=resultExtraFields(r,sel.value);};
+ },0);
 }
 $('addResult').onclick=()=>editResult();
 

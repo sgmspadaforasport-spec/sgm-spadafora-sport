@@ -119,7 +119,7 @@
         </div>
         <small>Seleziona App, Sito oppure entrambi. Dopo il salvataggio si aprirà la sezione Notifiche già compilata.</small>
       </div></div>
-    </div>,async()=>{
+    </div>`,async()=>{
       const obj={title:$('cnTitle').value.trim(),date:$('cnDate').value,excerpt:$('cnExcerpt').value.trim(),body:$('cnBody').value.trim(),image:$('cnImage').value.trim()};
       const file=$('cnImageFile').files[0];
       try{if(file)obj.image=await window.SGM_DB.uploadImage(file,'news');const notify=i===null&&$('cnNotify')?.checked;const notifyApp=!!$('cnNotifyApp')?.checked;const notifyWeb=!!$('cnNotifyWeb')?.checked;if(notify&&!notifyApp&&!notifyWeb){alert('Seleziona almeno App oppure Sito.');return;}if(i===null)data.news.unshift(obj);else data.news[i]=obj;renderNews();try{await window.SGM_DB.saveSiteData(data);if(typeof status==='function')status('✓ News pubblicata online.');}catch(saveErr){if(typeof status==='function')status('News aggiunta ma salvataggio online non riuscito: '+saveErr.message,true);throw saveErr;}if(notify){setTimeout(()=>{if(typeof openPanel==='function')openPanel('notificationsAdmin');const title=document.getElementById('pushTitle'),body=document.getElementById('pushBody'),target=document.getElementById('pushTarget');if(title)title.value='📰 '+(obj.title||'Nuova news');if(body)body.value=obj.excerpt||'È online una nuova notizia dal mondo SGM.';if(target)target.value='news.html';const app=document.getElementById('pushChannelApp'),web=document.getElementById('pushChannelWeb');if(app)app.checked=notifyApp;if(web)web.checked=notifyWeb;document.getElementById('sendPushNotification')?.scrollIntoView({behavior:'smooth',block:'center'});},120);}}catch(e){alert('Errore caricamento immagine: '+e.message);}

@@ -77,9 +77,30 @@
   function renderNews(){
     ensureContentData();const list=document.getElementById('newsAdminList');if(!list)return;
     if(!data.news.length){list.innerHTML='<div class="empty">Nessuna news inserita.</div>';return;}
-    list.innerHTML=data.news.map((n,i)=>`<div class="item-card"><div><h3>${esc(n.title||'News')}</h3><p>${esc(n.date||'')}<br>${esc(n.excerpt||'')}</p></div><div class="item-actions"><button class="btn btn-dark btn-small edit-news-admin" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-news-admin" data-i="${i}">Elimina</button></div></div>`).join('');
+    list.innerHTML=data.news.map((n,i)=>`<div class="item-card"><div><h3>${esc(n.title||'News')}</h3><p>${esc(n.date||'')}<br>${esc(n.excerpt||'')}</p></div><div class="item-actions"><button class="btn btn-primary btn-small notify-news-admin" data-i="${i}">🔔 Invia notifica</button><button class="btn btn-dark btn-small edit-news-admin" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-news-admin" data-i="${i}">Elimina</button></div></div>`).join('');
+    list.querySelectorAll('.notify-news-admin').forEach(b=>b.onclick=()=>prepareNewsNotification(+b.dataset.i));
     list.querySelectorAll('.edit-news-admin').forEach(b=>b.onclick=()=>editNews(+b.dataset.i));
     list.querySelectorAll('.del-news-admin').forEach(b=>b.onclick=()=>{data.news.splice(+b.dataset.i,1);renderNews();note();});
+  }
+
+  function prepareNewsNotification(i){
+    ensureContentData();
+    const n=data.news[i]; if(!n)return;
+    if(typeof openPanel==='function')openPanel('notificationsAdmin');
+    setTimeout(()=>{
+      const title=document.getElementById('pushTitle');
+      const body=document.getElementById('pushBody');
+      const target=document.getElementById('pushTarget');
+      const newsTemplate=document.querySelector('.push-template[data-type="news"]');
+      if(newsTemplate)newsTemplate.click();
+      if(title)title.value='📰 '+(n.title||'Nuova news');
+      if(body)body.value=n.excerpt||'È online una nuova notizia dal mondo SGM.';
+      if(target)target.value='news.html';
+      const app=document.getElementById('pushChannelApp'),web=document.getElementById('pushChannelWeb');
+      if(app&&!app.checked&&!web?.checked)app.checked=true;
+      if(web&&!app?.checked&&!web.checked)web.checked=true;
+      document.getElementById('sendPushNotification')?.scrollIntoView({behavior:'smooth',block:'center'});
+    },120);
   }
 
   function editNews(i=null){

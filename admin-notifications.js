@@ -71,6 +71,48 @@
     document.getElementById('clearPushNotification').addEventListener('click',()=>applyTemplate('custom'));
     document.getElementById('refreshPushHistory').addEventListener('click',refreshMeta);
     applyTemplate('custom');
+    installResultNotificationIntegration();
+  }
+
+  function installResultNotificationIntegration(){
+    if(window.__sgmResultNotifyInstalled || typeof window.editResult!=='function')return;
+    window.__sgmResultNotifyInstalled=true;
+    const original=window.editResult;
+    window.editResult=function(i=null){
+      original(i);
+      const fields=document.getElementById('resultFields');
+      if(!fields||document.getElementById('rNotify'))return;
+      fields.insertAdjacentHTML('beforeend',`<div class="field full"><div style="border:2px solid #ffd400;border-radius:14px;padding:16px"><label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:900"><input id="rNotify" type="checkbox" style="width:22px;height:22px;accent-color:#ffd400"> 🔔 Invia una notifica dopo il salvataggio</label><div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:14px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:800"><input id="rNotifyApp" type="checkbox" checked style="width:18px;height:18px;accent-color:#ffd400"> 📱 App</label><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:800"><input id="rNotifyWeb" type="checkbox" checked style="width:18px;height:18px;accent-color:#ffd400"> 🌐 Sito</label></div><small style="display:block;color:#888;margin-top:8px">Seleziona App, Sito oppure entrambi. Dopo il salvataggio si aprirà la sezione Notifiche già compilata.</small></div></div>`);
+      const baseSave=modalSaveFn;
+      modalSaveFn=async()=>{
+        const notify=!!document.getElementById('rNotify')?.checked;
+        const notifyApp=!!document.getElementById('rNotifyApp')?.checked;
+        const notifyWeb=!!document.getElementById('rNotifyWeb')?.checked;
+        const sport=document.getElementById('rSport')?.value||'SGM';
+        const home=document.getElementById('rHome')?.value||'';
+        const away=document.getElementById('rAway')?.value||'';
+        const hs=document.getElementById('rHomeScore')?.value||'';
+        const as=document.getElementById('rAwayScore')?.value||'';
+        if(notify&&!notifyApp&&!notifyWeb){alert('Seleziona almeno App oppure Sito.');throw new Error('Canale notifica non selezionato');}
+        if(baseSave)await baseSave();
+        if(notify){
+          setTimeout(()=>{
+            if(typeof openPanel==='function')openPanel('notificationsAdmin');
+            applyTemplate('result');
+            const title=document.getElementById('pushTitle'),body=document.getElementById('pushBody'),target=document.getElementById('pushTarget');
+            if(title)title.value='🏆 Risultato '+sport;
+            if(body)body.value=`${home} ${hs} - ${as} ${away}`.trim();
+            if(target)target.value='calendario-risultati.html';
+            const app=document.getElementById('pushChannelApp'),web=document.getElementById('pushChannelWeb');
+            if(app)app.checked=notifyApp;if(web)web.checked=notifyWeb;
+            document.getElementById('sendPushNotification')?.scrollIntoView({behavior:'smooth',block:'center'});
+          },120);
+        }
+      };
+    };
+    const add=document.getElementById('addResult');if(add)add.onclick=()=>window.editResult();
+    const list=document.getElementById('resultsList');
+    if(list)list.addEventListener('click',e=>{const b=e.target.closest('.edit-result');if(b){e.preventDefault();e.stopImmediatePropagation();window.editResult(+b.dataset.i);}},true);
   }
 
   let currentType='custom';

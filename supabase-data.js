@@ -35,5 +35,5 @@
   if(page==='staff.html')extras.push('staff-dynamic.js');
   if(page===''||page==='index.html')extras.push('home-news.js','home-layout-cleanup.js','home-hero-dynamic.js','home-admin-access.js','calendar-details-display.js');
   if(page!=='admin.html'&&page!=='admin')extras.push('professional-footer.js','web-notifications.js');
-  extras.forEach(src=>{const script=document.createElement('script');script.src=src+'?v=36';script.async=false;document.head.appendChild(script);});
+  extras.forEach(src=>{const script=document.createElement('script');script.src=src+'?v=37';script.async=false;document.head.appendChild(script);});
 })();

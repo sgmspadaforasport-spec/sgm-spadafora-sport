@@ -90,10 +90,11 @@
       <div class="field full"><label>Testo breve / anteprima</label><textarea id="cnExcerpt">${esc(n.excerpt||'')}</textarea></div>
       <div class="field full"><label>Testo completo</label><textarea id="cnBody" style="min-height:220px">${esc(n.body||'')}</textarea></div>
       <div class="field full"><label>Immagine</label><input id="cnImage" value="${esc(n.image||'')}" placeholder="URL immagine"><input id="cnImageFile" type="file" accept="image/jpeg,image/png,image/webp"><small>Puoi caricare una nuova immagine oppure lasciare quella esistente.</small></div>
+      <div class="field full"><label style="display:flex;align-items:center;gap:10px;cursor:pointer"><input id="cnNotify" type="checkbox" style="width:18px;height:18px;accent-color:#ffd400"> 🔔 Invia anche una notifica</label><small>Se selezionato, dopo aver creato la news si aprirà la sezione Notifiche già compilata. Potrai scegliere App, Sito o entrambi e confermare l'invio.</small></div>
     </div>`,async()=>{
       const obj={title:$('cnTitle').value.trim(),date:$('cnDate').value,excerpt:$('cnExcerpt').value.trim(),body:$('cnBody').value.trim(),image:$('cnImage').value.trim()};
       const file=$('cnImageFile').files[0];
-      try{if(file)obj.image=await window.SGM_DB.uploadImage(file,'news');if(i===null)data.news.unshift(obj);else data.news[i]=obj;renderNews();note();}catch(e){alert('Errore caricamento immagine: '+e.message);}
+      try{if(file)obj.image=await window.SGM_DB.uploadImage(file,'news');const notify=i===null&&$('cnNotify')?.checked;if(i===null)data.news.unshift(obj);else data.news[i]=obj;renderNews();note();if(notify){setTimeout(()=>{if(typeof openPanel==='function')openPanel('notificationsAdmin');const title=document.getElementById('pushTitle'),body=document.getElementById('pushBody'),target=document.getElementById('pushTarget');if(title)title.value='📰 '+(obj.title||'Nuova news');if(body)body.value=obj.excerpt||'È online una nuova notizia dal mondo SGM.';if(target)target.value='news.html';},80);}}catch(e){alert('Errore caricamento immagine: '+e.message);}
     });
   }
 

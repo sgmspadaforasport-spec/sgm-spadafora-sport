@@ -342,7 +342,7 @@ function openModal(title, body, saveFn){
 }
 function closeModal(){$('modal').classList.remove('open');modalSaveFn=null;}
 $('modalClose').onclick=closeModal;$('modalCancel').onclick=closeModal;
-$('modalSave').onclick=()=>{try{if(modalSaveFn)modalSaveFn();closeModal();}catch(e){alert('Controlla i dati inseriti.');}};
+$('modalSave').onclick=async()=>{const btn=$('modalSave');try{if(btn){btn.disabled=true;btn.textContent='Salvataggio...';}if(modalSaveFn)await modalSaveFn();closeModal();}catch(e){alert('Salvataggio non riuscito: '+(e?.message||'Controlla i dati inseriti.'));}finally{if(btn){btn.disabled=false;btn.textContent='Salva';}}};
 
 function editMatch(i=null){
  const m=i===null?{sport:'Calcio a 5',date:'',time:'',home:'ASD SGM Spadafora Sport',away:'',page:''}:data.next_matches[i];
@@ -564,7 +564,7 @@ $('logout').onclick=async()=>{await window.SGM_DB.signOut();location.href='login
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="supabase-data.js"></script>
+<script src="supabase-data.js?v=29"></script>
  <script>
 loadData();
 </script>

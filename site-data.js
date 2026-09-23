@@ -753,6 +753,97 @@
 
 
   /* =========================================
+     HOME: PROSSIME GARE AUTOMATICHE
+     Legge direttamente i calendari di ogni sport.
+  ========================================= */
+
+  function parseGameDate(dateValue, timeValue) {
+    const raw = String(dateValue || "").trim();
+    if (!raw) return null;
+
+    let y, m, d;
+    let match = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (match) {
+      y = +match[1]; m = +match[2]; d = +match[3];
+    } else {
+      match = raw.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);
+      if (!match) return null;
+      d = +match[1]; m = +match[2]; y = +match[3];
+    }
+
+    const time = String(timeValue || "").match(/(\d{1,2}):(\d{2})/);
+    const hh = time ? +time[1] : 23;
+    const mm = time ? +time[2] : 59;
+    const result = new Date(y, m - 1, d, hh, mm, 59);
+    return Number.isNaN(result.getTime()) ? null : result;
+  }
+
+  function renderHomeUpcoming(data) {
+    const root = document.querySelector(".upcoming-grid");
+    if (!root) return;
+
+    const sports = [
+      { key: "calcio_a_5", label: "Calcio a 5", icon: "⚽", page: "calcio-a-5-calendario.html" },
+      { key: "pallavolo_maschile", label: "Pallavolo Maschile", icon: "🏐", page: "pallavolo-maschile-calendario.html" },
+      { key: "pallavolo_femminile", label: "Pallavolo Femminile", icon: "🏐", page: "pallavolo-femminile-calendario.html" },
+      { key: "basket", label: "Basket", icon: "🏀", page: "basket-calendario.html" }
+    ];
+
+    const now = new Date();
+    const upcoming = [];
+
+    sports.forEach(info => {
+      const calendar = getCalendar(getSport(data, info.key));
+      const futureGames = calendar
+        .map(game => ({ game, when: parseGameDate(game.date || game.data, game.time || game.ora) }))
+        .filter(item => item.when && item.when >= now)
+        .sort((a, b) => a.when - b.when);
+
+      if (futureGames.length) {
+        upcoming.push({ ...info, ...futureGames[0] });
+      }
+    });
+
+    upcoming.sort((a, b) => a.when - b.when);
+
+    if (!upcoming.length) {
+      root.innerHTML = `
+        <div class="dynamic-empty">
+          <strong>PROSSIME GARE IN AGGIORNAMENTO</strong>
+          <span>Le prossime partite compariranno automaticamente quando saranno inseriti i calendari.</span>
+        </div>`;
+      return;
+    }
+
+    root.innerHTML = upcoming.map(item => {
+      const g = item.game;
+      const date = g.date || g.data || "";
+      const time = g.time || g.ora || "";
+      const home = g.home || g.casa || "";
+      const away = g.away || g.trasferta || "";
+
+      return `
+        <article class="upcoming-card">
+          <div class="upcoming-top">
+            <span class="upcoming-sport">${esc(item.label)}</span>
+            <span class="upcoming-icon">${item.icon}</span>
+          </div>
+          <div class="upcoming-date">
+            <strong>${esc(date)}</strong>
+            <span>${time ? "Ore " + esc(time) : "Orario da definire"}</span>
+          </div>
+          <div class="upcoming-match">
+            <strong>${esc(home)}</strong>
+            <span>VS</span>
+            <strong>${esc(away)}</strong>
+          </div>
+          <a href="${esc(item.page)}">Vai al calendario →</a>
+        </article>`;
+    }).join("");
+  }
+
+
+  /* =========================================
      AVVIO SUPABASE
   ========================================= */
 
@@ -799,6 +890,8 @@
       renderSportCalendar(data);
 
       renderSportStandings(data);
+
+      renderHomeUpcoming(data);
 
 
       document.dispatchEvent(

@@ -844,6 +844,94 @@
 
 
   /* =========================================
+     HOME: RISULTATI RECENTI AUTOMATICI
+     Mostra l'ultima gara con risultato per ogni sport.
+  ========================================= */
+
+  function renderHomeRecentResults(data) {
+    const root = document.querySelector(".results-grid");
+    if (!root) return;
+
+    const sports = [
+      { key: "calcio_a_5", label: "Calcio a 5", icon: "⚽", page: "calcio-a-5-calendario.html" },
+      { key: "pallavolo_maschile", label: "Pallavolo Maschile", icon: "🏐", page: "pallavolo-maschile-calendario.html" },
+      { key: "pallavolo_femminile", label: "Pallavolo Femminile", icon: "🏐", page: "pallavolo-femminile-calendario.html" },
+      { key: "basket", label: "Basket", icon: "🏀", page: "basket-calendario.html" }
+    ];
+
+    const recent = [];
+
+    sports.forEach(info => {
+      const calendar = getCalendar(getSport(data, info.key));
+
+      const played = calendar
+        .map(game => {
+          const homeScore = game.home_score ?? game.gol_casa ?? game.punti_casa ?? game.set_casa;
+          const awayScore = game.away_score ?? game.gol_trasferta ?? game.punti_trasferta ?? game.set_trasferta;
+          const hasScore =
+            homeScore !== undefined && homeScore !== null && homeScore !== "" && homeScore !== "-" &&
+            awayScore !== undefined && awayScore !== null && awayScore !== "" && awayScore !== "-";
+
+          return {
+            game,
+            when: parseGameDate(game.date || game.data, game.time || game.ora),
+            homeScore,
+            awayScore,
+            hasScore
+          };
+        })
+        .filter(item => item.hasScore)
+        .sort((a, b) => {
+          if (a.when && b.when) return b.when - a.when;
+          if (a.when) return -1;
+          if (b.when) return 1;
+          return 0;
+        });
+
+      if (played.length) recent.push({ ...info, ...played[0] });
+    });
+
+    recent.sort((a, b) => {
+      if (a.when && b.when) return b.when - a.when;
+      if (a.when) return -1;
+      if (b.when) return 1;
+      return 0;
+    });
+
+    if (!recent.length) {
+      root.innerHTML = `
+        <div class="dynamic-empty">
+          <strong>RISULTATI IN AGGIORNAMENTO</strong>
+          <span>I risultati compariranno automaticamente quando saranno inseriti nei calendari.</span>
+        </div>`;
+      return;
+    }
+
+    root.innerHTML = recent.map(item => {
+      const g = item.game;
+      const date = g.date || g.data || "";
+      const home = g.home || g.casa || "";
+      const away = g.away || g.trasferta || "";
+
+      return `
+        <article class="result-card">
+          <div class="result-top">
+            <span class="result-sport">${esc(item.label)}</span>
+            <span class="result-icon">${item.icon}</span>
+          </div>
+          <div class="result-date">${esc(date)}</div>
+          <div class="result-match">
+            <strong>${esc(home)}</strong>
+            <b>${esc(item.homeScore)} - ${esc(item.awayScore)}</b>
+            <strong>${esc(away)}</strong>
+          </div>
+          <a href="${esc(item.page)}">Vai al calendario →</a>
+        </article>`;
+    }).join("");
+  }
+
+
+  /* =========================================
      AVVIO SUPABASE
   ========================================= */
 
@@ -892,6 +980,8 @@
       renderSportStandings(data);
 
       renderHomeUpcoming(data);
+
+      renderHomeRecentResults(data);
 
 
       document.dispatchEvent(

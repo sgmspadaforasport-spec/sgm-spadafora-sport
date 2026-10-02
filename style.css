@@ -10,3 +10,29 @@
 @media(max-width:900px){.upcoming-grid,.results-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:768px){.site-header{position:sticky;top:0}.nav-wrap{width:100%;min-height:72px;padding:8px 14px;position:relative}.brand{min-width:0;gap:8px}.brand-logo{width:54px;height:54px}.brand-text strong{font-size:14px}.brand-text span{font-size:11px}.menu-toggle{display:flex;width:46px;height:46px;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:#151515;border:1px solid #333;border-radius:10px}.menu-toggle span{display:block;width:23px;height:3px;background:#fff}.main-nav{display:none;position:fixed;top:72px;left:0;right:0;width:100%;height:calc(100dvh - 72px);padding:12px 14px 28px;background:#080808;z-index:9999;overflow-x:hidden;overflow-y:auto}.main-nav.menu-open{display:flex;flex-direction:column;flex-wrap:nowrap;align-items:stretch;justify-content:flex-start;gap:6px}.main-nav a{display:block;width:100%;min-width:0;flex:none;padding:13px 14px;background:#151515;border:1px solid #252525;text-align:left;font-size:14px}.main-nav a[href="rose.html"]{display:none!important}.main-nav .sgm-push-nav{display:block!important;background:#ffd400!important;color:#080808!important;order:999}.home-hero{padding:30px 0 40px}.home-hero-logo{width:120px}.home-hero h1{font-size:48px}.home-manifesto-grid{grid-template-columns:1fr}.home-section-head,.home-tv-inner,.home-social-inner{flex-direction:column;align-items:flex-start}.footer-wrap{flex-direction:column;text-align:center}}
 @media(max-width:520px){.container{width:min(100% - 28px,1180px)}.upcoming-grid,.results-grid{grid-template-columns:1fr}.home-hero h1{font-size:42px}}
+
+
+/* HOME MATCH CARDS — Prossime gare / Risultati recenti */
+.home-upcoming{background:#fff}
+.home-results{background:#0b0b0b;color:#fff}
+.home-results .home-section-head>a{color:var(--yellow)}
+.upcoming-grid,.results-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.upcoming-card,.result-card{position:relative;overflow:hidden;border-radius:20px;padding:0;background:#fff;border:1px solid #e7e7e7;box-shadow:0 12px 32px rgba(0,0,0,.08);min-width:0}
+.upcoming-card:before,.result-card:before{content:"";display:block;height:5px;background:var(--yellow)}
+.result-card{background:#151515;border-color:#2b2b2b;box-shadow:0 14px 34px rgba(0,0,0,.28)}
+.upcoming-top,.result-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px 12px;border-bottom:1px solid #ececec}
+.result-top{border-bottom-color:#292929}
+.upcoming-sport,.result-sport{font-size:12px;font-weight:900;letter-spacing:.8px;text-transform:uppercase}
+.result-sport{color:var(--yellow)}
+.upcoming-icon,.result-icon{font-size:24px;line-height:1}
+.upcoming-date{display:flex;align-items:baseline;justify-content:center;gap:10px;padding:15px 18px 2px;text-align:center}
+.upcoming-date strong{font-size:16px}.upcoming-date span{font-size:13px;color:#666;font-weight:700}
+.upcoming-match,.result-match{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:14px;padding:22px 18px;text-align:center}
+.upcoming-match strong,.result-match strong{font-size:18px;line-height:1.15;overflow-wrap:anywhere}
+.upcoming-match span{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#080808;color:var(--yellow);font-size:11px;font-weight:900}
+.result-date{text-align:center;padding:14px 18px 0;color:#aaa;font-size:13px;font-weight:800}
+.result-match b{display:grid;place-items:center;min-width:88px;padding:9px 12px;border-radius:12px;background:var(--yellow);color:#080808;font-size:25px;line-height:1;font-weight:900}
+.result-match strong{color:#fff}
+.upcoming-card>a,.result-card>a{display:block;margin:0 18px 17px;padding-top:13px;border-top:1px solid #ececec;font-size:12px;font-weight:900;text-align:right}
+.result-card>a{border-top-color:#292929;color:#ddd}
+@media(max-width:768px){.upcoming-grid,.results-grid{grid-template-columns:1fr;gap:14px}.upcoming-card,.result-card{border-radius:16px}.upcoming-match,.result-match{padding:18px 14px;gap:9px}.upcoming-match strong,.result-match strong{font-size:15px}.result-match b{min-width:74px;font-size:22px}.home-upcoming,.home-results{padding:44px 0}}

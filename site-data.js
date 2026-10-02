@@ -852,6 +852,27 @@
     const root = document.querySelector(".results-grid");
     if (!root) return;
 
+    const sportMeta = {
+      "calcio a 5": { label: "Calcio a 5", icon: "⚽", page: "calcio-a-5-calendario.html" },
+      "pallavolo maschile": { label: "Pallavolo Maschile", icon: "🏐", page: "pallavolo-maschile-calendario.html" },
+      "pallavolo femminile": { label: "Pallavolo Femminile", icon: "🏐", page: "pallavolo-femminile-calendario.html" },
+      "basket": { label: "Basket", icon: "🏀", page: "basket-calendario.html" }
+    };
+
+    const recent = [];
+
+    /* I risultati inseriti dal pannello “Ultimi risultati” hanno priorità:
+       prima la Home legge recent_results, poi integra eventuali risultati
+       presenti direttamente nei calendari. */
+    (Array.isArray(data?.recent_results) ? data.recent_results : []).forEach((game,index) => {
+      const key=String(game.sport||"").trim().toLowerCase();
+      const meta=sportMeta[key]||{label:game.sport||"Risultato",icon:"🏆",page:"calendario-risultati.html"};
+      const homeScore=game.home_score ?? game.gol_casa ?? game.punti_casa ?? game.set_casa;
+      const awayScore=game.away_score ?? game.gol_trasferta ?? game.punti_trasferta ?? game.set_trasferta;
+      const hasScore=homeScore!==undefined&&homeScore!==null&&homeScore!==""&&homeScore!=="-"&&awayScore!==undefined&&awayScore!==null&&awayScore!==""&&awayScore!=="-";
+      if(hasScore) recent.push({...meta,game,homeScore,awayScore,when:parseGameDate(game.date||game.data,game.time||game.ora),sourcePriority:2,index});
+    });
+
     const sports = [
       { key: "calcio_a_5", label: "Calcio a 5", icon: "⚽", page: "calcio-a-5-calendario.html" },
       { key: "pallavolo_maschile", label: "Pallavolo Maschile", icon: "🏐", page: "pallavolo-maschile-calendario.html" },
@@ -859,60 +880,48 @@
       { key: "basket", label: "Basket", icon: "🏀", page: "basket-calendario.html" }
     ];
 
-    const recent = [];
-
     sports.forEach(info => {
-      const calendar = getCalendar(getSport(data, info.key));
-
-      const played = calendar
-        .map(game => {
-          const homeScore = game.home_score ?? game.gol_casa ?? game.punti_casa ?? game.set_casa;
-          const awayScore = game.away_score ?? game.gol_trasferta ?? game.punti_trasferta ?? game.set_trasferta;
-          const hasScore =
-            homeScore !== undefined && homeScore !== null && homeScore !== "" && homeScore !== "-" &&
-            awayScore !== undefined && awayScore !== null && awayScore !== "" && awayScore !== "-";
-
-          return {
-            game,
-            when: parseGameDate(game.date || game.data, game.time || game.ora),
-            homeScore,
-            awayScore,
-            hasScore
-          };
-        })
-        .filter(item => item.hasScore)
-        .sort((a, b) => {
-          if (a.when && b.when) return b.when - a.when;
-          if (a.when) return -1;
-          if (b.when) return 1;
-          return 0;
-        });
-
-      if (played.length) recent.push({ ...info, ...played[0] });
+      getCalendar(getSport(data,info.key)).forEach((game,index) => {
+        const homeScore=game.home_score ?? game.gol_casa ?? game.punti_casa ?? game.set_casa;
+        const awayScore=game.away_score ?? game.gol_trasferta ?? game.punti_trasferta ?? game.set_trasferta;
+        const hasScore=homeScore!==undefined&&homeScore!==null&&homeScore!==""&&homeScore!=="-"&&awayScore!==undefined&&awayScore!==null&&awayScore!==""&&awayScore!=="-";
+        if(hasScore) recent.push({...info,game,homeScore,awayScore,when:parseGameDate(game.date||game.data,game.time||game.ora),sourcePriority:1,index});
+      });
     });
 
-    recent.sort((a, b) => {
-      if (a.when && b.when) return b.when - a.when;
-      if (a.when) return -1;
-      if (b.when) return 1;
-      return 0;
+    recent.sort((a,b)=>{
+      if(a.when&&b.when&&b.when-a.when!==0)return b.when-a.when;
+      if(a.when&&!b.when)return -1;
+      if(!a.when&&b.when)return 1;
+      if(b.sourcePriority!==a.sourcePriority)return b.sourcePriority-a.sourcePriority;
+      return b.index-a.index;
     });
 
-    if (!recent.length) {
+    const unique=[];
+    const seen=new Set();
+    for(const item of recent){
+      const g=item.game;
+      const signature=[String(g.date||g.data||""),String(g.home||g.casa||"").toLowerCase(),String(g.away||g.trasferta||"").toLowerCase(),String(item.homeScore),String(item.awayScore)].join("|");
+      if(seen.has(signature))continue;
+      seen.add(signature);
+      unique.push(item);
+      if(unique.length>=4)break;
+    }
+
+    if (!unique.length) {
       root.innerHTML = `
         <div class="dynamic-empty">
           <strong>RISULTATI IN AGGIORNAMENTO</strong>
-          <span>I risultati compariranno automaticamente quando saranno inseriti nei calendari.</span>
+          <span>I risultati compariranno automaticamente quando saranno inseriti.</span>
         </div>`;
       return;
     }
 
-    root.innerHTML = recent.map(item => {
-      const g = item.game;
-      const date = g.date || g.data || "";
-      const home = g.home || g.casa || "";
-      const away = g.away || g.trasferta || "";
-
+    root.innerHTML = unique.map(item => {
+      const g=item.game;
+      const date=g.date||g.data||"";
+      const home=g.home||g.casa||"";
+      const away=g.away||g.trasferta||"";
       return `
         <article class="result-card">
           <div class="result-top">

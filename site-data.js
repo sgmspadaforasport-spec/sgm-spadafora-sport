@@ -885,7 +885,11 @@
         const homeScore=game.home_score ?? game.gol_casa ?? game.punti_casa ?? game.set_casa;
         const awayScore=game.away_score ?? game.gol_trasferta ?? game.punti_trasferta ?? game.set_trasferta;
         const hasScore=homeScore!==undefined&&homeScore!==null&&homeScore!==""&&homeScore!=="-"&&awayScore!==undefined&&awayScore!==null&&awayScore!==""&&awayScore!=="-";
-        if(hasScore) recent.push({...info,game,homeScore,awayScore,when:parseGameDate(game.date||game.data,game.time||game.ora),sourcePriority:1,index});
+        const text=[game.status,game.stato,game.note,game.home,game.casa,game.away,game.trasferta].filter(Boolean).join(" ").toLowerCase();
+        const isRest=/\\briposo\\b/.test(text);
+        const when=parseGameDate(game.date||game.data,game.time||game.ora);
+        if(hasScore) recent.push({...info,game,homeScore,awayScore,when,sourcePriority:1,index});
+        else if(isRest && when && when < new Date()) recent.push({...info,game,homeScore:"RIPOSO",awayScore:"",when,sourcePriority:1,index,isRest:true});
       });
     });
 
@@ -922,18 +926,24 @@
       const date=g.date||g.data||"";
       const home=g.home||g.casa||"";
       const away=g.away||g.trasferta||"";
+      const round=g.round||g.giornata||"";
       return `
-        <article class="result-card">
+        <article class="result-card${item.isRest?' result-card-rest':''}">
           <div class="result-top">
             <span class="result-sport">${esc(item.label)}</span>
-            <span class="result-icon">${item.icon}</span>
+            <span class="result-icon">${item.isRest?'⏸️':item.icon}</span>
           </div>
-          <div class="result-date">${esc(date)}</div>
-          <div class="result-match">
-            <strong>${esc(home)}</strong>
-            <b>${esc(item.homeScore)} - ${esc(item.awayScore)}</b>
-            <strong>${esc(away)}</strong>
-          </div>
+          <div class="result-date">${esc(date)}${round?' · '+esc(round):''}</div>
+          ${item.isRest ? `
+            <div class="result-match result-rest">
+              <strong>SGM SPADAFORA SPORT</strong>
+              <b>RIPOSO</b>
+            </div>` : `
+            <div class="result-match">
+              <strong>${esc(home)}</strong>
+              <b>${esc(item.homeScore)} - ${esc(item.awayScore)}</b>
+              <strong>${esc(away)}</strong>
+            </div>`}
           <a href="${esc(item.page)}">Vai al calendario →</a>
         </article>`;
     }).join("");

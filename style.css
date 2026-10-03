@@ -74,3 +74,23 @@
   .home-results .result-match strong{font-size:14px}
   .home-results .result-match b{min-width:78px;font-size:25px;padding:10px}
 }
+
+
+/* HOME RESULT CARD V2 — classi dedicate, nessuna ereditarieta dal calendario */
+.home-results .home-result-card{
+  position:relative;overflow:hidden;min-width:0;
+  background:#050505 !important;
+  border:2px solid var(--yellow) !important;
+  border-radius:18px;
+  box-shadow:0 14px 34px rgba(0,0,0,.45);
+}
+.home-results .home-result-card:before{content:"";display:block;height:7px;background:var(--yellow)}
+.home-results .home-result-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 17px 11px;border-bottom:1px solid rgba(255,214,0,.35)}
+.home-results .home-result-sport{color:var(--yellow);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+.home-results .home-result-icon{font-size:24px;line-height:1}
+.home-results .home-result-date{text-align:center;padding:13px 16px 0;color:var(--yellow);font-size:12px;font-weight:900;letter-spacing:.4px;text-transform:uppercase}
+.home-results .home-result-match{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px;padding:20px 16px 23px;text-align:center}
+.home-results .home-result-match strong{color:var(--yellow) !important;font-size:17px;font-weight:900;line-height:1.12;text-transform:uppercase;overflow-wrap:anywhere}
+.home-results .home-result-match b{display:grid;place-items:center;min-width:92px;padding:12px 13px;border:2px solid var(--yellow);border-radius:12px;background:#000 !important;color:var(--yellow) !important;font-size:30px;line-height:1;font-weight:900}
+.home-results .home-result-card>a{display:block;margin:0 16px 16px;padding-top:12px;border-top:1px solid rgba(255,214,0,.3);color:var(--yellow);font-size:12px;font-weight:900;text-align:right}
+@media(max-width:768px){.home-results .home-result-match{gap:8px;padding:18px 12px 21px}.home-results .home-result-match strong{font-size:14px}.home-results .home-result-match b{min-width:78px;font-size:25px;padding:10px}.home-results .home-result-card{border-radius:16px}}

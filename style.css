@@ -94,3 +94,19 @@
 .home-results .home-result-match b{display:grid;place-items:center;min-width:92px;padding:12px 13px;border:2px solid var(--yellow);border-radius:12px;background:#000 !important;color:var(--yellow) !important;font-size:30px;line-height:1;font-weight:900}
 .home-results .home-result-card>a{display:block;margin:0 16px 16px;padding-top:12px;border-top:1px solid rgba(255,214,0,.3);color:var(--yellow);font-size:12px;font-weight:900;text-align:right}
 @media(max-width:768px){.home-results .home-result-match{gap:8px;padding:18px 12px 21px}.home-results .home-result-match strong{font-size:14px}.home-results .home-result-match b{min-width:78px;font-size:25px;padding:10px}.home-results .home-result-card{border-radius:16px}}
+
+
+/* HOME PROSSIME GARE — stesso stile SGM dei risultati recenti */
+.home-upcoming{background:#0a0a0a;color:#fff}
+.home-upcoming .section-kicker,.home-upcoming h2,.home-upcoming .home-section-head>a{color:var(--yellow)}
+.home-upcoming .upcoming-card{position:relative;overflow:hidden;min-width:0;background:#050505;border:2px solid var(--yellow);border-radius:18px;box-shadow:0 14px 34px rgba(0,0,0,.45)}
+.home-upcoming .upcoming-card:before{content:"";display:block;height:7px;background:var(--yellow)}
+.home-upcoming .upcoming-top{padding:14px 17px 11px;border-bottom:1px solid rgba(255,214,0,.35)}
+.home-upcoming .upcoming-sport{color:var(--yellow);font-size:13px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+.home-upcoming .upcoming-date{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px 0;color:var(--yellow);text-align:left}
+.home-upcoming .upcoming-date strong,.home-upcoming .upcoming-date span{color:var(--yellow);font-size:12px;font-weight:900}
+.home-upcoming .upcoming-match{display:grid;grid-template-columns:minmax(0,.9fr) 58px minmax(0,1.25fr);align-items:center;gap:8px;padding:22px 12px;text-align:center;width:100%;box-sizing:border-box}
+.home-upcoming .upcoming-match strong{display:block;min-width:0;color:var(--yellow);font-size:clamp(11px,2.6vw,15px);line-height:1.15;text-transform:uppercase;overflow-wrap:normal;word-break:normal;hyphens:none}
+.home-upcoming .upcoming-match span{display:grid;place-items:center;width:58px;height:48px;box-sizing:border-box;border:2px solid var(--yellow);border-radius:11px;background:#000;color:var(--yellow);font-size:14px;font-weight:900}
+.home-upcoming .upcoming-card>a{display:block;margin:0 16px 16px;padding-top:12px;border-top:1px solid rgba(255,214,0,.3);color:var(--yellow);font-size:12px;font-weight:900;text-align:right}
+@media(max-width:520px){.home-upcoming .upcoming-match{grid-template-columns:minmax(0,.85fr) 52px minmax(0,1.3fr);gap:6px;padding:18px 8px}.home-upcoming .upcoming-match strong{font-size:10.5px}.home-upcoming .upcoming-match span{width:52px;height:44px;font-size:12px}.home-upcoming .upcoming-date{padding-left:12px;padding-right:12px}}

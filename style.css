@@ -110,3 +110,34 @@
 .home-upcoming .upcoming-match span{display:grid;place-items:center;width:58px;height:48px;box-sizing:border-box;border:2px solid var(--yellow);border-radius:11px;background:#000;color:var(--yellow);font-size:14px;font-weight:900}
 .home-upcoming .upcoming-card>a{display:block;margin:0 16px 16px;padding-top:12px;border-top:1px solid rgba(255,214,0,.3);color:var(--yellow);font-size:12px;font-weight:900;text-align:right}
 @media(max-width:520px){.home-upcoming .upcoming-match{grid-template-columns:minmax(0,.85fr) 52px minmax(0,1.3fr);gap:6px;padding:18px 8px}.home-upcoming .upcoming-match strong{font-size:10.5px}.home-upcoming .upcoming-match span{width:52px;height:44px;font-size:12px}.home-upcoming .upcoming-date{padding-left:12px;padding-right:12px}}
+
+
+/* DIVISORE HOME — Prossime gare / Risultati recenti */
+.home-results{position:relative;margin-top:0;padding-top:72px}
+.home-results:before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:50%;
+  width:min(92%,1180px);
+  height:1px;
+  transform:translateX(-50%);
+  background:linear-gradient(90deg,transparent 0%,var(--yellow) 12%,var(--yellow) 88%,transparent 100%);
+  box-shadow:0 0 14px rgba(255,214,0,.22);
+}
+.home-results:after{
+  content:"";
+  position:absolute;
+  top:-3px;
+  left:50%;
+  width:76px;
+  height:7px;
+  transform:translateX(-50%);
+  border-radius:999px;
+  background:var(--yellow);
+}
+@media(max-width:768px){
+  .home-results{padding-top:58px}
+  .home-results:before{width:88%}
+  .home-results:after{width:54px;height:5px;top:-2px}
+}

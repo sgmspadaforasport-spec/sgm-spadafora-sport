@@ -771,7 +771,7 @@
       d = +match[1]; m = +match[2]; y = +match[3];
     }
 
-    const time = String(timeValue || "").match(/(\d{1,2}):(\d{2})/);
+    const time = String(timeValue || "").match(/(\d{1,2})[:.](\d{2})/);
     const hh = time ? +time[1] : 23;
     const mm = time ? +time[2] : 59;
     const result = new Date(y, m - 1, d, hh, mm, 59);

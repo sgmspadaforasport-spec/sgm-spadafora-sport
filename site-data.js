@@ -886,7 +886,7 @@
         const awayScore=game.away_score ?? game.gol_trasferta ?? game.punti_trasferta ?? game.set_trasferta;
         const hasScore=homeScore!==undefined&&homeScore!==null&&homeScore!==""&&homeScore!=="-"&&awayScore!==undefined&&awayScore!==null&&awayScore!==""&&awayScore!=="-";
         const text=[game.status,game.stato,game.note,game.home,game.casa,game.away,game.trasferta].filter(Boolean).join(" ").toLowerCase();
-        const isRest=/\\briposo\\b/.test(text);
+        const isRest=/\\bripos[oa]\\b/.test(text);
         const when=parseGameDate(game.date||game.data,game.time||game.ora);
         if(hasScore) recent.push({...info,game,homeScore,awayScore,when,sourcePriority:1,index});
         else if(isRest && when && when < new Date()) recent.push({...info,game,homeScore:"RIPOSO",awayScore:"",when,sourcePriority:1,index,isRest:true});

@@ -867,8 +867,8 @@
     (Array.isArray(data?.recent_results) ? data.recent_results : []).forEach((game,index) => {
       const key=String(game.sport||"").trim().toLowerCase();
       const meta=sportMeta[key]||{label:game.sport||"Risultato",icon:"🏆",page:"calendario-risultati.html"};
-      const homeScore=game.home_score ?? game.gol_casa ?? game.punti_casa ?? game.set_casa;
-      const awayScore=game.away_score ?? game.gol_trasferta ?? game.punti_trasferta ?? game.set_trasferta;
+      const homeScore=game.home_score ?? game.homeScore ?? game.score_home ?? game.scoreHome ?? game.gol_casa ?? game.punti_casa ?? game.set_casa ?? game.risultato_casa;
+      const awayScore=game.away_score ?? game.awayScore ?? game.score_away ?? game.scoreAway ?? game.gol_trasferta ?? game.punti_trasferta ?? game.set_trasferta ?? game.risultato_trasferta;
       const hasScore=homeScore!==undefined&&homeScore!==null&&homeScore!==""&&homeScore!=="-"&&awayScore!==undefined&&awayScore!==null&&awayScore!==""&&awayScore!=="-";
       if(hasScore) recent.push({...meta,game,homeScore,awayScore,when:parseGameDate(game.date||game.data,game.time||game.ora),sourcePriority:2,index});
     });
@@ -882,8 +882,8 @@
 
     sports.forEach(info => {
       getCalendar(getSport(data,info.key)).forEach((game,index) => {
-        const homeScore=game.home_score ?? game.gol_casa ?? game.punti_casa ?? game.set_casa;
-        const awayScore=game.away_score ?? game.gol_trasferta ?? game.punti_trasferta ?? game.set_trasferta;
+        const homeScore=game.home_score ?? game.homeScore ?? game.score_home ?? game.scoreHome ?? game.gol_casa ?? game.punti_casa ?? game.set_casa ?? game.risultato_casa;
+        const awayScore=game.away_score ?? game.awayScore ?? game.score_away ?? game.scoreAway ?? game.gol_trasferta ?? game.punti_trasferta ?? game.set_trasferta ?? game.risultato_trasferta;
         const hasScore=homeScore!==undefined&&homeScore!==null&&homeScore!==""&&homeScore!=="-"&&awayScore!==undefined&&awayScore!==null&&awayScore!==""&&awayScore!=="-";
         const text=[game.status,game.stato,game.note,game.home,game.casa,game.away,game.trasferta].filter(Boolean).join(" ").toLowerCase();
         const isRest=/\\bripos[oa]\\b/.test(text);

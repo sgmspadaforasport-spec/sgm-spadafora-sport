@@ -36,3 +36,41 @@
 .upcoming-card>a,.result-card>a{display:block;margin:0 18px 17px;padding-top:13px;border-top:1px solid #ececec;font-size:12px;font-weight:900;text-align:right}
 .result-card>a{border-top-color:#292929;color:#ddd}
 @media(max-width:768px){.upcoming-grid,.results-grid{grid-template-columns:1fr;gap:14px}.upcoming-card,.result-card{border-radius:16px}.upcoming-match,.result-match{padding:18px 14px;gap:9px}.upcoming-match strong,.result-match strong{font-size:15px}.result-match b{min-width:74px;font-size:22px}.home-upcoming,.home-results{padding:44px 0}}
+
+
+/* Home - Risultati recenti: stile SGM nero/giallo */
+.home-results{background:#0a0a0a;color:#fff}
+.home-results .section-kicker,.home-results h2{color:var(--yellow)}
+.home-results .result-card{
+  background:linear-gradient(145deg,#050505 0%,#111 100%);
+  border:2px solid var(--yellow);
+  border-radius:18px;
+  box-shadow:0 12px 30px rgba(0,0,0,.42);
+}
+.home-results .result-card:before{height:7px;background:var(--yellow)}
+.home-results .result-top{padding:14px 17px 11px;border-bottom:1px solid rgba(255,214,0,.35)}
+.home-results .result-sport{color:var(--yellow);font-size:13px;letter-spacing:1px}
+.home-results .result-date{color:var(--yellow);font-size:12px;letter-spacing:.4px;padding:13px 16px 0;text-transform:uppercase}
+.home-results .result-match{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;padding:20px 16px 23px}
+.home-results .result-match strong{color:var(--yellow);font-size:17px;font-weight:900;line-height:1.12;text-transform:uppercase}
+.home-results .result-match b{
+  min-width:92px;
+  padding:12px 13px;
+  border:2px solid var(--yellow);
+  border-radius:12px;
+  background:#000;
+  color:var(--yellow);
+  font-size:30px;
+  font-weight:1000;
+  box-shadow:0 0 0 3px rgba(255,214,0,.08);
+}
+.home-results .result-card>a{
+  margin:0 16px 16px;
+  padding-top:12px;
+  border-top:1px solid rgba(255,214,0,.3);
+  color:var(--yellow);
+}
+@media(max-width:768px){
+  .home-results .result-match strong{font-size:14px}
+  .home-results .result-match b{min-width:78px;font-size:25px;padding:10px}
+}

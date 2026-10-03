@@ -921,13 +921,13 @@
       const away = g.away || g.trasferta || "";
       const round = g.round || g.giornata || "";
       return `
-        <article class="result-card">
-          <div class="result-top">
-            <span class="result-sport">${esc(item.label)}</span>
-            <span class="result-icon">${item.icon}</span>
+        <article class="home-result-card">
+          <div class="home-result-top">
+            <span class="home-result-sport">${esc(item.label)}</span>
+            <span class="home-result-icon">${item.icon}</span>
           </div>
-          <div class="result-date">${esc(date)}${round ? " · " + esc(round) + "ª giornata" : ""}</div>
-          <div class="result-match">
+          <div class="home-result-date">${esc(date)}${round ? " · " + esc(round) + "ª giornata" : ""}</div>
+          <div class="home-result-match">
             <strong>${esc(home)}</strong>
             <b>${esc(item.homeScore)} - ${esc(item.awayScore)}</b>
             <strong>${esc(away)}</strong>

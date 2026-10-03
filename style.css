@@ -141,3 +141,34 @@
   .home-results:before{width:88%}
   .home-results:after{width:54px;height:5px;top:-2px}
 }
+
+
+/* DIVISORE HOME — Risultati recenti / SGM TV */
+.home-tv{position:relative;padding-top:72px}
+.home-tv:before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:50%;
+  width:min(92%,1180px);
+  height:1px;
+  transform:translateX(-50%);
+  background:linear-gradient(90deg,transparent 0%,var(--yellow) 12%,var(--yellow) 88%,transparent 100%);
+  box-shadow:0 0 14px rgba(255,214,0,.22);
+}
+.home-tv:after{
+  content:"";
+  position:absolute;
+  top:-3px;
+  left:50%;
+  width:76px;
+  height:7px;
+  transform:translateX(-50%);
+  border-radius:999px;
+  background:var(--yellow);
+}
+@media(max-width:768px){
+  .home-tv{padding-top:58px}
+  .home-tv:before{width:88%}
+  .home-tv:after{width:54px;height:5px;top:-2px}
+}

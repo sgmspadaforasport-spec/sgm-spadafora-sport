@@ -26,9 +26,10 @@
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arrangeMenu);else arrangeMenu();
   const page=(location.pathname.split('/').pop()||'').toLowerCase();const extras=[];
-  if(page==='admin.html'||page==='admin')extras.push('admin-content.js','admin-staff.js','admin-about.js','admin-youth-staff.js','admin-comunicati.js','admin-leagues.js','admin-home.js','admin-notifications.js','admin-auto-push.js','admin-calendar-details.js');
+  if(page==='admin.html'||page==='admin')extras.push('admin-content.js','admin-staff.js','admin-about.js','admin-youth-staff.js','admin-comunicati.js','admin-leagues.js','admin-home.js','admin-notifications.js','admin-auto-push.js','admin-calendar-details.js','sgm-tv-categories.js');
   if(['news.html','sponsor.html','galleria.html'].includes(page))extras.push('content-pages.js');
   if(['news.html','sponsor.html','galleria.html','sgm-tv.html','calendario-risultati.html','squadre.html'].includes(page))extras.push('premium-sections.js');
+  if(page==='sgm-tv.html')extras.push('sgm-tv-categories.js');
   if(['calcio-a-5.html','pallavolo-maschile.html','pallavolo-femminile.html','basket.html','giovanile-calcio.html'].includes(page))extras.push('team-section-premium.js');
   if(page.endsWith('-calendario.html')||page.endsWith('-classifica.html'))extras.push('league-display.js');
   if(page.endsWith('-calendario.html'))extras.push('calendar-details-display.js');

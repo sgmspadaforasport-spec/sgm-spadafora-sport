@@ -54,7 +54,7 @@
         .sgm-tv-thumb:after{content:"▶";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:#ffd400;color:#080808;font-size:19px;padding-left:3px;box-shadow:0 7px 20px rgba(0,0,0,.35)}
         .sgm-tv-card-body{padding:16px}
         .sgm-tv-card-cat{display:inline-block;color:#ffd400;font-size:10px;font-weight:1000;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
-        .sgm-tv-card h4{color:#fff;font-size:18px;line-height:1.2;margin:0 0 8px}
+        .sgm-tv-card h4{color:#fff;font-size:18px;line-height:1.2;margin:0 0 8px}.sgm-tv-description{color:#bbb;font-size:13px;line-height:1.5;margin:0 0 13px;white-space:pre-line}
         .sgm-tv-date{color:#888;font-size:12px;margin:0 0 14px}
         .sgm-tv-watch{display:inline-flex;align-items:center;gap:7px;color:#111;background:#ffd400;border-radius:10px;padding:9px 12px;text-decoration:none;font-size:12px;font-weight:1000}
         .sgm-tv-empty{grid-column:1/-1;background:#fff;border:1px solid #e1e1e1;border-radius:16px;padding:30px;text-align:center;color:#777;font-weight:800}
@@ -67,7 +67,7 @@
         const list=cat?videos.filter(v=>v.category===cat):videos;
         title.textContent=cat||'Tutti i video';
         count.textContent=list.length+' '+(list.length===1?'video':'video');
-        grid.innerHTML=list.length?list.map(v=>`<article class="sgm-tv-card">${v.thumbnail?`<div class="sgm-tv-thumb" style="background-image:url('${esc(v.thumbnail)}')"></div>`:'<div class="sgm-tv-thumb"></div>'}<div class="sgm-tv-card-body"><span class="sgm-tv-card-cat">${esc(v.category||'SGM TV')}</span><h4>${esc(v.title||'Video')}</h4>${v.date?`<p class="sgm-tv-date">${esc(v.date)}</p>`:''}${v.url?`<a class="sgm-tv-watch" href="${esc(v.url)}" target="_blank" rel="noopener">▶ Guarda il video</a>`:'<span class="sgm-tv-date">Contenuto in preparazione</span>'}</div></article>`).join(''):'<div class="sgm-tv-empty">Nessun video disponibile in questa categoria.</div>';
+        grid.innerHTML=list.length?list.map(v=>`<article class="sgm-tv-card">${v.thumbnail?`<div class="sgm-tv-thumb" style="background-image:url('${esc(v.thumbnail)}')"></div>`:'<div class="sgm-tv-thumb"></div>'}<div class="sgm-tv-card-body"><span class="sgm-tv-card-cat">${esc(v.category||'SGM TV')}</span><h4>${esc(v.title||'Video')}</h4>${v.description?`<p class="sgm-tv-description">${esc(v.description)}</p>`:''}${v.date?`<p class="sgm-tv-date">${esc(v.date)}</p>`:''}${v.url?`<a class="sgm-tv-watch" href="${esc(v.url)}" target="_blank" rel="noopener">▶ Guarda il video</a>`:'<span class="sgm-tv-date">Contenuto in preparazione</span>'}</div></article>`).join(''):'<div class="sgm-tv-empty">Nessun video disponibile in questa categoria.</div>';
       };
       target.querySelectorAll('.sgm-tv-filter').forEach(b=>b.onclick=()=>{target.querySelectorAll('.sgm-tv-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');render(b.dataset.cat);});
       render('');

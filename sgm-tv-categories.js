@@ -14,7 +14,7 @@
   }
 
   function initAdmin(){
-    if(typeof window.ensureData!=='function'||!window.data){setTimeout(initAdmin,100);return;}
+    if(typeof ensureData!=='function'||typeof data==='undefined'||!data){setTimeout(initAdmin,100);return;}
     ensureData();
     normalizeCategories(data.sgm_tv);
 

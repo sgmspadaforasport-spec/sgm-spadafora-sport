@@ -407,28 +407,42 @@ function editStanding(i=null){
 }
 $('addStanding').onclick=()=>editStanding();
 
-function renderTvCategories(){
- const list=$('tvCategoriesList');if(!list)return;
+function normalizeTvCategoryObjects(){
  const cats=data.sgm_tv.categories||[];
- list.innerHTML=cats.length?cats.map((c,i)=>`<span style="display:inline-flex;align-items:center;gap:8px;background:#171717;border:1px solid #333;border-radius:999px;padding:8px 11px;font-size:11px;font-weight:800">${esc(c)} <button class="del-tv-category" data-i="${i}" title="Elimina categoria" style="border:0;background:transparent;color:#ff8b8b;font-size:16px;font-weight:900;cursor:pointer;line-height:1">×</button></span>`).join(''):'<span style="color:#999;font-size:12px">Nessuna categoria. Creane una per aggiungere i video.</span>';
+ data.sgm_tv.categories=cats.map(c=>typeof c==='string'?{name:c,cover:''}:{name:String(c.name||'').trim(),cover:c.cover||''}).filter(c=>c.name);
+}
+function renderTvCategories(){
+ const list=$('tvCategoriesList');if(!list)return;normalizeTvCategoryObjects();
+ const cats=data.sgm_tv.categories||[];
+ list.innerHTML=cats.length?cats.map((c,i)=>`<div style="width:180px;background:#171717;border:1px solid #333;border-radius:12px;overflow:hidden"><div style="height:92px;background:#222 center/cover no-repeat ${c.cover?`url('${esc(c.cover)}')`:''}"></div><div style="padding:10px"><strong style="display:block;font-size:12px;margin-bottom:8px">${esc(c.name)}</strong><div style="display:flex;gap:6px"><button class="btn btn-dark btn-small edit-tv-category" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-tv-category" data-i="${i}">Elimina</button></div></div></div>`).join(''):'<span style="color:#999;font-size:12px">Nessuna categoria. Creane una per aggiungere i video.</span>';
+ list.querySelectorAll('.edit-tv-category').forEach(b=>b.onclick=()=>editTvCategory(+b.dataset.i));
  list.querySelectorAll('.del-tv-category').forEach(b=>b.onclick=()=>{
-   const i=+b.dataset.i,name=data.sgm_tv.categories[i];
+   const i=+b.dataset.i,name=data.sgm_tv.categories[i].name;
    const used=data.sgm_tv.videos.filter(v=>v.category===name).length;
    if(used&&!confirm('La categoria "'+name+'" è assegnata a '+used+' video. Eliminare comunque la categoria?'))return;
    data.sgm_tv.categories.splice(i,1);renderTvCategories();
  });
 }
-function addTvCategory(){
- openModal('Aggiungi categoria',`<div class="field full"><label>Nome categoria</label><input id="tvCategoryName" placeholder="Es. Dietro le quinte"></div>`,()=>{
-   const name=$('tvCategoryName').value.trim();if(!name)return;
-   if(data.sgm_tv.categories.some(c=>c.toLowerCase()===name.toLowerCase())){alert('Questa categoria esiste già.');return;}
-   data.sgm_tv.categories.push(name);renderTvCategories();
+function editTvCategory(i=null){
+ normalizeTvCategoryObjects();
+ const c=i===null?{name:'',cover:''}:data.sgm_tv.categories[i];
+ openModal(i===null?'Aggiungi categoria':'Modifica categoria',`<div class="fields"><div class="field full"><label>Nome categoria</label><input id="tvCategoryName" value="${esc(c.name)}" placeholder="Es. Dietro le quinte"></div><div class="field full"><label>Immagine di copertina della categoria</label><input id="tvCategoryCoverFile" type="file" accept="image/jpeg,image/png,image/webp"></div><div class="field full"><label>URL copertina</label><input id="tvCategoryCover" value="${esc(c.cover)}" placeholder="Si compila automaticamente dopo il caricamento"></div></div>`,async()=>{
+   const name=$('tvCategoryName').value.trim();if(!name)throw new Error('Inserisci il nome della categoria.');
+   if(data.sgm_tv.categories.some((x,n)=>n!==i&&x.name.toLowerCase()===name.toLowerCase()))throw new Error('Questa categoria esiste già.');
+   let cover=$('tvCategoryCover').value.trim();const file=$('tvCategoryCoverFile').files[0];
+   if(file)cover=await window.SGM_DB.uploadImage(file,'sgm-tv/categorie');
+   const oldName=i===null?'':data.sgm_tv.categories[i].name;
+   const obj={name,cover};
+   if(i===null)data.sgm_tv.categories.push(obj);else{data.sgm_tv.categories[i]=obj;if(oldName!==name)data.sgm_tv.videos.forEach(v=>{if(v.category===oldName)v.category=name;});}
+   renderTvCategories();renderVideos();
  });
 }
+function addTvCategory(){editTvCategory(null);}
 $('addTvCategory').onclick=addTvCategory;
 
 function editVideo(i=null){
- const cats=data.sgm_tv.categories||[];
+ normalizeTvCategoryObjects();
+ const cats=(data.sgm_tv.categories||[]).map(c=>c.name);
  if(!cats.length){alert('Prima crea almeno una categoria SGM TV.');return;}
  const v=i===null?{title:'',category:cats[0],date:'',url:'',thumbnail:''}:data.sgm_tv.videos[i];
  const choices=[...cats];if(v.category&&!choices.includes(v.category))choices.push(v.category);

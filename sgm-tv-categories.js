@@ -88,7 +88,7 @@
       const tv=data.sgm_tv||{};normalizeCategories(tv);
       const videos=Array.isArray(tv.videos)?tv.videos:[];
       const target=document.querySelector('main>.section>.container');if(!target)return;
-      const cats=tv.categories.filter(c=>videos.some(v=>v.category===c.name));
+      const cats=tv.categories;
       const css=document.createElement('style');css.textContent=`
         main>.section{background:#f4f4f4;padding-top:34px}
         .sgm-tv-shell{max-width:1180px;margin:0 auto}

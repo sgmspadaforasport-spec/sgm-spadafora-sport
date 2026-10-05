@@ -16,69 +16,6 @@
     return tv.categories;
   }
 
-  function initAdmin(){
-    if(typeof ensureData!=='function'||typeof data==='undefined'||!data){setTimeout(initAdmin,100);return;}
-    ensureData();
-    normalizeCategories(data.sgm_tv);
-
-    const videoList=document.getElementById('videoList');
-    if(!videoList)return;
-    let box=document.getElementById('tvCategoriesManager');
-    if(!box){
-      box=document.createElement('div');
-      box.id='tvCategoriesManager';
-      box.style.margin='18px 0 22px';
-      videoList.parentNode.insertBefore(box,videoList);
-    }
-
-    window.renderTVCategories=function(){
-      normalizeCategories(data.sgm_tv);
-      box.innerHTML=`<div style="border:1px solid #333;border-radius:12px;padding:16px;background:#0b0b0b">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
-          <div><strong style="font-size:15px">Categorie SGM TV</strong><div style="font-size:10px;color:#999;margin-top:4px">Aggiungi o elimina le categorie disponibili per i video.</div></div>
-          <button class="btn btn-primary btn-small" id="addTvCategory">+ Aggiungi categoria</button>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">${data.sgm_tv.categories.map((c,i)=>`<span style="display:inline-flex;align-items:center;gap:7px;background:#171717;border:1px solid #333;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:800">${esc(c)} <button data-i="${i}" class="del-tv-category" title="Elimina" style="border:0;background:transparent;color:#ff8b8b;font-weight:900;cursor:pointer">×</button></span>`).join('')}</div>
-      </div>`;
-      document.getElementById('addTvCategory').onclick=()=>{
-        openModal('Aggiungi categoria',`<div class="field full"><label>Nome categoria</label><input id="tvCategoryName" placeholder="Es. Dietro le quinte"></div>`,()=>{
-          const name=document.getElementById('tvCategoryName').value.trim();
-          if(!name)return;
-          if(data.sgm_tv.categories.some(x=>x.toLowerCase()===name.toLowerCase())){alert('Questa categoria esiste già.');return;}
-          data.sgm_tv.categories.push(name);renderTVCategories();
-        });
-      };
-      box.querySelectorAll('.del-tv-category').forEach(btn=>btn.onclick=()=>{
-        const i=+btn.dataset.i, name=data.sgm_tv.categories[i];
-        const count=data.sgm_tv.videos.filter(v=>v.category===name).length;
-        if(count && !confirm(`La categoria "${name}" contiene ${count} video. I video resteranno pubblicati ma senza una categoria valida. Vuoi eliminarla?`))return;
-        data.sgm_tv.categories.splice(i,1);renderTVCategories();
-      });
-    };
-
-    window.editVideo=function(i=null){
-      normalizeCategories(data.sgm_tv);
-      const fallback=data.sgm_tv.categories[0]||'SGM TV';
-      const v=i===null?{title:'',category:fallback,date:'',url:'',thumbnail:''}:data.sgm_tv.videos[i];
-      const cats=[...data.sgm_tv.categories];
-      if(v.category&&!cats.includes(v.category))cats.push(v.category);
-      openModal(i===null?'Aggiungi video':'Modifica video',`
-       <div class="fields">
-       <div class="field full"><label>Titolo</label><input id="vTitle" value="${esc(v.title)}"></div>
-       <div class="field"><label>Categoria SGM TV</label><select id="vCategory">${cats.map(x=>`<option value="${esc(x)}" ${x===v.category?'selected':''}>${esc(x)}</option>`).join('')}</select></div>
-       <div class="field"><label>Data</label><input id="vDate" value="${esc(v.date)}"></div>
-       <div class="field full"><label>Link video</label><input id="vUrl" value="${esc(v.url)}"></div>
-       <div class="field full"><label>Copertina / immagine (percorso)</label><input id="vThumb" value="${esc(v.thumbnail)}"></div></div>`,
-       ()=>{
-         const obj={title:document.getElementById('vTitle').value.trim(),category:document.getElementById('vCategory').value,date:document.getElementById('vDate').value.trim(),url:document.getElementById('vUrl').value.trim(),thumbnail:document.getElementById('vThumb').value.trim()};
-         if(i===null)data.sgm_tv.videos.unshift(obj);else data.sgm_tv.videos[i]=obj;
-         renderVideos();renderTVCategories();
-       });
-    };
-    const add=document.getElementById('addVideo');if(add)add.onclick=()=>window.editVideo();
-    window.renderTVCategories();
-    if(typeof renderVideos==='function')renderVideos();
-  }
 
   async function initPublic(){
     if(!window.SGM_DB){setTimeout(initPublic,100);return;}
@@ -131,6 +68,5 @@
     }catch(e){console.warn('Categorie SGM TV non disponibili',e);}
   }
 
-  if(page==='admin.html'||page==='admin')initAdmin();
   if(page==='sgm-tv.html')setTimeout(initPublic,250);
 })();

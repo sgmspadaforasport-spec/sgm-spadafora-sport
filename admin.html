@@ -437,9 +437,27 @@ function editVideo(i=null){
  <div class="field full"><label>Titolo</label><input id="vTitle" value="${esc(v.title)}"></div>
  <div class="field"><label>Categoria SGM TV</label><select id="vCategory">${choices.map(x=>`<option value="${esc(x)}" ${x===v.category?'selected':''}>${esc(x)}</option>`).join('')}</select></div>
  <div class="field"><label>Data</label><input id="vDate" value="${esc(v.date)}"></div>
- <div class="field full"><label>Link video</label><input id="vUrl" value="${esc(v.url)}"></div>
- <div class="field full"><label>Copertina / immagine (percorso)</label><input id="vThumb" value="${esc(v.thumbnail)}"></div></div>`,
- ()=>{const obj={title:$('vTitle').value.trim(),category:$('vCategory').value,date:$('vDate').value.trim(),url:$('vUrl').value.trim(),thumbnail:$('vThumb').value.trim()};if(i===null)data.sgm_tv.videos.unshift(obj);else data.sgm_tv.videos[i]=obj;renderVideos();renderTvCategories();});
+ <div class="field full"><label>Carica video dal dispositivo</label><input id="vFile" type="file" accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov"><small style="color:#999">MP4, WebM o MOV. In alternativa puoi usare il link qui sotto.</small></div>
+ <div class="field full"><label>Link video / URL del video caricato</label><input id="vUrl" value="${esc(v.url)}" placeholder="Si compila automaticamente dopo il caricamento"></div>
+ <div class="field full"><label>Carica copertina</label><input id="vThumbFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
+ <div class="field full"><label>Copertina / immagine (URL)</label><input id="vThumb" value="${esc(v.thumbnail)}" placeholder="Si compila automaticamente dopo il caricamento"></div></div>`,
+ async()=>{
+   let videoUrl=$('vUrl').value.trim(),thumbUrl=$('vThumb').value.trim();
+   const videoFile=$('vFile').files[0],thumbFile=$('vThumbFile').files[0];
+   if(videoFile){
+     if(!videoFile.type.startsWith('video/'))throw new Error('Seleziona un file video valido.');
+     videoUrl=await window.SGM_DB.uploadImage(videoFile,'sgm-tv/videos');
+     $('vUrl').value=videoUrl;
+   }
+   if(thumbFile){
+     thumbUrl=await window.SGM_DB.uploadImage(thumbFile,'sgm-tv/copertine');
+     $('vThumb').value=thumbUrl;
+   }
+   if(!videoUrl)throw new Error('Carica un video oppure inserisci un link video.');
+   const obj={title:$('vTitle').value.trim(),category:$('vCategory').value,date:$('vDate').value.trim(),url:videoUrl,thumbnail:thumbUrl};
+   if(i===null)data.sgm_tv.videos.unshift(obj);else data.sgm_tv.videos[i]=obj;
+   renderVideos();renderTvCategories();
+ });
 }
 $('addVideo').onclick=()=>editVideo();
 
@@ -601,7 +619,7 @@ $('logout').onclick=async()=>{await window.SGM_DB.signOut();location.href='login
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="supabase-data.js?v=37"></script>
+<script src="supabase-data.js?v=45"></script>
  <script>
 loadData();
 </script>

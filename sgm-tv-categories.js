@@ -5,11 +5,14 @@
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   function normalizeCategories(tv){
-    tv.categories=Array.isArray(tv.categories)?tv.categories.filter(Boolean):[];
-    const used=(Array.isArray(tv.videos)?tv.videos:[]).map(v=>String(v.category||'').trim()).filter(Boolean);
-    [...DEFAULT_CATEGORIES,...used].forEach(name=>{
-      if(!tv.categories.some(x=>String(x).toLowerCase()===name.toLowerCase())) tv.categories.push(name);
-    });
+    const hadCategories=Array.isArray(tv.categories);
+    tv.categories=hadCategories?tv.categories.map(x=>String(x||'').trim()).filter(Boolean):[];
+    if(!hadCategories){
+      const used=(Array.isArray(tv.videos)?tv.videos:[]).map(v=>String(v.category||'').trim()).filter(Boolean);
+      [...DEFAULT_CATEGORIES,...used].forEach(name=>{
+        if(!tv.categories.some(x=>String(x).toLowerCase()===name.toLowerCase())) tv.categories.push(name);
+      });
+    }
     return tv.categories;
   }
 

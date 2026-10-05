@@ -414,7 +414,17 @@ function normalizeTvCategoryObjects(){
 function renderTvCategories(){
  const list=$('tvCategoriesList');if(!list)return;normalizeTvCategoryObjects();
  const cats=data.sgm_tv.categories||[];
- list.innerHTML=cats.length?cats.map((c,i)=>`<div style="width:180px;background:#171717;border:1px solid #333;border-radius:12px;overflow:hidden"><div style="height:92px;background:#222 center/cover no-repeat ${c.cover?`url('${esc(c.cover)}')`:''}"></div><div style="padding:10px"><strong style="display:block;font-size:12px;margin-bottom:8px">${esc(c.name)}</strong><div style="display:flex;gap:6px"><button class="btn btn-dark btn-small edit-tv-category" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-tv-category" data-i="${i}">Elimina</button></div></div></div>`).join(''):'<span style="color:#999;font-size:12px">Nessuna categoria. Creane una per aggiungere i video.</span>';
+ list.innerHTML=cats.length?cats.map((c,i)=>`<div style="width:220px;background:#171717;border:1px solid #333;border-radius:12px;overflow:hidden"><div style="height:110px;background:#222 center/cover no-repeat ${c.cover?`url('${esc(c.cover)}')`:''};display:flex;align-items:center;justify-content:center">${c.cover?'':'<span style="color:#777;font-size:11px">Nessuna copertina</span>'}</div><div style="padding:10px"><strong style="display:block;font-size:12px;margin-bottom:10px">${esc(c.name)}</strong><label class="btn btn-primary btn-small" style="display:block;text-align:center;margin-bottom:8px;cursor:pointer">📷 Carica copertina<input class="tv-category-cover-upload" data-i="${i}" type="file" accept="image/jpeg,image/png,image/webp" hidden></label><div style="display:flex;gap:6px"><button class="btn btn-dark btn-small edit-tv-category" data-i="${i}">Modifica</button><button class="btn btn-danger btn-small del-tv-category" data-i="${i}">Elimina</button></div></div></div>`).join(''):'<span style="color:#999;font-size:12px">Nessuna categoria. Creane una per aggiungere i video.</span>';
+ list.querySelectorAll('.tv-category-cover-upload').forEach(inp=>inp.onchange=async()=>{
+   const file=inp.files[0];if(!file)return;const i=+inp.dataset.i;
+   try{
+     status('Caricamento copertina categoria...');
+     const url=await window.SGM_DB.uploadImage(file,'sgm-tv/categorie');
+     data.sgm_tv.categories[i].cover=url;
+     await window.SGM_DB.saveSiteData(data);
+     renderTvCategories();status('✓ Copertina categoria caricata e salvata online.');
+   }catch(e){status('Errore caricamento copertina: '+e.message,true);}
+ });
  list.querySelectorAll('.edit-tv-category').forEach(b=>b.onclick=()=>editTvCategory(+b.dataset.i));
  list.querySelectorAll('.del-tv-category').forEach(b=>b.onclick=()=>{
    const i=+b.dataset.i,name=data.sgm_tv.categories[i].name;
@@ -633,7 +643,7 @@ $('logout').onclick=async()=>{await window.SGM_DB.signOut();location.href='login
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="supabase-data.js?v=47"></script>
+<script src="supabase-data.js?v=48"></script>
  <script>
 loadData();
 </script>

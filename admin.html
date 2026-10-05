@@ -454,11 +454,12 @@ function editVideo(i=null){
  normalizeTvCategoryObjects();
  const cats=(data.sgm_tv.categories||[]).map(c=>c.name);
  if(!cats.length){alert('Prima crea almeno una categoria SGM TV.');return;}
- const v=i===null?{title:'',category:cats[0],date:'',url:'',thumbnail:''}:data.sgm_tv.videos[i];
+ const v=i===null?{title:'',description:'',category:cats[0],date:'',url:'',thumbnail:''}:data.sgm_tv.videos[i];
  const choices=[...cats];if(v.category&&!choices.includes(v.category))choices.push(v.category);
  openModal(i===null?'Aggiungi video':'Modifica video',`
  <div class="fields">
  <div class="field full"><label>Titolo</label><input id="vTitle" value="${esc(v.title)}"></div>
+ <div class="field full"><label>Descrizione pubblica</label><textarea id="vDescription" rows="4" placeholder="Scrivi la descrizione che comparirà nella pagina pubblica SGM TV">${esc(v.description||'')}</textarea><small style="color:#999">Questa descrizione sarà visibile pubblicamente insieme al video.</small></div>
  <div class="field"><label>Categoria SGM TV</label><select id="vCategory">${choices.map(x=>`<option value="${esc(x)}" ${x===v.category?'selected':''}>${esc(x)}</option>`).join('')}</select></div>
  <div class="field"><label>Data</label><input id="vDate" value="${esc(v.date)}"></div>
  <div class="field full"><label>Carica video dal dispositivo</label><input id="vFile" type="file" accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov"><small style="color:#999">MP4, WebM o MOV. In alternativa puoi usare il link qui sotto.</small></div>
@@ -478,7 +479,7 @@ function editVideo(i=null){
      $('vThumb').value=thumbUrl;
    }
    if(!videoUrl)throw new Error('Carica un video oppure inserisci un link video.');
-   const obj={title:$('vTitle').value.trim(),category:$('vCategory').value,date:$('vDate').value.trim(),url:videoUrl,thumbnail:thumbUrl};
+   const obj={title:$('vTitle').value.trim(),description:$('vDescription').value.trim(),category:$('vCategory').value,date:$('vDate').value.trim(),url:videoUrl,thumbnail:thumbUrl};
    if(i===null)data.sgm_tv.videos.unshift(obj);else data.sgm_tv.videos[i]=obj;
    renderVideos();renderTvCategories();
  });
@@ -643,7 +644,7 @@ $('logout').onclick=async()=>{await window.SGM_DB.signOut();location.href='login
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="supabase-data.js?v=48"></script>
+<script src="supabase-data.js?v=53"></script>
  <script>
 loadData();
 </script>

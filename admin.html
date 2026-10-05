@@ -169,6 +169,13 @@ textarea{min-height:120px;resize:vertical}
         <div class="fields">
           <div class="field full"><label>Canale Twitch</label><input id="tvTwitch"></div>
         </div>
+        <div style="margin:18px 0 22px;border:1px solid #333;border-radius:12px;padding:16px;background:#0b0b0b">
+          <div class="panel-head" style="margin-bottom:12px">
+            <div><h3 style="margin:0">Categorie SGM TV</h3><p>Crea ed elimina le categorie disponibili per i video.</p></div>
+            <button class="btn btn-primary btn-small" id="addTvCategory">+ Aggiungi categoria</button>
+          </div>
+          <div id="tvCategoriesList" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+        </div>
         <div id="videoList" class="item-list"></div>
       </section>
 
@@ -261,6 +268,12 @@ function ensureData(){
   });
   data.sgm_tv=data.sgm_tv||{videos:[]};data.recent_results=data.recent_results||[];data.palmares=data.palmares||[];
   data.sgm_tv.videos=data.sgm_tv.videos||[];
+  if(!Array.isArray(data.sgm_tv.categories)){
+    const defaults=['Highlights','Interviste','Salottino Giallonero','Format','Puntate'];
+    const used=data.sgm_tv.videos.map(v=>String(v.category||'').trim()).filter(Boolean);
+    data.sgm_tv.categories=[];
+    [...defaults,...used].forEach(c=>{if(!data.sgm_tv.categories.some(x=>x.toLowerCase()===c.toLowerCase()))data.sgm_tv.categories.push(c);});
+  }
 }
 
 function renderSportTabs(){
@@ -317,6 +330,7 @@ function renderStandings(){
 
 function renderVideos(){
   $('tvTwitch').value=data.sgm_tv.twitch||data.contacts.twitch||'';
+  renderTvCategories();
   const arr=data.sgm_tv.videos;
   const list=$('videoList');
   if(!arr.length){list.innerHTML='<div class="empty">Nessun video pubblicato.</div>';return;}
@@ -393,16 +407,39 @@ function editStanding(i=null){
 }
 $('addStanding').onclick=()=>editStanding();
 
+function renderTvCategories(){
+ const list=$('tvCategoriesList');if(!list)return;
+ const cats=data.sgm_tv.categories||[];
+ list.innerHTML=cats.length?cats.map((c,i)=>`<span style="display:inline-flex;align-items:center;gap:8px;background:#171717;border:1px solid #333;border-radius:999px;padding:8px 11px;font-size:11px;font-weight:800">${esc(c)} <button class="del-tv-category" data-i="${i}" title="Elimina categoria" style="border:0;background:transparent;color:#ff8b8b;font-size:16px;font-weight:900;cursor:pointer;line-height:1">×</button></span>`).join(''):'<span style="color:#999;font-size:12px">Nessuna categoria. Creane una per aggiungere i video.</span>';
+ list.querySelectorAll('.del-tv-category').forEach(b=>b.onclick=()=>{
+   const i=+b.dataset.i,name=data.sgm_tv.categories[i];
+   const used=data.sgm_tv.videos.filter(v=>v.category===name).length;
+   if(used&&!confirm('La categoria "'+name+'" è assegnata a '+used+' video. Eliminare comunque la categoria?'))return;
+   data.sgm_tv.categories.splice(i,1);renderTvCategories();
+ });
+}
+function addTvCategory(){
+ openModal('Aggiungi categoria',`<div class="field full"><label>Nome categoria</label><input id="tvCategoryName" placeholder="Es. Dietro le quinte"></div>`,()=>{
+   const name=$('tvCategoryName').value.trim();if(!name)return;
+   if(data.sgm_tv.categories.some(c=>c.toLowerCase()===name.toLowerCase())){alert('Questa categoria esiste già.');return;}
+   data.sgm_tv.categories.push(name);renderTvCategories();
+ });
+}
+$('addTvCategory').onclick=addTvCategory;
+
 function editVideo(i=null){
- const v=i===null?{title:'',category:'Interviste',date:'',url:'',thumbnail:''}:data.sgm_tv.videos[i];
+ const cats=data.sgm_tv.categories||[];
+ if(!cats.length){alert('Prima crea almeno una categoria SGM TV.');return;}
+ const v=i===null?{title:'',category:cats[0],date:'',url:'',thumbnail:''}:data.sgm_tv.videos[i];
+ const choices=[...cats];if(v.category&&!choices.includes(v.category))choices.push(v.category);
  openModal(i===null?'Aggiungi video':'Modifica video',`
  <div class="fields">
  <div class="field full"><label>Titolo</label><input id="vTitle" value="${esc(v.title)}"></div>
- <div class="field"><label>Categoria</label><select id="vCategory">${['Interviste','Highlights','Format','Puntate'].map(x=>`<option ${x===v.category?'selected':''}>${x}</option>`).join('')}</select></div>
+ <div class="field"><label>Categoria SGM TV</label><select id="vCategory">${choices.map(x=>`<option value="${esc(x)}" ${x===v.category?'selected':''}>${esc(x)}</option>`).join('')}</select></div>
  <div class="field"><label>Data</label><input id="vDate" value="${esc(v.date)}"></div>
  <div class="field full"><label>Link video</label><input id="vUrl" value="${esc(v.url)}"></div>
  <div class="field full"><label>Copertina / immagine (percorso)</label><input id="vThumb" value="${esc(v.thumbnail)}"></div></div>`,
- ()=>{const obj={title:$('vTitle').value.trim(),category:$('vCategory').value,date:$('vDate').value.trim(),url:$('vUrl').value.trim(),thumbnail:$('vThumb').value.trim()};if(i===null)data.sgm_tv.videos.unshift(obj);else data.sgm_tv.videos[i]=obj;renderVideos();});
+ ()=>{const obj={title:$('vTitle').value.trim(),category:$('vCategory').value,date:$('vDate').value.trim(),url:$('vUrl').value.trim(),thumbnail:$('vThumb').value.trim()};if(i===null)data.sgm_tv.videos.unshift(obj);else data.sgm_tv.videos[i]=obj;renderVideos();renderTvCategories();});
 }
 $('addVideo').onclick=()=>editVideo();
 

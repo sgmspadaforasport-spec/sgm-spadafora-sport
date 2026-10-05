@@ -36,7 +36,7 @@
         .sgm-tv-top p{color:#aaa;margin:0;max-width:700px;font-size:14px}
         .sgm-tv-all{margin-top:20px;position:relative;z-index:2}
         .sgm-tv-all .sgm-tv-filter{border:1px solid #ffd400;background:#ffd400;color:#080808;border-radius:10px;padding:10px 16px;font-weight:1000;cursor:pointer}
-        .sgm-tv-categories-title{font-size:12px;color:#777;text-transform:uppercase;letter-spacing:1.2px;font-weight:1000;margin:0 0 12px}
+        .sgm-tv-categories-title{font-size:22px;color:#111;text-transform:uppercase;letter-spacing:.4px;font-weight:1000;margin:4px 0 16px;display:flex;align-items:center;gap:10px}.sgm-tv-categories-title:before{content:"";width:5px;height:25px;border-radius:4px;background:#ffd400;display:block}
         .sgm-tv-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 28px}
         .sgm-tv-filter.category{position:relative;aspect-ratio:16/8;border:0;background:#151515 center/cover no-repeat;color:#fff;border-radius:16px;padding:0;overflow:hidden;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.13);transition:.22s;text-align:left}
         .sgm-tv-filter.category:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.82))}

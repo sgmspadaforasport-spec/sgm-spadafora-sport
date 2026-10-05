@@ -90,15 +90,41 @@
       const target=document.querySelector('main>.section>.container');if(!target)return;
       const cats=tv.categories.filter(c=>videos.some(v=>v.category===c));
       const css=document.createElement('style');css.textContent=`
-        .sgm-tv-filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:24px}
-        .sgm-tv-filter{border:1px solid #d6d6d6;background:#fff;color:#111;border-radius:999px;padding:10px 14px;font-weight:900;cursor:pointer}
-        .sgm-tv-filter.active{background:#111;color:#ffd400;border-color:#111}
+        main>.section{background:#f4f4f4;padding-top:34px}
+        .sgm-tv-shell{max-width:1180px;margin:0 auto}
+        .sgm-tv-top{background:#0b0b0b;border-radius:22px;padding:24px 24px 20px;margin-bottom:24px;box-shadow:0 14px 34px rgba(0,0,0,.12);position:relative;overflow:hidden}
+        .sgm-tv-top:after{content:"TV";position:absolute;right:20px;top:-24px;font-size:120px;font-weight:1000;color:rgba(255,212,0,.06);line-height:1}
+        .sgm-tv-kicker{color:#ffd400;font-size:12px;font-weight:1000;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 7px}
+        .sgm-tv-top h2{color:#fff;font-size:clamp(25px,4vw,40px);margin:0 0 8px;line-height:1}
+        .sgm-tv-top p{color:#aaa;margin:0;max-width:700px;font-size:14px}
+        .sgm-tv-filters{display:flex;gap:9px;overflow-x:auto;padding:4px 2px 12px;margin:20px -2px 0;scrollbar-width:none;position:relative;z-index:2}
+        .sgm-tv-filters::-webkit-scrollbar{display:none}
+        .sgm-tv-filter{flex:0 0 auto;border:1px solid #343434;background:#171717;color:#ddd;border-radius:999px;padding:10px 15px;font-weight:900;cursor:pointer;transition:.2s}
+        .sgm-tv-filter:hover,.sgm-tv-filter.active{background:#ffd400;color:#050505;border-color:#ffd400}
+        .sgm-tv-section-head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin:0 2px 18px}
+        .sgm-tv-section-head h3{font-size:25px;margin:0;color:#111}
+        .sgm-tv-count{font-size:12px;font-weight:900;color:#777;text-transform:uppercase;letter-spacing:.8px}
+        .sgm-tv-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+        .sgm-tv-card{background:#0c0c0c;border-radius:18px;overflow:hidden;box-shadow:0 9px 24px rgba(0,0,0,.12);transition:transform .2s,box-shadow .2s}
+        .sgm-tv-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(0,0,0,.18)}
+        .sgm-tv-thumb{aspect-ratio:16/9;background:#1b1b1b center/cover no-repeat;position:relative}
+        .sgm-tv-thumb:after{content:"▶";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:#ffd400;color:#080808;font-size:19px;padding-left:3px;box-shadow:0 7px 20px rgba(0,0,0,.35)}
+        .sgm-tv-card-body{padding:16px}
+        .sgm-tv-card-cat{display:inline-block;color:#ffd400;font-size:10px;font-weight:1000;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
+        .sgm-tv-card h4{color:#fff;font-size:18px;line-height:1.2;margin:0 0 8px}
+        .sgm-tv-date{color:#888;font-size:12px;margin:0 0 14px}
+        .sgm-tv-watch{display:inline-flex;align-items:center;gap:7px;color:#111;background:#ffd400;border-radius:10px;padding:9px 12px;text-decoration:none;font-size:12px;font-weight:1000}
+        .sgm-tv-empty{grid-column:1/-1;background:#fff;border:1px solid #e1e1e1;border-radius:16px;padding:30px;text-align:center;color:#777;font-weight:800}
+        @media(max-width:900px){.sgm-tv-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media(max-width:600px){main>.section{padding-top:20px}.sgm-tv-top{border-radius:16px;padding:20px 16px 14px}.sgm-tv-grid{grid-template-columns:1fr;gap:14px}.sgm-tv-section-head h3{font-size:21px}.sgm-tv-thumb:after{width:46px;height:46px}.sgm-tv-card h4{font-size:17px}}
       `;document.head.appendChild(css);
-      target.innerHTML=`<div class="sgm-tv-filters"><button class="sgm-tv-filter active" data-cat="">Tutti</button>${cats.map(c=>`<button class="sgm-tv-filter" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}</div><div id="sgmTvDynamicGrid" class="premium-tv-grid"></div>`;
-      const grid=document.getElementById('sgmTvDynamicGrid');
+      target.innerHTML=`<div class="sgm-tv-shell"><div class="sgm-tv-top"><p class="sgm-tv-kicker">Il canale ufficiale giallonero</p><h2>Guarda SGM TV</h2><p>Highlights, interviste, format e tutte le puntate dedicate al mondo ASD SGM Spadafora Sport.</p><div class="sgm-tv-filters"><button class="sgm-tv-filter active" data-cat="">Tutti i video</button>${cats.map(c=>`<button class="sgm-tv-filter" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}</div></div><div class="sgm-tv-section-head"><h3 id="sgmTvTitle">Tutti i video</h3><span class="sgm-tv-count" id="sgmTvCount"></span></div><div id="sgmTvDynamicGrid" class="sgm-tv-grid"></div></div>`;
+      const grid=document.getElementById('sgmTvDynamicGrid'),title=document.getElementById('sgmTvTitle'),count=document.getElementById('sgmTvCount');
       const render=cat=>{
         const list=cat?videos.filter(v=>v.category===cat):videos;
-        grid.innerHTML=list.length?list.map(v=>`<article class="premium-card">${v.thumbnail?`<div class="premium-video-thumb" style="background-image:url('${esc(v.thumbnail)}')"></div>`:'<div class="premium-video-thumb"></div>'}<div class="premium-head"><span class="premium-pill">${esc(v.category||'SGM TV')}</span><h2>${esc(v.title||'Video')}</h2>${v.date?`<p class="premium-sub">${esc(v.date)}</p>`:''}</div><div class="premium-body">${v.url?`<a class="premium-video-link" href="${esc(v.url)}" target="_blank" rel="noopener">Guarda il video →</a>`:'Contenuto in preparazione.'}</div></article>`).join(''):'<div class="premium-empty">Nessun video in questa categoria.</div>';
+        title.textContent=cat||'Tutti i video';
+        count.textContent=list.length+' '+(list.length===1?'video':'video');
+        grid.innerHTML=list.length?list.map(v=>`<article class="sgm-tv-card">${v.thumbnail?`<div class="sgm-tv-thumb" style="background-image:url('${esc(v.thumbnail)}')"></div>`:'<div class="sgm-tv-thumb"></div>'}<div class="sgm-tv-card-body"><span class="sgm-tv-card-cat">${esc(v.category||'SGM TV')}</span><h4>${esc(v.title||'Video')}</h4>${v.date?`<p class="sgm-tv-date">${esc(v.date)}</p>`:''}${v.url?`<a class="sgm-tv-watch" href="${esc(v.url)}" target="_blank" rel="noopener">▶ Guarda il video</a>`:'<span class="sgm-tv-date">Contenuto in preparazione</span>'}</div></article>`).join(''):'<div class="sgm-tv-empty">Nessun video disponibile in questa categoria.</div>';
       };
       target.querySelectorAll('.sgm-tv-filter').forEach(b=>b.onclick=()=>{target.querySelectorAll('.sgm-tv-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');render(b.dataset.cat);});
       render('');

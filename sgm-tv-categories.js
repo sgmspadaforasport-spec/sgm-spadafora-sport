@@ -6,11 +6,11 @@
 
   function normalizeCategories(tv){
     const hadCategories=Array.isArray(tv.categories);
-    tv.categories=hadCategories?tv.categories.map(x=>String(x||'').trim()).filter(Boolean):[];
+    tv.categories=hadCategories?tv.categories.map(x=>typeof x==='string'?{name:String(x).trim(),cover:''}:{name:String(x?.name||'').trim(),cover:x?.cover||''}).filter(x=>x.name):[];
     if(!hadCategories){
       const used=(Array.isArray(tv.videos)?tv.videos:[]).map(v=>String(v.category||'').trim()).filter(Boolean);
       [...DEFAULT_CATEGORIES,...used].forEach(name=>{
-        if(!tv.categories.some(x=>String(x).toLowerCase()===name.toLowerCase())) tv.categories.push(name);
+        if(!tv.categories.some(x=>x.name.toLowerCase()===name.toLowerCase())) tv.categories.push({name,cover:''});
       });
     }
     return tv.categories;
@@ -88,7 +88,7 @@
       const tv=data.sgm_tv||{};normalizeCategories(tv);
       const videos=Array.isArray(tv.videos)?tv.videos:[];
       const target=document.querySelector('main>.section>.container');if(!target)return;
-      const cats=tv.categories.filter(c=>videos.some(v=>v.category===c));
+      const cats=tv.categories.filter(c=>videos.some(v=>v.category===c.name));
       const css=document.createElement('style');css.textContent=`
         main>.section{background:#f4f4f4;padding-top:34px}
         .sgm-tv-shell{max-width:1180px;margin:0 auto}
@@ -118,7 +118,7 @@
         @media(max-width:900px){.sgm-tv-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
         @media(max-width:600px){main>.section{padding-top:20px}.sgm-tv-top{border-radius:16px;padding:20px 16px 14px}.sgm-tv-grid{grid-template-columns:1fr;gap:14px}.sgm-tv-section-head h3{font-size:21px}.sgm-tv-thumb:after{width:46px;height:46px}.sgm-tv-card h4{font-size:17px}}
       `;document.head.appendChild(css);
-      target.innerHTML=`<div class="sgm-tv-shell"><div class="sgm-tv-top"><p class="sgm-tv-kicker">Il canale ufficiale giallonero</p><h2>Guarda SGM TV</h2><p>Highlights, interviste, format e tutte le puntate dedicate al mondo ASD SGM Spadafora Sport.</p><div class="sgm-tv-filters"><button class="sgm-tv-filter active" data-cat="">Tutti i video</button>${cats.map(c=>`<button class="sgm-tv-filter" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}</div></div><div class="sgm-tv-section-head"><h3 id="sgmTvTitle">Tutti i video</h3><span class="sgm-tv-count" id="sgmTvCount"></span></div><div id="sgmTvDynamicGrid" class="sgm-tv-grid"></div></div>`;
+      target.innerHTML=`<div class="sgm-tv-shell"><div class="sgm-tv-top"><p class="sgm-tv-kicker">Il canale ufficiale giallonero</p><h2>Guarda SGM TV</h2><p>Highlights, interviste, format e tutte le puntate dedicate al mondo ASD SGM Spadafora Sport.</p><div class="sgm-tv-filters"><button class="sgm-tv-filter active" data-cat="">Tutti i video</button>${cats.map(c=>`<button class="sgm-tv-filter" data-cat="${esc(c.name)}" style="${c.cover?`background-image:linear-gradient(rgba(0,0,0,.48),rgba(0,0,0,.48)),url('${esc(c.cover)}');background-size:cover;background-position:center;color:#fff`:''}">${esc(c.name)}</button>`).join('')}</div></div><div class="sgm-tv-section-head"><h3 id="sgmTvTitle">Tutti i video</h3><span class="sgm-tv-count" id="sgmTvCount"></span></div><div id="sgmTvDynamicGrid" class="sgm-tv-grid"></div></div>`;
       const grid=document.getElementById('sgmTvDynamicGrid'),title=document.getElementById('sgmTvTitle'),count=document.getElementById('sgmTvCount');
       const render=cat=>{
         const list=cat?videos.filter(v=>v.category===cat):videos;

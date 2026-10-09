@@ -29,7 +29,7 @@
   if(page==='admin.html'||page==='admin')extras.push('admin-content.js','admin-staff.js','admin-about.js','admin-youth-staff.js','admin-comunicati.js','admin-leagues.js','admin-home.js','admin-notifications.js','admin-auto-push.js','admin-calendar-details.js');
   if(['news.html','sponsor.html','galleria.html'].includes(page))extras.push('content-pages.js');
   if(['news.html','sponsor.html','galleria.html','sgm-tv.html'].includes(page))extras.push('premium-sections.js');
-  if(['calcio-a-5.html','pallavolo-maschile.html','pallavolo-femminile.html','basket.html','giovanile-calcio.html'].includes(page))extras.push('team-section-premium.js?v=86');
+  if(['calcio-a-5.html','pallavolo-maschile.html','pallavolo-femminile.html','basket.html','giovanile-calcio.html'].includes(page))extras.push('team-section-premium.js?v=88');
   if(page.endsWith('-calendario.html')||page.endsWith('-classifica.html'))extras.push('league-display.js');
   if(page.endsWith('-calendario.html'))extras.push('calendar-details-display.js');
   if(page==='staff.html')extras.push('staff-dynamic.js');

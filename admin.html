@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Squadre v69 | ASD SGM Spadafora Sport</title>
+<title>Admin v77 | ASD SGM Spadafora Sport</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -90,6 +90,7 @@ textarea{min-height:120px;resize:vertical}
 <button class="nav-btn" data-panel="results">Ultimi risultati</button>
       <button class="nav-btn" data-panel="sports">Rose e staff</button>
       <button class="nav-btn" data-panel="teamCovers">🖼️ Copertine squadre</button>
+      <button class="nav-btn" data-panel="youthTraining">🏫 Settore giovanile</button>
       <button class="nav-btn" data-panel="standings">Classifiche</button>
 <button class="nav-btn" data-panel="calendar">Calendari</button>
 <button class="nav-btn" data-panel="palmaresAdmin">Palmarès</button>
@@ -139,6 +140,11 @@ textarea{min-height:120px;resize:vertical}
       <section class="admin-panel" id="teamCovers">
         <div class="panel-head"><div><h2>Copertine squadre</h2><p>Carica l'immagine mostrata nella pagina pubblica Squadre.</p></div></div>
         <div id="teamCoversList" class="item-list"></div>
+      </section>
+
+      <section class="admin-panel" id="youthTraining">
+        <div class="panel-head"><div><h2>Settore Giovanile</h2><p>Gestisci gli orari di allenamento di Calcio a 5, Pallavolo e Basket.</p></div></div>
+        <div id="youthTrainingAdmin"></div>
       </section>
 
       <section class="admin-panel" id="standings">
@@ -272,6 +278,8 @@ function ensureData(){
     data.sports[k].staff=data.sports[k].staff||[];
     data.sports[k].standings=data.sports[k].standings||[];data.sports[k].calendar=data.sports[k].calendar||[];
   });
+  data.youth_training=data.youth_training||{};
+  ['calcio_a_5','pallavolo','basket'].forEach(k=>{if(!Array.isArray(data.youth_training[k]))data.youth_training[k]=[];});
   data.team_covers=data.team_covers||{};
   ['calcio_a_5','pallavolo_maschile','pallavolo_femminile','basket','giovanile_calcio'].forEach(k=>{if(typeof data.team_covers[k]!=='string')data.team_covers[k]='';});
   data.sgm_tv=data.sgm_tv||{videos:[]};data.recent_results=data.recent_results||[];data.palmares=data.palmares||[];
@@ -327,6 +335,34 @@ function renderTeamCovers(){
     try{data.team_covers[b.dataset.k]='';await window.SGM_DB.saveSiteData(data);renderTeamCovers();status('✓ Copertina rimossa.');}
     catch(e){status('Errore: '+e.message,true);}
   });
+}
+
+
+function renderYouthTraining(){
+  const root=$('youthTrainingAdmin');if(!root)return;
+  const labels={calcio_a_5:'⚽ Calcio a 5',pallavolo:'🏐 Pallavolo',basket:'🏀 Basket'};
+  root.innerHTML=Object.entries(labels).map(([sport,label])=>`
+    <div style="margin:0 0 24px;padding:18px;border:1px solid #2d2d2d;border-radius:14px;background:#0b0b0b">
+      <div class="panel-head" style="margin-bottom:12px"><div><h3 style="margin:0;color:#ffd400">${label}</h3></div><button type="button" class="btn btn-primary btn-small youth-add" data-sport="${sport}">+ Aggiungi orario</button></div>
+      <div class="item-list">${data.youth_training[sport].length?data.youth_training[sport].map((x,i)=>`
+        <div class="item-card"><div><h3>${esc(x.group||'Gruppo')}</h3><p>${esc(x.days||'')}${x.time?' · '+esc(x.time):''}${x.place?'<br>'+esc(x.place):''}</p></div>
+        <div class="item-actions"><button type="button" class="btn btn-dark btn-small youth-edit" data-sport="${sport}" data-i="${i}">Modifica</button><button type="button" class="btn btn-danger btn-small youth-del" data-sport="${sport}" data-i="${i}">Elimina</button></div></div>`).join(''):'<div class="empty">Nessun orario inserito.</div>'}</div>
+    </div>`).join('');
+  root.querySelectorAll('.youth-add').forEach(b=>b.onclick=()=>editYouthTraining(b.dataset.sport,null));
+  root.querySelectorAll('.youth-edit').forEach(b=>b.onclick=()=>editYouthTraining(b.dataset.sport,+b.dataset.i));
+  root.querySelectorAll('.youth-del').forEach(b=>b.onclick=()=>{data.youth_training[b.dataset.sport].splice(+b.dataset.i,1);renderYouthTraining();});
+}
+function editYouthTraining(sport,i){
+  const x=i===null?{}:data.youth_training[sport][i]||{};
+  openModal(i===null?'Aggiungi orario':'Modifica orario',`
+    <div class="fields">
+      <div class="field full"><label>Categoria / gruppo</label><input id="ytGroup" value="${esc(x.group||'')}" placeholder="Es. Piccoli Amici 2020/21"></div>
+      <div class="field"><label>Giorni</label><input id="ytDays" value="${esc(x.days||'')}" placeholder="Es. Lunedì e mercoledì"></div>
+      <div class="field"><label>Orario</label><input id="ytTime" value="${esc(x.time||'')}" placeholder="Es. 14:30–16:00"></div>
+      <div class="field full"><label>Luogo</label><input id="ytPlace" value="${esc(x.place||'')}" placeholder="Es. Palazzetto dello Sport Spadafora"></div>
+    </div>`,
+    ()=>{const obj={group:$('ytGroup').value.trim(),days:$('ytDays').value.trim(),time:$('ytTime').value.trim(),place:$('ytPlace').value.trim()};if(i===null)data.youth_training[sport].push(obj);else data.youth_training[sport][i]=obj;renderYouthTraining();}
+  );
 }
 
 function renderMatches(){
@@ -659,7 +695,7 @@ async function loadData(){
    ensureData();renderAll();
  }catch(e){status('Impossibile caricare i dati online: '+e.message,true);}
 }
-function renderAll(){renderSportTabs();renderTeamCovers();renderMatches();renderRoster();renderStaff();renderStandings();renderVideos();renderResults();renderCalendarTabs();renderCalendarList();renderPalmares();loadContacts();$('rawJson').value=JSON.stringify(data,null,2);}
+function renderAll(){renderSportTabs();renderTeamCovers();renderYouthTraining();renderMatches();renderRoster();renderStaff();renderStandings();renderVideos();renderResults();renderCalendarTabs();renderCalendarList();renderPalmares();loadContacts();$('rawJson').value=JSON.stringify(data,null,2);}
 
 $('saveOnline').onclick=async()=>{
  try{
@@ -694,6 +730,6 @@ $('logout').onclick=async()=>{await window.SGM_DB.signOut();location.href='login
  <script>
 loadData();
 </script>
-<!-- SGM-ADMIN-V69: reliable team-cover picker -->
+<!-- SGM-ADMIN-V77: youth training management -->
 </body>
 </html>

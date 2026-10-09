@@ -60,6 +60,12 @@
   .premium-page[data-premium-page="squadre"] .home-quick-grid>a:hover{transform:translateY(-4px);box-shadow:0 20px 42px rgba(0,0,0,.22)!important}
   @media(max-width:700px){.premium-page[data-premium-page="squadre"] .home-quick-grid{grid-template-columns:1fr!important}.premium-page[data-premium-page="squadre"] .home-quick-grid>a{min-height:240px!important}}
 
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a{overflow:hidden!important;isolation:isolate}
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a>.sgm-team-cover-photo{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;z-index:0!important;max-width:none!important;border:0!important;filter:none!important}
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a:before{z-index:1!important;background:linear-gradient(to top,rgba(0,0,0,.82),rgba(0,0,0,.15) 70%,transparent)!important;pointer-events:none}
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a>span,.premium-page[data-premium-page="squadre"] .home-quick-grid>a>strong{z-index:2!important}
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a:after{z-index:2!important}
+
   .premium-tv-grid,.premium-calendar-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
   .premium-video-thumb{aspect-ratio:16/9;background:#171717 center/cover no-repeat;position:relative;border-bottom:4px solid var(--yellow)}
   .premium-video-thumb:after{content:'▶';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--yellow);color:#000;font-size:22px;font-weight:900}
@@ -108,7 +114,7 @@
       ['calcio-a-5.html','calcio_a_5'],['pallavolo-maschile.html','pallavolo_maschile'],
       ['pallavolo-femminile.html','pallavolo_femminile'],['basket.html','basket'],['giovanile-calcio.html','giovanile_calcio']
     ];
-    map.forEach(([href,key])=>{const a=grid.querySelector('a[href="'+href+'"]');if(a&&covers[key])a.style.setProperty('background-image',"url('"+String(covers[key]).replace(/'/g,"%27")+"')",'important');});
+    map.forEach(([href,key])=>{const a=grid.querySelector('a[href="'+href+'"]');if(a&&covers[key]){let img=a.querySelector('.sgm-team-cover-photo');if(!img){img=document.createElement('img');img.className='sgm-team-cover-photo';img.alt='';a.prepend(img);}if(img.src!==covers[key])img.src=covers[key];};});
   }
 
   function renderTV(data){

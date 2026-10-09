@@ -89,28 +89,36 @@
 
   const style=document.createElement('style');
   style.textContent=`
-    [data-sgm-calendar].calendar-list{gap:16px!important}
-    [data-sgm-calendar] .calendar-card{position:relative;overflow:hidden;background:#fff!important;border:1px solid #dedede!important;border-radius:18px!important;padding:0!important;box-shadow:0 10px 28px rgba(0,0,0,.07);transition:transform .2s,box-shadow .2s}
-    [data-sgm-calendar] .calendar-card:hover{transform:translateY(-2px);box-shadow:0 15px 34px rgba(0,0,0,.11)}
-    [data-sgm-calendar] .calendar-card:before{content:"";display:block;height:5px;background:var(--yellow,#ffd400)}
-    [data-sgm-calendar] .calendar-head{margin:0!important;padding:13px 18px!important;background:#0b0b0b;align-items:center!important}
-    [data-sgm-calendar] .calendar-head strong,[data-sgm-calendar] .calendar-head b{color:var(--yellow,#ffd400)!important;font-size:12px!important;font-weight:1000!important;text-transform:uppercase;letter-spacing:.65px}
-    [data-sgm-calendar] .calendar-head span{color:#ddd!important;font-size:11px!important;font-weight:800}
-    [data-sgm-calendar] .calendar-teams{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important;gap:18px!important;padding:24px 20px 18px;min-height:82px}
-    [data-sgm-calendar] .calendar-teams strong{font-size:clamp(15px,2vw,20px);line-height:1.12;color:#111;font-weight:1000;text-transform:uppercase}
-    [data-sgm-calendar] .calendar-teams>span,[data-sgm-calendar] .calendar-teams>b{display:grid;place-items:center;min-width:70px;padding:10px 12px;background:#111;color:var(--yellow,#ffd400);border:2px solid var(--yellow,#ffd400);border-radius:12px;font-size:18px;font-weight:1000;white-space:nowrap}
-    [data-sgm-calendar] .calendar-card>small{margin:0!important;padding:0 20px 18px!important;color:#777!important;font-size:12px!important;font-weight:700}
-    [data-sgm-calendar] .sgm-game-detail{margin:0 20px 20px!important}
+    [data-sgm-calendar].calendar-list{gap:20px!important}
+    [data-sgm-calendar] .calendar-card{position:relative;overflow:hidden;background:#fff!important;border:1px solid #ddd!important;border-radius:22px!important;padding:0!important;box-shadow:0 14px 35px rgba(0,0,0,.09);transition:.2s ease}
+    [data-sgm-calendar] .calendar-card:hover{transform:translateY(-3px);box-shadow:0 18px 42px rgba(0,0,0,.13)}
+    [data-sgm-calendar] .calendar-card:before{content:"";display:block;height:6px;background:var(--yellow,#ffd400)}
+    [data-sgm-calendar] .calendar-head{margin:0!important;padding:14px 20px!important;background:#080808;align-items:center!important}
+    [data-sgm-calendar] .calendar-head strong{display:inline-flex;background:var(--yellow,#ffd400);color:#000!important;padding:6px 10px;border-radius:999px;font-size:11px!important;font-weight:1000!important;text-transform:uppercase;letter-spacing:.5px}
+    [data-sgm-calendar] .calendar-head span{color:#eee!important;font-size:12px!important;font-weight:900}
+    [data-sgm-calendar] .calendar-status{position:absolute;right:18px;top:58px;color:#8b8b8b;font-size:9px;font-weight:1000;letter-spacing:1px}
+    [data-sgm-calendar] .is-played .calendar-status{color:#786500}
+    [data-sgm-calendar] .calendar-teams{grid-template-columns:minmax(0,1fr) 82px minmax(0,1fr)!important;gap:18px!important;padding:35px 24px 22px;min-height:90px}
+    [data-sgm-calendar] .calendar-teams strong{font-size:clamp(16px,2vw,21px)!important;line-height:1.12;color:#111;font-weight:1000;text-transform:uppercase}
+    [data-sgm-calendar] .calendar-teams strong:last-child{text-align:right}
+    [data-sgm-calendar] .calendar-teams>b{display:grid;place-items:center;min-width:82px;padding:11px 7px;background:#080808;color:var(--yellow,#ffd400);border:2px solid var(--yellow,#ffd400);border-radius:13px;font-size:19px;font-weight:1000;white-space:nowrap;box-shadow:0 5px 14px rgba(0,0,0,.15)}
+    [data-sgm-calendar] .calendar-card>small{display:block;margin:0!important;padding:0 24px 18px!important;color:#777!important;font-size:12px!important;font-weight:800}
+    [data-sgm-calendar] .calendar-extra{margin:0 20px 20px;padding:15px 16px;background:#111;color:#fff;border-radius:14px;border-left:5px solid var(--yellow,#ffd400)}
+    [data-sgm-calendar] .calendar-extra>span{display:block;color:var(--yellow,#ffd400);font-size:10px;font-weight:1000;letter-spacing:.8px;margin-bottom:8px}
+    [data-sgm-calendar] .calendar-extra>strong{font-size:13px;line-height:1.5}
+    [data-sgm-calendar] .calendar-extra-pills{display:flex;gap:7px;flex-wrap:wrap}
+    [data-sgm-calendar] .calendar-extra-pills b{background:#242424;border:1px solid #444;border-radius:9px;padding:7px 9px;color:#aaa;font-size:10px}
+    [data-sgm-calendar] .calendar-extra-pills em{font-style:normal;color:#fff;font-size:12px;margin-left:3px}
     @media(max-width:560px){
-      [data-sgm-calendar] .calendar-head{flex-direction:row!important;flex-wrap:wrap;gap:5px 12px!important;padding:12px 14px!important}
-      [data-sgm-calendar] .calendar-teams{grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr)!important;gap:7px!important;padding:20px 10px 15px;text-align:center!important}
-      [data-sgm-calendar] .calendar-teams strong,[data-sgm-calendar] .calendar-teams strong:last-child{text-align:center!important;font-size:12px!important;overflow-wrap:normal;word-break:normal}
-      [data-sgm-calendar] .calendar-teams>span,[data-sgm-calendar] .calendar-teams>b{min-width:56px;padding:8px 3px;font-size:15px}
-      [data-sgm-calendar] .calendar-card>small{padding:0 14px 15px!important}
-      [data-sgm-calendar] .sgm-game-detail{margin:0 14px 15px!important}
+      [data-sgm-calendar] .calendar-head{flex-direction:row!important;flex-wrap:wrap;padding:12px 13px!important}
+      [data-sgm-calendar] .calendar-status{top:55px;right:12px}
+      [data-sgm-calendar] .calendar-teams{grid-template-columns:minmax(0,1fr) 60px minmax(0,1fr)!important;gap:6px!important;padding:34px 9px 18px;text-align:center!important}
+      [data-sgm-calendar] .calendar-teams strong,[data-sgm-calendar] .calendar-teams strong:last-child{text-align:center!important;font-size:11.5px!important;line-height:1.15}
+      [data-sgm-calendar] .calendar-teams>b{min-width:60px;padding:9px 2px;font-size:15px}
+      [data-sgm-calendar] .calendar-card>small{padding:0 13px 15px!important;text-align:center}
+      [data-sgm-calendar] .calendar-extra{margin:0 12px 14px;padding:13px}
+      [data-sgm-calendar] .calendar-extra-pills{gap:5px}
     }
-    [data-sgm-calendar] .sgm-game-detail{margin:0 20px 20px!important;padding:14px 16px!important;background:#f7f7f7!important;color:#222!important;border:0!important;border-left:5px solid var(--yellow,#ffd400)!important;border-radius:12px!important;font-size:13px!important}
-    [data-sgm-calendar] .sgm-game-detail strong{color:#111!important}
     .sgm-game-detail{margin-top:12px;padding:10px 12px;border-radius:9px;background:#111;color:#ddd;border-left:3px solid var(--yellow,#ffd400);font-size:12px;line-height:1.5}
     .sgm-game-detail strong{color:var(--yellow,#ffd400)}
     .home-results .results-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}

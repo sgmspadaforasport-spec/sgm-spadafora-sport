@@ -51,6 +51,15 @@
   .premium-page .home-quick-grid>a strong{padding:32px 24px;color:#111!important;font-size:30px!important;line-height:1.05}
   .premium-page .home-quick-grid>a:after{content:'SCOPRI →';position:absolute;right:22px;bottom:18px;color:#8a7200;font-size:10px;font-weight:900;letter-spacing:.6px}
 
+  .premium-page[data-premium-page="squadre"] .home-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:20px!important}
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a{position:relative;min-height:300px!important;background:#111 center/cover no-repeat!important;border:0!important;border-radius:20px!important;box-shadow:0 14px 32px rgba(0,0,0,.16)!important;justify-content:flex-end!important;isolation:isolate}
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(to top,rgba(0,0,0,.96) 0%,rgba(0,0,0,.55) 45%,rgba(0,0,0,.14) 75%);border-radius:inherit}
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a span{position:absolute;left:22px;top:20px;background:var(--yellow)!important;color:#000!important;border:0!important;border-radius:999px;padding:7px 11px!important;font-size:9px!important}
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a strong{padding:28px 24px 52px!important;color:#fff!important;font-size:clamp(27px,3vw,38px)!important;text-shadow:0 2px 12px #000}
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a:after{content:"ENTRA NELLA SQUADRA →";left:24px;right:auto;bottom:22px;color:var(--yellow);font-size:10px}
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a:hover{transform:translateY(-4px);box-shadow:0 20px 42px rgba(0,0,0,.22)!important}
+  @media(max-width:700px){.premium-page[data-premium-page="squadre"] .home-quick-grid{grid-template-columns:1fr!important}.premium-page[data-premium-page="squadre"] .home-quick-grid>a{min-height:240px!important}}
+
   .premium-tv-grid,.premium-calendar-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
   .premium-video-thumb{aspect-ratio:16/9;background:#171717 center/cover no-repeat;position:relative;border-bottom:4px solid var(--yellow)}
   .premium-video-thumb:after{content:'▶';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--yellow);color:#000;font-size:22px;font-weight:900}
@@ -91,6 +100,17 @@
 
   function targetContainer(){return document.querySelector('main>.section>.container')}
 
+  function renderTeams(data){
+    if(page!=='squadre.html')return;
+    const grid=document.querySelector('.home-quick-grid');if(!grid)return;
+    const covers=data?.team_covers||{};
+    const map=[
+      ['calcio-a-5.html','calcio_a_5'],['pallavolo-maschile.html','pallavolo_maschile'],
+      ['pallavolo-femminile.html','pallavolo_femminile'],['basket.html','basket'],['giovanile-calcio.html','giovanile_calcio']
+    ];
+    map.forEach(([href,key])=>{const a=grid.querySelector('a[href="'+href+'"]');if(a&&covers[key])a.style.backgroundImage="url('"+String(covers[key]).replace(/'/g,"%27")+"')";});
+  }
+
   function renderTV(data){
     if(page!=='sgm-tv.html') return;
     const target=targetContainer(); if(!target) return;
@@ -109,7 +129,7 @@
   }
 
   async function init(){
-    try{const data=await getData();renderTV(data);renderCalendar(data);}catch(e){console.warn('Tema premium: dati non disponibili',e)}
+    try{const data=await getData();renderTeams(data);renderTV(data);renderCalendar(data);}catch(e){console.warn('Tema premium: dati non disponibili',e)}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

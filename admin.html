@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Squadre v68 | ASD SGM Spadafora Sport</title>
+<title>Admin Squadre v69 | ASD SGM Spadafora Sport</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -295,16 +295,38 @@ function renderTeamCovers(){
   const labels={...sportLabels,giovanile_calcio:'Settore Giovanile'};
   const list=$('teamCoversList'); if(!list)return;
   list.innerHTML=Object.entries(labels).map(([k,label])=>`
-    <div class="item-card" style="grid-template-columns:110px 1fr auto">
-      <div style="width:110px;height:70px;border-radius:9px;background:#191919 center/cover no-repeat;background-image:url('${esc(data.team_covers[k]||'')}')"></div>
-      <div><h3>${esc(label)}</h3><p>${data.team_covers[k]?'Copertina caricata':'Nessuna copertina caricata'}</p></div>
-      <div class="item-actions"><label class="btn btn-primary btn-small">📷 Carica<input class="team-cover-file" data-k="${k}" type="file" accept="image/jpeg,image/png,image/webp" hidden></label>${data.team_covers[k]?`<button class="btn btn-danger btn-small team-cover-remove" data-k="${k}">Rimuovi</button>`:''}</div>
+    <div class="item-card team-cover-card" data-k="${k}" style="grid-template-columns:110px 1fr auto">
+      <div class="team-cover-preview" style="width:110px;height:70px;border-radius:9px;background:#191919 center/cover no-repeat;background-image:url('${esc(data.team_covers[k]||'')}')"></div>
+      <div><h3>${esc(label)}</h3><p class="team-cover-state">${data.team_covers[k]?'Copertina caricata':'Nessuna copertina caricata'}</p></div>
+      <div class="item-actions">
+        <input class="team-cover-file" data-k="${k}" type="file" accept="image/*" style="display:none">
+        <button type="button" class="btn btn-primary btn-small team-cover-pick" data-k="${k}">📷 Scegli immagine</button>
+        ${data.team_covers[k]?`<button type="button" class="btn btn-danger btn-small team-cover-remove" data-k="${k}">Rimuovi</button>`:''}
+      </div>
     </div>`).join('');
-  list.querySelectorAll('.team-cover-file').forEach(inp=>inp.onchange=async()=>{
-    const file=inp.files[0];if(!file)return;
-    try{status('Caricamento copertina in corso...');const url=await window.SGM_DB.uploadImage(file,'squadre/copertine');data.team_covers[inp.dataset.k]=url;await window.SGM_DB.saveSiteData(data);renderTeamCovers();status('✓ Copertina caricata e pubblicata online.');}catch(e){status('Errore caricamento: '+e.message,true);}
+  list.querySelectorAll('.team-cover-pick').forEach(btn=>btn.onclick=()=>{
+    const input=list.querySelector('.team-cover-file[data-k="'+btn.dataset.k+'"]');
+    if(input)input.click();
   });
-  list.querySelectorAll('.team-cover-remove').forEach(b=>b.onclick=async()=>{data.team_covers[b.dataset.k]='';await window.SGM_DB.saveSiteData(data);renderTeamCovers();status('✓ Copertina rimossa.');});
+  list.querySelectorAll('.team-cover-file').forEach(inp=>inp.onchange=async()=>{
+    const file=inp.files&&inp.files[0];if(!file)return;
+    const card=inp.closest('.team-cover-card'),state=card?.querySelector('.team-cover-state'),preview=card?.querySelector('.team-cover-preview');
+    if(state)state.textContent='Caricamento di '+file.name+'...';
+    if(preview){const local=URL.createObjectURL(file);preview.style.backgroundImage="url('"+local+"')";}
+    try{
+      const url=await window.SGM_DB.uploadImage(file,'squadre/copertine');
+      data.team_covers[inp.dataset.k]=url;
+      await window.SGM_DB.saveSiteData(data);
+      renderTeamCovers();status('✓ Copertina caricata e pubblicata online.');
+    }catch(e){
+      if(state)state.textContent='Errore: '+(e.message||'caricamento non riuscito');
+      status('Errore caricamento: '+(e.message||e),true);
+    }finally{inp.value='';}
+  });
+  list.querySelectorAll('.team-cover-remove').forEach(b=>b.onclick=async()=>{
+    try{data.team_covers[b.dataset.k]='';await window.SGM_DB.saveSiteData(data);renderTeamCovers();status('✓ Copertina rimossa.');}
+    catch(e){status('Errore: '+e.message,true);}
+  });
 }
 
 function renderMatches(){
@@ -672,6 +694,6 @@ $('logout').onclick=async()=>{await window.SGM_DB.signOut();location.href='login
  <script>
 loadData();
 </script>
-<!-- SGM-ADMIN-V68: team-covers enabled -->
+<!-- SGM-ADMIN-V69: reliable team-cover picker -->
 </body>
 </html>

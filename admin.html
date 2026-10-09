@@ -89,6 +89,7 @@ textarea{min-height:120px;resize:vertical}
       <button class="nav-btn" data-panel="matches">Prossime gare</button>
 <button class="nav-btn" data-panel="results">Ultimi risultati</button>
       <button class="nav-btn" data-panel="sports">Rose e staff</button>
+      <button class="nav-btn" data-panel="teamCovers">Copertine squadre</button>
       <button class="nav-btn" data-panel="standings">Classifiche</button>
 <button class="nav-btn" data-panel="calendar">Calendari</button>
 <button class="nav-btn" data-panel="palmaresAdmin">Palmarès</button>
@@ -133,6 +134,11 @@ textarea{min-height:120px;resize:vertical}
           <div class="toolbar"><button class="btn btn-primary" id="addStaff">+ Aggiungi membro staff</button></div>
           <div id="staffList" class="item-list" style="margin-top:14px"></div>
         </div>
+      </section>
+
+      <section class="admin-panel" id="teamCovers">
+        <div class="panel-head"><div><h2>Copertine squadre</h2><p>Carica l'immagine mostrata nella pagina pubblica Squadre.</p></div></div>
+        <div id="teamCoversList" class="item-list"></div>
       </section>
 
       <section class="admin-panel" id="standings">
@@ -266,6 +272,8 @@ function ensureData(){
     data.sports[k].staff=data.sports[k].staff||[];
     data.sports[k].standings=data.sports[k].standings||[];data.sports[k].calendar=data.sports[k].calendar||[];
   });
+  data.team_covers=data.team_covers||{};
+  ['calcio_a_5','pallavolo_maschile','pallavolo_femminile','basket','giovanile_calcio'].forEach(k=>{if(typeof data.team_covers[k]!=='string')data.team_covers[k]='';});
   data.sgm_tv=data.sgm_tv||{videos:[]};data.recent_results=data.recent_results||[];data.palmares=data.palmares||[];
   data.sgm_tv.videos=data.sgm_tv.videos||[];
   if(!Array.isArray(data.sgm_tv.categories)){
@@ -281,6 +289,22 @@ function renderSportTabs(){
   $('sportTabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{currentSport=b.dataset.k;renderSportTabs();renderRoster();renderStaff();});
   $('standingSportTabs').innerHTML=Object.entries(sportLabels).map(([k,v])=>`<button data-k="${k}" class="${k===currentStandingSport?'active':''}">${v}</button>`).join('');
   $('standingSportTabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{currentStandingSport=b.dataset.k;renderSportTabs();renderStandings();});
+}
+
+function renderTeamCovers(){
+  const labels={...sportLabels,giovanile_calcio:'Settore Giovanile'};
+  const list=$('teamCoversList'); if(!list)return;
+  list.innerHTML=Object.entries(labels).map(([k,label])=>`
+    <div class="item-card" style="grid-template-columns:110px 1fr auto">
+      <div style="width:110px;height:70px;border-radius:9px;background:#191919 center/cover no-repeat;background-image:url('${esc(data.team_covers[k]||'')}')"></div>
+      <div><h3>${esc(label)}</h3><p>${data.team_covers[k]?'Copertina caricata':'Nessuna copertina caricata'}</p></div>
+      <div class="item-actions"><label class="btn btn-primary btn-small">📷 Carica<input class="team-cover-file" data-k="${k}" type="file" accept="image/jpeg,image/png,image/webp" hidden></label>${data.team_covers[k]?`<button class="btn btn-danger btn-small team-cover-remove" data-k="${k}">Rimuovi</button>`:''}</div>
+    </div>`).join('');
+  list.querySelectorAll('.team-cover-file').forEach(inp=>inp.onchange=async()=>{
+    const file=inp.files[0];if(!file)return;
+    try{status('Caricamento copertina in corso...');const url=await window.SGM_DB.uploadImage(file,'squadre/copertine');data.team_covers[inp.dataset.k]=url;await window.SGM_DB.saveSiteData(data);renderTeamCovers();status('✓ Copertina caricata e pubblicata online.');}catch(e){status('Errore caricamento: '+e.message,true);}
+  });
+  list.querySelectorAll('.team-cover-remove').forEach(b=>b.onclick=async()=>{data.team_covers[b.dataset.k]='';await window.SGM_DB.saveSiteData(data);renderTeamCovers();status('✓ Copertina rimossa.');});
 }
 
 function renderMatches(){
@@ -613,7 +637,7 @@ async function loadData(){
    ensureData();renderAll();
  }catch(e){status('Impossibile caricare i dati online: '+e.message,true);}
 }
-function renderAll(){renderSportTabs();renderMatches();renderRoster();renderStaff();renderStandings();renderVideos();renderResults();renderCalendarTabs();renderCalendarList();renderPalmares();loadContacts();$('rawJson').value=JSON.stringify(data,null,2);}
+function renderAll(){renderSportTabs();renderTeamCovers();renderMatches();renderRoster();renderStaff();renderStandings();renderVideos();renderResults();renderCalendarTabs();renderCalendarList();renderPalmares();loadContacts();$('rawJson').value=JSON.stringify(data,null,2);}
 
 $('saveOnline').onclick=async()=>{
  try{
@@ -644,7 +668,7 @@ $('logout').onclick=async()=>{await window.SGM_DB.signOut();location.href='login
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="supabase-data.js?v=53"></script>
+<script src="supabase-data.js?v=67"></script>
  <script>
 loadData();
 </script>

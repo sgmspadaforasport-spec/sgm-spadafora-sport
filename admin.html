@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin v79 | ASD SGM Spadafora Sport</title>
+<title>Admin v80 | ASD SGM Spadafora Sport</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -144,7 +144,7 @@ textarea{min-height:120px;resize:vertical}
       </section>
 
       <section class="admin-panel" id="sectionCovers">
-        <div class="panel-head"><div><h2>Copertine sezioni squadre</h2><p>5 copertine comuni a tutte le squadre: Rosa, Staff, Calendario, Classifica e News.</p></div></div>
+        <div class="panel-head"><div><h2>Copertine sezioni squadre</h2><p>5 copertine comuni a tutte le squadre: Rosa, Staff, Calendario e risultati, Classifica e News.</p></div></div>
         <div id="sectionCoversAdmin"></div>
       </section>
 
@@ -349,7 +349,7 @@ function renderTeamCovers(){
 
 function renderSectionCovers(){
  const root=$('sectionCoversAdmin');if(!root)return;
- const sections={rosa:'Rosa',staff:'Staff',calendario:'Calendario',classifica:'Classifica',news:'News'};
+ const sections={rosa:'Rosa',staff:'Staff',calendario:'Calendario e risultati',classifica:'Classifica',news:'News'};
  root.innerHTML='<div class="item-list">'+Object.entries(sections).map(([section,title])=>{const url=data.section_covers[section]||'';return `
   <div class="item-card section-cover-card" data-section="${section}" style="grid-template-columns:90px 1fr auto">
    <div class="section-cover-preview" style="width:90px;height:112px;border-radius:8px;background:#191919 center/cover no-repeat;background-image:url('${esc(url)}')"></div>
@@ -758,6 +758,6 @@ $('logout').onclick=async()=>{await window.SGM_DB.signOut();location.href='login
  <script>
 loadData();
 </script>
-<!-- SGM-ADMIN-V79: five shared section covers -->
+<!-- SGM-ADMIN-V80: calendario e risultati label -->
 </body>
 </html>

@@ -33,7 +33,7 @@
 <a href="pallavolo-maschile-staff.html"><img class="team-section-photo" src="https://vgxatjdtawugxkzjkyxw.supabase.co/storage/v1/object/public/sgm-media/squadre/sezioni/1791588786943-7586.png" alt="" loading="lazy" decoding="async"><span>SGM</span><strong>Staff</strong></a>
 <a href="pallavolo-maschile-calendario.html"><img class="team-section-photo" src="https://vgxatjdtawugxkzjkyxw.supabase.co/storage/v1/object/public/sgm-media/squadre/sezioni/1791588789316-7587.png" alt="" loading="lazy" decoding="async"><span>SGM</span><strong>Calendario e risultati</strong></a>
 <a href="pallavolo-maschile-classifica.html"><img class="team-section-photo" src="https://vgxatjdtawugxkzjkyxw.supabase.co/storage/v1/object/public/sgm-media/squadre/sezioni/1791588797251-7588.png" alt="" loading="lazy" decoding="async"><span>SGM</span><strong>Classifica</strong></a>
-<a href="news.html"><span>SGM</span><strong>News</strong></a>
+<a href="news.html"><img class="team-section-photo" src="https://vgxatjdtawugxkzjkyxw.supabase.co/storage/v1/object/public/sgm-media/squadre/sezioni/1791588811744-7589.png" alt="" loading="lazy" decoding="async"><span>SGM</span><strong>News</strong></a>
 </div>
 </div></section>
 </main>
@@ -49,5 +49,5 @@
  function render(d){const covers=d?.section_covers||{};document.querySelectorAll('.team-section-grid>a').forEach(a=>{let key='';const h=a.getAttribute('href')||'';for(const [k,s] of sections){if((k==='news'&&h==='news.html')||(k!=='news'&&h.endsWith(s))){key=k;break;}}if(!key||!covers[key])return;let img=a.querySelector('.team-section-photo');if(!img){img=document.createElement('img');img.className='team-section-photo';img.alt='';a.prepend(img);}img.src=covers[key];});}
  document.addEventListener('sgm-data-ready',e=>render(e.detail||window.SGM_SITE_DATA||{}));if(window.SGM_SITE_DATA)render(window.SGM_SITE_DATA);window.addEventListener('load',async()=>{if(window.SGM_SITE_DATA){render(window.SGM_SITE_DATA);return;}try{if(window.SGM_DB?.getSiteData){const d=await window.SGM_DB.getSiteData();render(d||{});}}catch(e){}});
 })();
-</script><script src="premium-sections.js?v=83"></script></body>
+</script><script src="premium-sections.js?v=84"></script></body>
 </html>

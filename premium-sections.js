@@ -80,6 +80,22 @@
     .premium-page[data-premium-page="squadre"] .home-quick-grid>a:after{right:18px!important;bottom:18px!important}
   }
 
+
+  /* v75: footer card su una sola riga */
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a>strong{
+    left:auto!important;right:24px!important;bottom:20px!important;
+    padding:0!important;margin:0!important;text-align:right!important;
+    max-width:58%!important;font-size:clamp(18px,2vw,27px)!important;line-height:1!important;
+  }
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a:after{
+    left:24px!important;right:auto!important;bottom:20px!important;
+    text-align:left!important;line-height:1!important;
+  }
+  @media(max-width:700px){
+    .premium-page[data-premium-page="squadre"] .home-quick-grid>a>strong{right:18px!important;bottom:18px!important;max-width:58%!important;font-size:20px!important}
+    .premium-page[data-premium-page="squadre"] .home-quick-grid>a:after{left:18px!important;right:auto!important;bottom:18px!important}
+  }
+
   .premium-tv-grid,.premium-calendar-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
   .premium-video-thumb{aspect-ratio:16/9;background:#171717 center/cover no-repeat;position:relative;border-bottom:4px solid var(--yellow)}
   .premium-video-thumb:after{content:'▶';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--yellow);color:#000;font-size:22px;font-weight:900}

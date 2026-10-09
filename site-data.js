@@ -498,145 +498,46 @@
   ========================================= */
 
   function renderSportCalendar(data) {
+    document.querySelectorAll("[data-sgm-calendar]").forEach(root => {
+      const key = normalizeSportKey(root.dataset.sgmCalendar);
+      const sport = getSport(data, key);
+      const calendar = getCalendar(sport);
 
-    document
-      .querySelectorAll("[data-sgm-calendar]")
-      .forEach(root => {
+      if (!calendar.length) {
+        root.innerHTML = '<div class="dynamic-empty"><strong>📅 CALENDARIO IN AGGIORNAMENTO</strong><span>Le gare saranno pubblicate appena disponibili.</span></div>';
+        return;
+      }
 
-        const key =
-          normalizeSportKey(
-            root.dataset.sgmCalendar
-          );
+      root.innerHTML = calendar.map(game => {
+        const round = game.round || game.giornata || "Gara";
+        const date = game.date || game.data || "";
+        const time = game.time || game.ora || "";
+        const home = game.home || game.casa || "";
+        const away = game.away || game.trasferta || "";
+        const homeScore = game.home_score ?? game.gol_casa ?? "-";
+        const awayScore = game.away_score ?? game.gol_trasferta ?? "-";
+        const venue = game.venue || game.luogo || "";
+        const played = String(homeScore).trim() !== "-" && String(awayScore).trim() !== "-";
 
-        const sport =
-          getSport(data, key);
-
-        const calendar =
-          getCalendar(sport);
-
-
-        if (!calendar.length) {
-
-          root.innerHTML = `
-
-            <div class="dynamic-empty">
-
-              <strong>
-                📅 CALENDARIO IN AGGIORNAMENTO
-              </strong>
-
-              <span>
-                Le gare saranno pubblicate
-                appena disponibili.
-              </span>
-
-            </div>
-
-          `;
-
-          return;
+        let details = "";
+        if (key === "calcio_a_5" && game.scorers) {
+          details = '<div class="calendar-extra"><span>⚽ MARCATORI SGM</span><strong>' + esc(game.scorers) + '</strong></div>';
+        } else if (key === "pallavolo_maschile" || key === "pallavolo_femminile") {
+          const sets = [game.set1,game.set2,game.set3,game.set4,game.set5].filter(Boolean);
+          if (sets.length) details = '<div class="calendar-extra"><span>🏐 PARZIALI SET</span><div class="calendar-extra-pills">' + sets.map((x,i)=>'<b>'+(i+1)+'° <em>'+esc(x)+'</em></b>').join("") + '</div></div>';
+        } else if (key === "basket") {
+          const qs = [game.q1,game.q2,game.q3,game.q4].filter(Boolean);
+          const ot = game.ot ? '<b>OT <em>'+esc(game.ot)+'</em></b>' : '';
+          if (qs.length || game.ot) details = '<div class="calendar-extra"><span>🏀 PARZIALI QUARTI</span><div class="calendar-extra-pills">' + qs.map((x,i)=>'<b>Q'+(i+1)+' <em>'+esc(x)+'</em></b>').join("") + ot + '</div></div>';
         }
 
-
-        root.innerHTML =
-          calendar.map(game => {
-
-            const round =
-              game.round ||
-              game.giornata ||
-              "Gara";
-
-            const date =
-              game.date ||
-              game.data ||
-              "";
-
-            const time =
-              game.time ||
-              game.ora ||
-              "";
-
-            const home =
-              game.home ||
-              game.casa ||
-              "";
-
-            const away =
-              game.away ||
-              game.trasferta ||
-              "";
-
-            const homeScore =
-              game.home_score ??
-              game.gol_casa ??
-              "-";
-
-            const awayScore =
-              game.away_score ??
-              game.gol_trasferta ??
-              "-";
-
-            const venue =
-              game.venue ||
-              game.luogo ||
-              "";
-
-
-            return `
-
-              <article class="calendar-card">
-
-                <div class="calendar-head">
-
-                  <strong>
-                    ${esc(round)}
-                  </strong>
-
-                  <span>
-                    ${esc(date)}
-                    ${
-                      time
-                        ? " · " + esc(time)
-                        : ""
-                    }
-                  </span>
-
-                </div>
-
-
-                <div class="calendar-teams">
-
-                  <strong>
-                    ${esc(home)}
-                  </strong>
-
-                  <b>
-                    ${esc(homeScore)}
-                    :
-                    ${esc(awayScore)}
-                  </b>
-
-                  <strong>
-                    ${esc(away)}
-                  </strong>
-
-                </div>
-
-
-                ${
-                  venue
-                    ? `<small>${esc(venue)}</small>`
-                    : ""
-                }
-
-              </article>
-
-            `;
-
-          }).join("");
-
-      });
-
+        return '<article class="calendar-card '+(played?'is-played':'is-upcoming')+'">' +
+          '<div class="calendar-head"><strong>'+esc(round)+'</strong><span>'+esc(date)+(time?' · '+esc(time):'')+'</span></div>' +
+          '<div class="calendar-status">'+(played?'RISULTATO':'PROSSIMA GARA')+'</div>' +
+          '<div class="calendar-teams"><strong>'+esc(home)+'</strong><b>'+esc(homeScore)+' : '+esc(awayScore)+'</b><strong>'+esc(away)+'</strong></div>' +
+          (venue?'<small>📍 '+esc(venue)+'</small>':'') + details + '</article>';
+      }).join("");
+    });
   }
 
 

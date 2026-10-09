@@ -22,9 +22,9 @@
       const games=Array.isArray(sport.calendar)?sport.calendar:Array.isArray(sport.calendario)?sport.calendario:[];
       const cards=root.querySelectorAll('.calendar-card');
       cards.forEach((card,i)=>{
-        card.querySelector('.sgm-game-detail')?.remove();
+        card.querySelectorAll('.sgm-game-detail').forEach(x=>x.remove());
         const html=detailHtml(key,games[i]||{});
-        if(html)card.insertAdjacentHTML('beforeend',html);
+        if(html){const old=card.querySelector('.calendar-extra');if(!old)card.insertAdjacentHTML('beforeend',html);}
       });
     });
   }
@@ -109,6 +109,8 @@
       [data-sgm-calendar] .calendar-card>small{padding:0 14px 15px!important}
       [data-sgm-calendar] .sgm-game-detail{margin:0 14px 15px!important}
     }
+    [data-sgm-calendar] .sgm-game-detail{margin:0 20px 20px!important;padding:14px 16px!important;background:#f7f7f7!important;color:#222!important;border:0!important;border-left:5px solid var(--yellow,#ffd400)!important;border-radius:12px!important;font-size:13px!important}
+    [data-sgm-calendar] .sgm-game-detail strong{color:#111!important}
     .sgm-game-detail{margin-top:12px;padding:10px 12px;border-radius:9px;background:#111;color:#ddd;border-left:3px solid var(--yellow,#ffd400);font-size:12px;line-height:1.5}
     .sgm-game-detail strong{color:var(--yellow,#ffd400)}
     .home-results .results-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}

@@ -108,7 +108,7 @@
       ['calcio-a-5.html','calcio_a_5'],['pallavolo-maschile.html','pallavolo_maschile'],
       ['pallavolo-femminile.html','pallavolo_femminile'],['basket.html','basket'],['giovanile-calcio.html','giovanile_calcio']
     ];
-    map.forEach(([href,key])=>{const a=grid.querySelector('a[href="'+href+'"]');if(a&&covers[key])a.style.backgroundImage="url('"+String(covers[key]).replace(/'/g,"%27")+"')";});
+    map.forEach(([href,key])=>{const a=grid.querySelector('a[href="'+href+'"]');if(a&&covers[key])a.style.setProperty('background-image',"url('"+String(covers[key]).replace(/'/g,"%27")+"')",'important');});
   }
 
   function renderTV(data){

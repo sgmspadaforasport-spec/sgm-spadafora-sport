@@ -1,6 +1,6 @@
 (function(){
   const page=(location.pathname.split('/').pop()||'').toLowerCase();
-  const supported=['sponsor.html','sgm-tv.html','galleria.html','calendario-risultati.html','news.html','squadre.html'];
+  const supported=['sponsor.html','sgm-tv.html','galleria.html','calendario-risultati.html','news.html','squadre.html','calcio-a-5.html','pallavolo-maschile.html','pallavolo-femminile.html','basket.html'];
   if(!supported.includes(page)) return;
 
   document.body.classList.add('premium-page');
@@ -107,6 +107,18 @@
     )!important;
   }
 
+
+  .premium-page[data-premium-page="calcio-a-5"] .team-section-grid,
+  .premium-page[data-premium-page="pallavolo-maschile"] .team-section-grid,
+  .premium-page[data-premium-page="pallavolo-femminile"] .team-section-grid,
+  .premium-page[data-premium-page="basket"] .team-section-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:20px!important}
+  .premium-page .team-section-grid>a{position:relative!important;min-height:300px!important;overflow:hidden!important;isolation:isolate!important;background:#111!important;border:0!important;border-radius:20px!important;box-shadow:0 14px 32px rgba(0,0,0,.16)!important}
+  .premium-page .team-section-grid>a>.team-section-photo{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;z-index:0!important;max-width:none!important;border:0!important}
+  .premium-page .team-section-grid>a:before{content:""!important;position:absolute!important;inset:0!important;z-index:1!important;background:linear-gradient(to top,rgba(0,0,0,.52) 0%,rgba(0,0,0,.24) 16%,rgba(0,0,0,.08) 30%,rgba(0,0,0,0) 48%)!important;pointer-events:none!important;border-radius:inherit!important}
+  .premium-page .team-section-grid>a>span{position:absolute!important;left:22px!important;top:20px!important;z-index:2!important;background:#ffd400!important;color:#000!important;border:0!important;border-radius:999px!important;padding:7px 11px!important;font-size:9px!important}
+  .premium-page .team-section-grid>a>strong{position:absolute!important;right:24px!important;bottom:20px!important;left:auto!important;z-index:2!important;padding:0!important;margin:0!important;color:#fff!important;text-align:right!important;max-width:82%!important;font-size:clamp(20px,2.4vw,30px)!important;line-height:1.05!important;text-shadow:0 2px 12px #000!important}
+  @media(max-width:700px){.premium-page .team-section-grid{grid-template-columns:1fr!important}.premium-page .team-section-grid>a{min-height:260px!important}.premium-page .team-section-grid>a>strong{right:18px!important;bottom:18px!important;font-size:23px!important}}
+
   .premium-tv-grid,.premium-calendar-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
   .premium-video-thumb{aspect-ratio:16/9;background:#171717 center/cover no-repeat;position:relative;border-bottom:4px solid var(--yellow)}
   .premium-video-thumb:after{content:'▶';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--yellow);color:#000;font-size:22px;font-weight:900}
@@ -158,6 +170,15 @@
     map.forEach(([href,key])=>{const a=grid.querySelector('a[href="'+href+'"]');if(a&&covers[key]){let img=a.querySelector('.sgm-team-cover-photo');if(!img){img=document.createElement('img');img.className='sgm-team-cover-photo';img.alt='';a.prepend(img);}if(img.src!==covers[key])img.src=covers[key];};});
   }
 
+
+  function renderSectionCovers(data){
+    if(!['calcio-a-5.html','pallavolo-maschile.html','pallavolo-femminile.html','basket.html'].includes(page))return;
+    const grid=document.querySelector('.team-section-grid');if(!grid)return;
+    const covers=data?.section_covers||{};
+    const sections=[['rosa','-rosa.html'],['staff','-staff.html'],['calendario','-calendario.html'],['classifica','-classifica.html'],['news','news.html']];
+    grid.querySelectorAll('a').forEach(a=>{const href=a.getAttribute('href')||'';let key='';for(const [k,end] of sections){if((k==='news'&&href==='news.html')||(k!=='news'&&href.endsWith(end))){key=k;break;}}if(!key||!covers[key])return;let img=a.querySelector('.team-section-photo');if(!img){img=document.createElement('img');img.className='team-section-photo';img.alt='';a.prepend(img);}if(img.src!==covers[key])img.src=covers[key];});
+  }
+
   function renderTV(data){
     if(page!=='sgm-tv.html') return;
     const target=targetContainer(); if(!target) return;
@@ -176,8 +197,9 @@
   }
 
   async function init(){
-    try{const data=await getData();renderTeams(data);renderTV(data);renderCalendar(data);}catch(e){console.warn('Tema premium: dati non disponibili',e)}
+    try{const data=await getData();renderTeams(data);renderSectionCovers(data);renderTV(data);renderCalendar(data);}catch(e){console.warn('Tema premium: dati non disponibili',e)}
   }
   if(page==='squadre.html')document.addEventListener('sgm-data-ready',e=>renderTeams(e.detail||window.SGM_SITE_DATA||{}));
+  if(['calcio-a-5.html','pallavolo-maschile.html','pallavolo-femminile.html','basket.html'].includes(page))document.addEventListener('sgm-data-ready',e=>renderSectionCovers(e.detail||window.SGM_SITE_DATA||{}));
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

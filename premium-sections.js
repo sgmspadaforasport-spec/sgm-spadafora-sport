@@ -55,15 +55,17 @@
   .premium-video-thumb{aspect-ratio:16/9;background:#171717 center/cover no-repeat;position:relative;border-bottom:4px solid var(--yellow)}
   .premium-video-thumb:after{content:'▶';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--yellow);color:#000;font-size:22px;font-weight:900}
   .premium-video-link{display:inline-flex;margin-top:16px;font-weight:900;color:#111;text-decoration:none;border-bottom:2px solid var(--yellow);padding-bottom:3px}
-  .premium-calendar-group{background:#fff;border:1px solid #e2e2e2;border-radius:18px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.07)}
-  .premium-calendar-list{display:grid;gap:0}.premium-game{padding:20px 24px;border-bottom:1px solid #eee}.premium-game:last-child{border-bottom:0}
-  .premium-game-meta{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px;color:#8a7200;font-size:10px;font-weight:900;text-transform:uppercase}
-  .premium-game-teams{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}.premium-game-teams strong:last-child{text-align:right}.premium-score{background:#111;color:#fff;border-radius:10px;padding:8px 12px;font-weight:900;white-space:nowrap}
-  .premium-game small{display:block;margin-top:10px;color:#777}
+  .premium-calendar-group{background:#fff;border:1px solid #dedede;border-radius:20px;overflow:hidden;box-shadow:0 14px 34px rgba(0,0,0,.08)}
+  .premium-calendar-group>.premium-head{position:relative;padding:22px 24px;border-bottom:5px solid var(--yellow)}
+  .premium-calendar-list{display:grid;gap:0}.premium-game{position:relative;padding:18px 22px 20px;border-bottom:1px solid #e9e9e9}.premium-game:last-child{border-bottom:0}.premium-game:hover{background:#fafafa}
+  .premium-game-meta{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px;color:#6f5c00;font-size:10px;font-weight:1000;text-transform:uppercase;letter-spacing:.45px}
+  .premium-game-meta span:first-child{display:inline-flex;background:#ffd400;color:#080808;border-radius:999px;padding:5px 8px}
+  .premium-game-teams{display:grid;grid-template-columns:minmax(0,1fr) 72px minmax(0,1fr);gap:12px;align-items:center}.premium-game-teams strong{font-size:14px;line-height:1.15;text-transform:uppercase}.premium-game-teams strong:last-child{text-align:right}.premium-score{display:grid;place-items:center;background:#111;color:#ffd400;border:2px solid #ffd400;border-radius:11px;padding:9px 5px;font-size:16px;font-weight:1000;white-space:nowrap}
+  .premium-game small{display:block;margin-top:13px;padding-top:11px;border-top:1px dashed #ddd;color:#777;font-size:11px;font-weight:700}
 
   @media(max-width:900px){.premium-page .sponsor-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.premium-page .gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.premium-tv-grid,.premium-calendar-groups{grid-template-columns:1fr}}
   @media(max-width:700px){.premium-page .premium-grid,.premium-page .content-grid,.premium-page .home-quick-grid{grid-template-columns:1fr!important}.premium-page .home-manifesto>.container{padding-top:58px!important;padding-bottom:44px!important}.premium-page .premium-head,.premium-page .premium-body,.premium-page .content-body{padding:20px!important}.premium-page .gallery-grid{grid-template-columns:1fr}}
-  @media(max-width:520px){.premium-page .sponsor-grid{grid-template-columns:1fr!important}.premium-game-teams{grid-template-columns:1fr;gap:7px}.premium-game-teams strong:last-child{text-align:left}.premium-score{width:max-content}}
+  @media(max-width:520px){.premium-page .sponsor-grid{grid-template-columns:1fr!important}.premium-game{padding:15px 12px 17px}.premium-game-meta{align-items:center}.premium-game-teams{grid-template-columns:minmax(0,1fr) 58px minmax(0,1fr);gap:6px;text-align:center}.premium-game-teams strong,.premium-game-teams strong:last-child{text-align:center;font-size:11px;overflow-wrap:normal;word-break:normal}.premium-score{width:58px;padding:8px 2px;font-size:14px}.premium-game small{text-align:center}}
   `;
   document.head.appendChild(css);
 

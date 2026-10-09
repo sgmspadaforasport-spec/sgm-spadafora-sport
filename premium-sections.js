@@ -96,6 +96,17 @@
     .premium-page[data-premium-page="squadre"] .home-quick-grid>a:after{left:18px!important;right:auto!important;bottom:18px!important}
   }
 
+
+  /* v76: sfumatura inferiore più leggera */
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a:before{
+    background:linear-gradient(to top,
+      rgba(0,0,0,.52) 0%,
+      rgba(0,0,0,.24) 16%,
+      rgba(0,0,0,.08) 30%,
+      rgba(0,0,0,0) 48%
+    )!important;
+  }
+
   .premium-tv-grid,.premium-calendar-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
   .premium-video-thumb{aspect-ratio:16/9;background:#171717 center/cover no-repeat;position:relative;border-bottom:4px solid var(--yellow)}
   .premium-video-thumb:after{content:'▶';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--yellow);color:#000;font-size:22px;font-weight:900}

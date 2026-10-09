@@ -131,5 +131,6 @@
   async function init(){
     try{const data=await getData();renderTeams(data);renderTV(data);renderCalendar(data);}catch(e){console.warn('Tema premium: dati non disponibili',e)}
   }
+  if(page==='squadre.html')document.addEventListener('sgm-data-ready',e=>renderTeams(e.detail||window.SGM_SITE_DATA||{}));
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

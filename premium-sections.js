@@ -52,7 +52,7 @@
   .premium-page .home-quick-grid>a:after{content:'SCOPRI →';position:absolute;right:22px;bottom:18px;color:#8a7200;font-size:10px;font-weight:900;letter-spacing:.6px}
 
   .premium-page[data-premium-page="squadre"] .home-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:20px!important}
-  .premium-page[data-premium-page="squadre"] .home-quick-grid>a{position:relative;min-height:300px!important;background:#111 center/cover no-repeat!important;border:0!important;border-radius:20px!important;box-shadow:0 14px 32px rgba(0,0,0,.16)!important;justify-content:flex-end!important;isolation:isolate}
+  .premium-page[data-premium-page="squadre"] .home-quick-grid>a{position:relative;min-height:300px!important;background-color:#111!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;border:0!important;border-radius:20px!important;box-shadow:0 14px 32px rgba(0,0,0,.16)!important;justify-content:flex-end!important;isolation:isolate}
   .premium-page[data-premium-page="squadre"] .home-quick-grid>a:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(to top,rgba(0,0,0,.96) 0%,rgba(0,0,0,.55) 45%,rgba(0,0,0,.14) 75%);border-radius:inherit}
   .premium-page[data-premium-page="squadre"] .home-quick-grid>a span{position:absolute;left:22px;top:20px;background:var(--yellow)!important;color:#000!important;border:0!important;border-radius:999px;padding:7px 11px!important;font-size:9px!important}
   .premium-page[data-premium-page="squadre"] .home-quick-grid>a strong{padding:28px 24px 52px!important;color:#fff!important;font-size:clamp(27px,3vw,38px)!important;text-shadow:0 2px 12px #000}

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin v78 | ASD SGM Spadafora Sport</title>
+<title>Admin v79 | ASD SGM Spadafora Sport</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -144,7 +144,7 @@ textarea{min-height:120px;resize:vertical}
       </section>
 
       <section class="admin-panel" id="sectionCovers">
-        <div class="panel-head"><div><h2>Copertine sezioni squadre</h2><p>Carica le copertine 1080×1350 per Rosa, Staff, Calendario, Classifica e News.</p></div></div>
+        <div class="panel-head"><div><h2>Copertine sezioni squadre</h2><p>5 copertine comuni a tutte le squadre: Rosa, Staff, Calendario, Classifica e News.</p></div></div>
         <div id="sectionCoversAdmin"></div>
       </section>
 
@@ -285,10 +285,7 @@ function ensureData(){
     data.sports[k].standings=data.sports[k].standings||[];data.sports[k].calendar=data.sports[k].calendar||[];
   });
   data.section_covers=data.section_covers||{};
-  ['calcio_a_5','pallavolo_maschile','pallavolo_femminile','basket'].forEach(sport=>{
-    data.section_covers[sport]=data.section_covers[sport]||{};
-    ['rosa','staff','calendario','classifica','news'].forEach(section=>{if(typeof data.section_covers[sport][section]!=='string')data.section_covers[sport][section]='';});
-  });
+  ['rosa','staff','calendario','classifica','news'].forEach(section=>{if(typeof data.section_covers[section]!=='string')data.section_covers[section]='';});
   data.youth_training=data.youth_training||{};
   ['calcio_a_5','pallavolo','basket'].forEach(k=>{if(!Array.isArray(data.youth_training[k]))data.youth_training[k]=[];});
   data.team_covers=data.team_covers||{};
@@ -352,26 +349,21 @@ function renderTeamCovers(){
 
 function renderSectionCovers(){
  const root=$('sectionCoversAdmin');if(!root)return;
- const sports={calcio_a_5:'Calcio a 5',pallavolo_maschile:'Pallavolo Maschile',pallavolo_femminile:'Pallavolo Femminile',basket:'Basket'};
  const sections={rosa:'Rosa',staff:'Staff',calendario:'Calendario',classifica:'Classifica',news:'News'};
- root.innerHTML=Object.entries(sports).map(([sport,label])=>`
-  <div style="margin:0 0 26px;padding:18px;border:1px solid #2d2d2d;border-radius:14px;background:#0b0b0b">
-   <h3 style="margin:0 0 14px;color:#ffd400">${esc(label)}</h3>
-   <div class="item-list">${Object.entries(sections).map(([section,title])=>{const url=data.section_covers[sport][section]||'';return `
-    <div class="item-card section-cover-card" data-sport="${sport}" data-section="${section}" style="grid-template-columns:90px 1fr auto">
-     <div class="section-cover-preview" style="width:90px;height:112px;border-radius:8px;background:#191919 center/cover no-repeat;background-image:url('${esc(url)}')"></div>
-     <div><h3>${title}</h3><p class="section-cover-state">${url?'Copertina caricata':'Nessuna copertina caricata'}</p></div>
-     <div class="item-actions"><input class="section-cover-file" type="file" accept="image/*" data-sport="${sport}" data-section="${section}" style="display:none"><button type="button" class="btn btn-primary btn-small section-cover-pick" data-sport="${sport}" data-section="${section}">📷 Scegli immagine</button>${url?`<button type="button" class="btn btn-danger btn-small section-cover-remove" data-sport="${sport}" data-section="${section}">Rimuovi</button>`:''}</div>
-    </div>`}).join('')}</div>
-  </div>`).join('');
- root.querySelectorAll('.section-cover-pick').forEach(b=>b.onclick=()=>root.querySelector('.section-cover-file[data-sport="'+b.dataset.sport+'"][data-section="'+b.dataset.section+'"]')?.click());
+ root.innerHTML='<div class="item-list">'+Object.entries(sections).map(([section,title])=>{const url=data.section_covers[section]||'';return `
+  <div class="item-card section-cover-card" data-section="${section}" style="grid-template-columns:90px 1fr auto">
+   <div class="section-cover-preview" style="width:90px;height:112px;border-radius:8px;background:#191919 center/cover no-repeat;background-image:url('${esc(url)}')"></div>
+   <div><h3>${title}</h3><p class="section-cover-state">${url?'Copertina caricata · usata per tutte le squadre':'Nessuna copertina caricata'}</p></div>
+   <div class="item-actions"><input class="section-cover-file" type="file" accept="image/*" data-section="${section}" style="display:none"><button type="button" class="btn btn-primary btn-small section-cover-pick" data-section="${section}">📷 Scegli immagine</button>${url?`<button type="button" class="btn btn-danger btn-small section-cover-remove" data-section="${section}">Rimuovi</button>`:''}</div>
+  </div>`}).join('')+'</div>';
+ root.querySelectorAll('.section-cover-pick').forEach(b=>b.onclick=()=>root.querySelector('.section-cover-file[data-section="'+b.dataset.section+'"]')?.click());
  root.querySelectorAll('.section-cover-file').forEach(inp=>inp.onchange=async()=>{
-   const file=inp.files?.[0];if(!file)return;const card=inp.closest('.section-cover-card'),state=card?.querySelector('.section-cover-state'),preview=card?.querySelector('.section-cover-preview');
-   if(state)state.textContent='Caricamento di '+file.name+'...';if(preview)preview.style.backgroundImage="url('"+URL.createObjectURL(file)+"')";
-   try{const url=await window.SGM_DB.uploadImage(file,'squadre/sezioni/'+inp.dataset.sport);data.section_covers[inp.dataset.sport][inp.dataset.section]=url;await window.SGM_DB.saveSiteData(data);renderSectionCovers();status('✓ Copertina '+inp.dataset.section+' pubblicata online.');}
-   catch(e){if(state)state.textContent='Errore: '+e.message;status('Errore caricamento: '+e.message,true);}
+  const file=inp.files?.[0];if(!file)return;const card=inp.closest('.section-cover-card'),state=card?.querySelector('.section-cover-state'),preview=card?.querySelector('.section-cover-preview');
+  if(state)state.textContent='Caricamento di '+file.name+'...';if(preview)preview.style.backgroundImage="url('"+URL.createObjectURL(file)+"')";
+  try{const url=await window.SGM_DB.uploadImage(file,'squadre/sezioni');data.section_covers[inp.dataset.section]=url;await window.SGM_DB.saveSiteData(data);renderSectionCovers();status('✓ Copertina '+inp.dataset.section+' pubblicata per tutte le squadre.');}
+  catch(e){if(state)state.textContent='Errore: '+e.message;status('Errore caricamento: '+e.message,true);}
  });
- root.querySelectorAll('.section-cover-remove').forEach(b=>b.onclick=async()=>{try{data.section_covers[b.dataset.sport][b.dataset.section]='';await window.SGM_DB.saveSiteData(data);renderSectionCovers();status('✓ Copertina rimossa.');}catch(e){status('Errore: '+e.message,true);}});
+ root.querySelectorAll('.section-cover-remove').forEach(b=>b.onclick=async()=>{try{data.section_covers[b.dataset.section]='';await window.SGM_DB.saveSiteData(data);renderSectionCovers();status('✓ Copertina rimossa.');}catch(e){status('Errore: '+e.message,true);}});
 }
 
 function renderYouthTraining(){
@@ -766,6 +758,6 @@ $('logout').onclick=async()=>{await window.SGM_DB.signOut();location.href='login
  <script>
 loadData();
 </script>
-<!-- SGM-ADMIN-V78: team section covers -->
+<!-- SGM-ADMIN-V79: five shared section covers -->
 </body>
 </html>

@@ -32,6 +32,7 @@
   });
   try{
     if(window.SGM_DB&&typeof window.SGM_DB.getSiteData==='function'){
+      if(typeof window.SGM_DB.init==='function')await window.SGM_DB.init();
       const latest=await window.SGM_DB.getSiteData();
       const covers=latest?.section_covers||{};
       links.forEach(x=>{if(x.key)x.image=(typeof covers[x.key]==='string'?covers[x.key]:'');});

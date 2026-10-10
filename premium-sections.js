@@ -33,11 +33,15 @@
   .premium-page .content-card.is-official{border-color:#e2e2e2!important}.premium-page .content-card.is-official .content-body{border-top:0!important}
   .premium-page details{margin-top:16px}.premium-page summary{list-style:none}.premium-page summary::-webkit-details-marker{display:none}
 
-  .premium-page .sponsor-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
-  .premium-page .sponsor-card{min-height:250px!important;padding:0!important;display:flex!important;flex-direction:column;justify-content:space-between!important;gap:0!important;text-align:center}
-  .premium-page .sponsor-card:before{content:'PARTNER SGM';display:block;width:100%;background:#111;color:#fff;border-bottom:4px solid var(--yellow);padding:14px 18px;font-size:10px;font-weight:900;letter-spacing:1px}
-  .premium-page .sponsor-card img{width:calc(100% - 48px)!important;height:135px!important;max-width:none!important;max-height:none!important;object-fit:contain!important;margin:24px auto 14px}
-  .premium-page .sponsor-card strong{display:block;width:100%;padding:16px 20px 20px;font-size:16px!important;color:#111;border-top:1px solid #eee}
+  .premium-page .sponsor-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:24px!important;align-items:stretch}
+  .premium-page .sponsor-card{position:relative!important;min-height:330px!important;padding:0!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;gap:0!important;text-align:center!important;background:#111!important;border:1px solid #252525!important;border-radius:22px!important;overflow:hidden!important;box-shadow:0 16px 38px rgba(0,0,0,.13)!important}
+  .premium-page .sponsor-card:before{content:'PARTNER SGM'!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;width:100%!important;height:48px!important;box-sizing:border-box!important;background:#111!important;color:var(--yellow)!important;border:0!important;border-bottom:1px solid #2b2b2b!important;padding:0 20px!important;font-size:9px!important;font-weight:1000!important;letter-spacing:1.2px!important}
+  .premium-page .sponsor-card:after{content:'SGM'!important;position:absolute!important;top:12px!important;right:16px!important;display:flex!important;align-items:center!important;justify-content:center!important;width:auto!important;height:24px!important;padding:0 10px!important;border-radius:999px!important;background:var(--yellow)!important;color:#000!important;font-size:8px!important;font-weight:1000!important;letter-spacing:.8px!important}
+  .premium-page .sponsor-logo-wrap{width:auto!important;min-height:190px!important;margin:18px 18px 0!important;padding:24px!important;box-sizing:border-box!important;border-radius:16px!important;background:#fff!important;border:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:none!important}
+  .premium-page .sponsor-card img{display:block!important;width:auto!important;height:auto!important;max-width:90%!important;max-height:135px!important;object-fit:contain!important;margin:0 auto!important;filter:none!important}
+  .premium-page .sponsor-card strong{display:flex!important;align-items:center!important;justify-content:center!important;flex:1!important;width:100%!important;box-sizing:border-box!important;margin:0!important;padding:20px 22px 22px!important;border:0!important;color:#fff!important;font-size:16px!important;line-height:1.25!important;font-weight:1000!important;letter-spacing:.25px!important;text-transform:uppercase!important}
+  .premium-page .sponsor-card .sponsor-no-logo{font-size:34px!important;font-weight:1000!important;color:#111!important}
+  .premium-page .sponsor-card:hover{transform:translateY(-5px)!important;box-shadow:0 22px 48px rgba(0,0,0,.18)!important;border-color:#4a4215!important}
   .premium-page .sponsor-card a{display:none!important}
 
   .premium-page .gallery-grid{columns:auto!important;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}

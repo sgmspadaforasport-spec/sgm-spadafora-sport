@@ -34,8 +34,8 @@
     if(window.SGM_DB&&typeof window.SGM_DB.getSiteData==='function'){
       const latest=await window.SGM_DB.getSiteData();
       const covers=latest?.section_covers||{};
-      links.forEach(x=>{if(x.key&&covers[x.key])x.image=covers[x.key];});
+      links.forEach(x=>{if(x.key)x.image=(typeof covers[x.key]==='string'?covers[x.key]:'');});
     }
-  }catch(e){console.warn('Copertine sezioni: uso fallback HTML',e);}
+  }catch(e){console.warn('Copertine sezioni: dati non disponibili',e);links.forEach(x=>{if(x.key)x.image='';});}
   main.innerHTML=`<section class="team-premium-hero"><div class="container team-premium-hero-inner"><div><p class="section-kicker yellow">${team.label}</p><h1>${team.title}</h1><p>${team.desc}</p></div><div class="team-premium-icon" aria-hidden="true">${team.icon}</div></div></section><section class="team-premium-nav"><div class="container"><div class="team-premium-head"><p class="section-kicker yellow">AREA SQUADRA</p><h2>Scopri la squadra</h2></div><div class="team-premium-grid">${links.map(x=>`<a href="${x.href}">${x.image?`<img src="${x.image}" alt="" loading="lazy">`:``}<span>${x.label}</span><strong>${x.title}</strong><b>→</b></a>`).join('')}</div></div></section>`;
 })();

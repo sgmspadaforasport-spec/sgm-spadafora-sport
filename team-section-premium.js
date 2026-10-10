@@ -30,6 +30,15 @@
     const href=a.getAttribute('href')||'#',title=a.querySelector('strong')?.textContent||a.textContent.trim();
     return {href,label:a.querySelector('span')?.textContent||'SGM',title,key:coverKeyFromHref(href,title),image:a.querySelector('img.team-section-photo')?.getAttribute('src')||''};
   });
+  const coverBase='https://vgxatjdtawugxkzjkyxw.supabase.co/storage/v1/object/public/sgm-media/squadre/sezioni/';
+  const fallbackCovers={
+    rosa:coverBase+'1791590957153-7592.png',
+    staff:coverBase+'1791590959065-7593.png',
+    calendario:coverBase+'1791590961704-7594.png',
+    classifica:coverBase+'1791590964386-7595.png',
+    news:coverBase+'1791590966821-7596.png'
+  };
+  links.forEach(x=>{if(x.key)x.image=fallbackCovers[x.key]||'';});
   try{
     let tries=0;
     while((!window.SGM_DB||!window.supabase)&&tries<50){await new Promise(r=>setTimeout(r,100));tries++;}
@@ -41,6 +50,6 @@
     const latest=await window.SGM_DB.getSiteData();
     const covers=latest&&latest.section_covers?latest.section_covers:{};
     links.forEach(x=>{if(x.key)x.image=typeof covers[x.key]==='string'?covers[x.key]:'';});
-  }catch(e){console.error('Copertine sezioni non caricate',e);links.forEach(x=>{if(x.key)x.image='';});}
+  }catch(e){console.error('Copertine sezioni: uso copertine di riserva',e);}
   main.innerHTML=`<section class="team-premium-hero"><div class="container team-premium-hero-inner"><div><p class="section-kicker yellow">${team.label}</p><h1>${team.title}</h1><p>${team.desc}</p></div><div class="team-premium-icon" aria-hidden="true">${team.icon}</div></div></section><section class="team-premium-nav"><div class="container"><div class="team-premium-head"><p class="section-kicker yellow">AREA SQUADRA</p><h2>Scopri la squadra</h2></div><div class="team-premium-grid">${links.map(x=>`<a href="${x.href}">${x.image?`<img src="${x.image}" alt="" loading="lazy">`:``}<span>${x.label}</span><strong>${x.title}</strong><b>→</b></a>`).join('')}</div></div></section>`;
 })();

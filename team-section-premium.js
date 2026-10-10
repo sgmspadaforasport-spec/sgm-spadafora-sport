@@ -31,12 +31,16 @@
     return {href,label:a.querySelector('span')?.textContent||'SGM',title,key:coverKeyFromHref(href,title),image:a.querySelector('img.team-section-photo')?.getAttribute('src')||''};
   });
   try{
-    if(window.SGM_DB&&typeof window.SGM_DB.getSiteData==='function'){
-      if(typeof window.SGM_DB.init==='function')await window.SGM_DB.init();
-      const latest=await window.SGM_DB.getSiteData();
-      const covers=latest?.section_covers||{};
-      links.forEach(x=>{if(x.key)x.image=(typeof covers[x.key]==='string'?covers[x.key]:'');});
+    let tries=0;
+    while((!window.SGM_DB||!window.supabase)&&tries<50){await new Promise(r=>setTimeout(r,100));tries++;}
+    if(!window.SGM_DB||typeof window.SGM_DB.getSiteData!=='function')throw new Error('SGM_DB non disponibile');
+    if(typeof window.SGM_DB.init==='function'){
+      const ok=await window.SGM_DB.init();
+      if(!ok)throw new Error('Supabase non inizializzato');
     }
-  }catch(e){console.warn('Copertine sezioni: dati non disponibili',e);links.forEach(x=>{if(x.key)x.image='';});}
+    const latest=await window.SGM_DB.getSiteData();
+    const covers=latest&&latest.section_covers?latest.section_covers:{};
+    links.forEach(x=>{if(x.key)x.image=typeof covers[x.key]==='string'?covers[x.key]:'';});
+  }catch(e){console.error('Copertine sezioni non caricate',e);links.forEach(x=>{if(x.key)x.image='';});}
   main.innerHTML=`<section class="team-premium-hero"><div class="container team-premium-hero-inner"><div><p class="section-kicker yellow">${team.label}</p><h1>${team.title}</h1><p>${team.desc}</p></div><div class="team-premium-icon" aria-hidden="true">${team.icon}</div></div></section><section class="team-premium-nav"><div class="container"><div class="team-premium-head"><p class="section-kicker yellow">AREA SQUADRA</p><h2>Scopri la squadra</h2></div><div class="team-premium-grid">${links.map(x=>`<a href="${x.href}">${x.image?`<img src="${x.image}" alt="" loading="lazy">`:``}<span>${x.label}</span><strong>${x.title}</strong><b>→</b></a>`).join('')}</div></div></section>`;
 })();

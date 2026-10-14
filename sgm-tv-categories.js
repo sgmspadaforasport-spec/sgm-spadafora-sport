@@ -50,8 +50,8 @@
         .sgm-tv-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
         .sgm-tv-card{background:#0c0c0c;border-radius:18px;overflow:hidden;box-shadow:0 9px 24px rgba(0,0,0,.12);transition:transform .2s,box-shadow .2s}
         .sgm-tv-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(0,0,0,.18)}
-        .sgm-tv-thumb{aspect-ratio:16/9;background:#1b1b1b center/cover no-repeat;position:relative}
-        .sgm-tv-thumb:after{content:"▶";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:#ffd400;color:#080808;font-size:19px;padding-left:3px;box-shadow:0 7px 20px rgba(0,0,0,.35)}
+        .sgm-tv-thumb{aspect-ratio:16/9;background:#1b1b1b center/cover no-repeat;position:relative}.sgm-tv-thumb-link{display:block;cursor:pointer;text-decoration:none}
+        .sgm-tv-thumb:after{content:"▶";position:absolute;left:auto;top:auto;right:16px;bottom:16px;transform:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:#ffd400;color:#080808;font-size:19px;padding-left:3px;box-shadow:0 7px 20px rgba(0,0,0,.35);transition:transform .18s}.sgm-tv-thumb-link:hover:after{transform:scale(1.08)}
         .sgm-tv-card-body{padding:16px}
         .sgm-tv-card-cat{display:inline-block;color:#ffd400;font-size:10px;font-weight:1000;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
         .sgm-tv-card h4{color:#fff;font-size:18px;line-height:1.2;margin:0 0 8px}.sgm-tv-description{color:#bbb;font-size:13px;line-height:1.5;margin:0 0 13px;white-space:pre-line}
@@ -67,7 +67,7 @@
         const list=cat?videos.filter(v=>v.category===cat):videos;
         title.textContent=cat||'Tutti i video';
         count.textContent=list.length+' '+(list.length===1?'video':'video');
-        grid.innerHTML=list.length?list.map(v=>`<article class="sgm-tv-card">${v.thumbnail?`<div class="sgm-tv-thumb" style="background-image:url('${esc(v.thumbnail)}')"></div>`:'<div class="sgm-tv-thumb"></div>'}<div class="sgm-tv-card-body"><span class="sgm-tv-card-cat">${esc(v.category||'SGM TV')}</span><h4>${esc(v.title||'Video')}</h4>${v.description?`<p class="sgm-tv-description">${esc(v.description)}</p>`:''}${v.date?`<p class="sgm-tv-date">${esc(v.date)}</p>`:''}${v.url?`<a class="sgm-tv-watch" href="${esc(v.url)}" target="_blank" rel="noopener">▶ Guarda il video</a>`:'<span class="sgm-tv-date">Contenuto in preparazione</span>'}</div></article>`).join(''):'<div class="sgm-tv-empty">Nessun video disponibile in questa categoria.</div>';
+        grid.innerHTML=list.length?list.map(v=>`<article class="sgm-tv-card">${v.url?`<a class="sgm-tv-thumb sgm-tv-thumb-link" href="${esc(v.url)}" target="_blank" rel="noopener" aria-label="Riproduci ${esc(v.title||'video')}"${v.thumbnail?` style="background-image:url('${esc(v.thumbnail)}')"`:''}></a>`:(v.thumbnail?`<div class="sgm-tv-thumb" style="background-image:url('${esc(v.thumbnail)}')"></div>`:'<div class="sgm-tv-thumb"></div>')}<div class="sgm-tv-card-body"><span class="sgm-tv-card-cat">${esc(v.category||'SGM TV')}</span><h4>${esc(v.title||'Video')}</h4>${v.description?`<p class="sgm-tv-description">${esc(v.description)}</p>`:''}${v.date?`<p class="sgm-tv-date">${esc(v.date)}</p>`:''}${v.url?`<a class="sgm-tv-watch" href="${esc(v.url)}" target="_blank" rel="noopener">▶ Guarda il video</a>`:'<span class="sgm-tv-date">Contenuto in preparazione</span>'}</div></article>`).join(''):'<div class="sgm-tv-empty">Nessun video disponibile in questa categoria.</div>';
       };
       target.querySelectorAll('.sgm-tv-filter').forEach(b=>b.onclick=()=>{target.querySelectorAll('.sgm-tv-filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');render(b.dataset.cat);});
       render('');

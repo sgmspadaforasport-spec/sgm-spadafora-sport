@@ -6,15 +6,22 @@
 <meta name="description" content="Sito ufficiale ASD SGM Spadafora Sport, polisportiva di Spadafora (Messina). Calcio a 5, pallavolo maschile e femminile, basket, settore giovanile, news, risultati e attività sportive.">
 <meta name="robots" content="index,follow,max-image-preview:large"><link rel="canonical" href="https://asdsgmspadaforasport.it/"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="shortcut icon" href="/favicon.svg"><link rel="apple-touch-icon" href="/IMG-20250217-WA0006.jpg"><link rel="stylesheet" href="style.css?v=137">
 <style>
-@media (max-width:1100px){
-  .home-results .results-grid{display:grid!important;grid-template-columns:1fr!important;max-width:820px!important;margin-left:auto!important;margin-right:auto!important;gap:22px!important}
-  .home-results .result-card{width:100%!important;max-width:none!important;box-sizing:border-box!important}
-  .home-results .result-score{grid-template-columns:minmax(0,1fr) 86px minmax(0,1fr)!important;gap:22px!important;padding:26px 28px!important}
-  .home-results .result-score strong{font-size:14px!important;line-height:1.15!important;overflow-wrap:normal!important;word-break:normal!important}
-  .home-results .result-score b{width:86px!important;min-width:86px!important}
+.home-results>.container{width:min(96%,1600px)!important;max-width:1600px!important}
+.home-results .results-grid{gap:20px!important}
+@media (min-width:901px) and (max-width:1300px){
+  .home-results>.container{width:98%!important;max-width:1240px!important}
+  .home-results .results-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:18px!important}
+  .home-results .result-card{width:100%!important;min-width:0!important;box-sizing:border-box!important}
+  .home-results .result-score{grid-template-columns:minmax(0,1fr) 72px minmax(0,1fr)!important;gap:10px!important;padding:22px 12px!important}
+  .home-results .result-score strong{font-size:12px!important;line-height:1.12!important;overflow-wrap:normal!important;word-break:normal!important}
+  .home-results .result-score b{width:72px!important;min-width:72px!important}
 }
-@media (max-width:520px){
-  .home-results .results-grid{max-width:100%!important}
+@media (max-width:900px){
+  .home-results>.container{width:96%!important}
+  .home-results .results-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media (max-width:600px){
+  .home-results .results-grid{grid-template-columns:1fr!important}
   .home-results .result-score{grid-template-columns:minmax(0,1fr) 62px minmax(0,1fr)!important;gap:8px!important;padding:20px 10px!important}
   .home-results .result-score strong{font-size:10.5px!important;overflow-wrap:anywhere!important}
   .home-results .result-score b{width:62px!important;min-width:62px!important}

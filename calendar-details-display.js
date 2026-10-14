@@ -59,8 +59,11 @@
         all.push({key,label,icon,href,g,i,t:dateValue(g.date||g.data||'')});
       });
     });
-    all.sort((a,b)=>(b.t-a.t)||(b.i-a.i));
-    const latest=all.slice(0,4);
+    const latest=sports.map(([key])=>{
+      const gamesForSport=all.filter(x=>x.key===key);
+      gamesForSport.sort((a,b)=>(b.t-a.t)||(b.i-a.i));
+      return gamesForSport[0]||null;
+    }).filter(Boolean);
     if(!latest.length){
       root.innerHTML='<div class="sgm-home-results-empty">Nessun risultato disponibile al momento.</div>';
       return;

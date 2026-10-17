@@ -26,7 +26,7 @@
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arrangeMenu);else arrangeMenu();
   const page=(location.pathname.split('/').pop()||'').toLowerCase();const extras=[];
-  if(page==='admin.html'||page==='admin')extras.push('admin-content.js','admin-staff.js','admin-about.js','admin-youth-staff.js','admin-comunicati.js','admin-leagues.js','admin-home.js','admin-notifications.js','admin-auto-push.js','admin-calendar-details.js');
+  if(page==='admin.html'||page==='admin')extras.push('admin-content.js','admin-staff.js','admin-about.js','admin-youth-staff.js','admin-comunicati.js?v=113','admin-leagues.js','admin-home.js','admin-notifications.js','admin-auto-push.js','admin-calendar-details.js');
   if(['news.html','sponsor.html','galleria.html'].includes(page))extras.push('content-pages.js');
   if(['news.html','sponsor.html','galleria.html','sgm-tv.html'].includes(page))extras.push('premium-sections.js');
   if(page==='giovanile-calcio.html')extras.push('team-section-premium.js?v=90');

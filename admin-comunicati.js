@@ -63,14 +63,15 @@
 
   function editComunicato(i=null){
     ensureData();
-    const c=i===null?{title:'',text:'',image:''}:data.comunicati_ufficiali[i];
+    const c=i===null?{title:'',text:'',image:'',date:new Date().toISOString().slice(0,10)}:data.comunicati_ufficiali[i];
     openModal(i===null?'Aggiungi comunicato ufficiale':'Modifica comunicato ufficiale',`
       <div class="fields">
         <div class="field full"><label>Titolo</label><input id="coTitle" value="${esc(c.title||'')}"></div>
+        <div class="field"><label>Data</label><input id="coDate" type="date" value="${esc(c.date||new Date().toISOString().slice(0,10))}"></div>
         <div class="field full"><label>Testo</label><textarea id="coText" style="min-height:240px">${esc(c.text||'')}</textarea></div>
         <div class="field full"><label>Immagine</label><input id="coImage" value="${esc(c.image||'')}" placeholder="URL immagine"><input id="coImageFile" type="file" accept="image/jpeg,image/png,image/webp"><small>Carica l'immagine del comunicato oppure lascia quella esistente.</small></div>
       </div>`,async()=>{
-        const obj={title:$('coTitle').value.trim(),text:$('coText').value.trim(),image:$('coImage').value.trim()};
+        const obj={title:$('coTitle').value.trim(),text:$('coText').value.trim(),image:$('coImage').value.trim(),date:$('coDate').value||new Date().toISOString().slice(0,10)};
         const file=$('coImageFile').files[0];
         try{
           if(file)obj.image=await window.SGM_DB.uploadImage(file,'comunicati');

@@ -683,8 +683,9 @@ function editCalendarGame(i=null){
  <div class="field"><label>Casa</label><input id="cHome" value="${esc(g.home)}"></div>
  <div class="field"><label>Ospite</label><input id="cAway" value="${esc(g.away)}"></div>
  <div class="field"><label>Risultato casa</label><input id="cHS" value="${esc(g.home_score)}"></div>
- <div class="field"><label>Risultato ospite</label><input id="cAS" value="${esc(g.away_score)}"></div></div>`,
- ()=>{const obj={round:$('cRound').value,date:$('cDate').value,time:$('cTime').value,venue:$('cVenue').value,home:$('cHome').value,away:$('cAway').value,home_score:$('cHS').value,away_score:$('cAS').value};if(i===null)data.sports[currentCalendarSport].calendar.push(obj);else data.sports[currentCalendarSport].calendar[i]=obj;renderCalendarList();});
+ <div class="field"><label>Risultato ospite</label><input id="cAS" value="${esc(g.away_score)}"></div>
+ <div class="field full"><label style="display:flex;align-items:center;gap:10px;cursor:pointer"><input id="cLive" type="checkbox" ${g.live?'checked':''} style="width:auto"> <strong>🔴 LIVE — partita in corso</strong></label><small style="color:#888">Attiva durante la gara per mostrare il badge LIVE nella Home.</small></div></div>`,
+ ()=>{const obj={round:$('cRound').value,date:$('cDate').value,time:$('cTime').value,venue:$('cVenue').value,home:$('cHome').value,away:$('cAway').value,home_score:$('cHS').value,away_score:$('cAS').value,live:!!$('cLive')?.checked};if(i===null)data.sports[currentCalendarSport].calendar.push(obj);else data.sports[currentCalendarSport].calendar[i]=obj;renderCalendarList();});
 }
 $('addCalendarGame').onclick=()=>editCalendarGame();
 
@@ -754,7 +755,7 @@ $('logout').onclick=async()=>{await window.SGM_DB.signOut();location.href='login
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="supabase-data.js?v=67"></script>
+<script src="supabase-data.js?v=115"></script>
  <script>
 loadData();
 </script>

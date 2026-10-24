@@ -55,7 +55,7 @@
       games.forEach((g,i)=>{
         const hs=g.home_score??g.gol_casa;
         const as=g.away_score??g.gol_trasferta;
-        if(!scorePresent(hs)||!scorePresent(as))return;
+        if(!g.live&&(!scorePresent(hs)||!scorePresent(as)))return;
         all.push({key,label,icon,href,g,i,t:dateValue(g.date||g.data||'')});
       });
     });
@@ -76,7 +76,7 @@
       const date=g.date||g.data||'';
       const round=g.round||g.giornata||'';
       return `<article class="result-card">
-        <div class="result-sport">${icon} ${esc(label)}</div>
+        <div class="result-sport">${icon} ${esc(label)}${g.live?'<span class="sgm-live-badge"><i></i> LIVE</span>':''}</div>
         ${date||round?`<small>${esc(round)}${round&&date?' · ':''}${esc(date)}</small>`:''}
         <div class="result-score"><strong>${esc(home)}</strong><b>${esc(hs)} : ${esc(as)}</b><strong>${esc(away)}</strong></div>
         ${detailHtml(key,g)}
@@ -127,7 +127,10 @@
     .home-results .results-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
     .home-results .result-card{position:relative;overflow:hidden;border:2px solid var(--yellow,#ffd400);border-radius:18px;padding:0;background:#050505;color:var(--yellow,#ffd400);min-width:0;box-shadow:0 14px 34px rgba(0,0,0,.45)}
     .home-results .result-card:before{content:"";display:block;height:7px;background:var(--yellow,#ffd400)}
-    .home-results .result-sport{padding:15px 18px 11px;border-bottom:1px solid rgba(255,212,0,.35);font-size:12px;font-weight:900;letter-spacing:.8px;color:var(--yellow,#ffd400);text-transform:uppercase}
+    .home-results .result-sport{padding:15px 18px 11px;border-bottom:1px solid rgba(255,212,0,.35);font-size:12px;font-weight:900;letter-spacing:.8px;color:var(--yellow,#ffd400);text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .home-results .sgm-live-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;background:#e00000;color:#fff;font-size:9px;font-weight:1000;letter-spacing:.8px;box-shadow:0 0 0 3px rgba(224,0,0,.15)}
+    .home-results .sgm-live-badge i{width:7px;height:7px;border-radius:50%;background:#fff;display:block;animation:sgmLivePulse 1.1s infinite}
+    @keyframes sgmLivePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.72)}}
     .home-results .result-card small{display:block;padding:12px 18px 0;color:var(--yellow,#ffd400);font-size:11px;font-weight:800}
     .home-results .result-score{display:grid;grid-template-columns:minmax(0,1fr) 76px minmax(0,1fr);align-items:center;gap:14px;margin:0;padding:22px 14px;text-align:center;width:100%;box-sizing:border-box;min-width:0}
     .home-results .result-score strong{display:block;min-width:0;max-width:100%;color:var(--yellow,#ffd400);font-size:clamp(10px,1.15vw,14px);line-height:1.12;text-transform:uppercase;overflow-wrap:anywhere;word-break:normal;hyphens:auto}

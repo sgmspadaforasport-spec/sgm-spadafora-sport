@@ -19,7 +19,7 @@
         const away=(String(html).match(/id="cAway" value="([^"]*)"/)||[])[1]||'';
         current=arr.find(g=>String(g.home||'')===home&&String(g.away||'')===away)||null;
       }
-      let extra='';
+      let extra=`<div class="field full"><label style="display:flex;align-items:center;gap:10px;cursor:pointer"><input id="cLive" type="checkbox" ${current?.live?'checked':''} style="width:auto"> <strong>🔴 LIVE</strong> — partita in corso</label><small style="color:#888">Attiva questa spunta durante la gara per mostrare il simbolo LIVE nella Home.</small></div>`;
       if(sport==='calcio_a_5'){
         extra=`<div class="field full"><label>Marcatori SGM</label><textarea id="cScorers" placeholder="Es. Rossi (2), Bianchi, Verdi">${esc(current?.scorers||'')}</textarea><small style="color:#888">Inserisci i nomi dei marcatori; puoi indicare tra parentesi il numero di gol.</small></div>`;
       }else if(sport==='pallavolo_maschile'||sport==='pallavolo_femminile'){
@@ -30,7 +30,7 @@
       html=String(html).replace(/<\/div>\s*$/,extra+'</div>');
       const beforeLen=arr.length;
       const wrapped=function(){
-        const details={};
+        const details={live:!!document.getElementById('cLive')?.checked};
         const home=document.getElementById('cHome')?.value||'';
         const away=document.getElementById('cAway')?.value||'';
         if(sport==='calcio_a_5')details.scorers=document.getElementById('cScorers')?.value.trim()||'';

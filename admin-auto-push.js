@@ -10,6 +10,7 @@
     if(title.includes('news')) return 'news';
     if(title.includes('risultato')) return 'result';
     if(title.includes('comunicato')) return 'official';
+    if(title.includes('gara calendario')) return 'calendar_game';
     if(title.includes('gara')) return 'next_match';
     return '';
   }
@@ -31,7 +32,7 @@
       <div style="background:#111;border:2px solid #ffd400;border-radius:12px;padding:14px">
         <label style="display:flex;align-items:center;gap:10px;cursor:pointer;text-transform:none;font-size:13px;color:#fff;font-weight:900">
           <input id="sgmNotifyEnabled" type="checkbox" style="width:20px;height:20px;accent-color:#ffd400">
-          🔔 Invia una notifica dopo il salvataggio
+          🔔 <span id="sgmNotifyLabel">Invia una notifica dopo il salvataggio</span>
         </label>
         <div id="sgmNotifyChannels" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
           <label style="display:flex;align-items:center;gap:8px;text-transform:none"><input id="sgmNotifyApp" type="checkbox" checked style="width:18px;height:18px;accent-color:#ffd400"> 📱 App</label>
@@ -40,6 +41,17 @@
         <small style="display:block;color:#999;margin-top:8px">Seleziona App, Sito oppure entrambi. La notifica parte quando il contenuto viene salvato online.</small>
       </div>`;
     body.appendChild(box);
+    const refreshLabel=()=>{
+      const label=document.getElementById('sgmNotifyLabel');
+      if(!label)return;
+      if(kind==='calendar_game'){
+        const hs=(document.getElementById('cHS')?.value||'').trim();
+        const as=(document.getElementById('cAS')?.value||'').trim();
+        label.textContent=(hs!==''&&as!=='')?'Invia notifica risultato':'Invia notifica partita';
+      }
+    };
+    refreshLabel();
+    ['cHS','cAS'].forEach(id=>document.getElementById(id)?.addEventListener('input',refreshLabel));
   }
 
   function buildJob(){
@@ -48,7 +60,12 @@
     const web=!!document.getElementById('sgmNotifyWeb')?.checked;
     if(!app&&!web){alert('Seleziona almeno App oppure Sito per la notifica.');return null;}
     const channel=app&&web?'all':app?'app':'web';
-    const kind=document.getElementById('sgmNotifyBox')?.dataset.kind||kindFromModal();
+    let kind=document.getElementById('sgmNotifyBox')?.dataset.kind||kindFromModal();
+    if(kind==='calendar_game'){
+      const hs=(document.getElementById('cHS')?.value||'').trim();
+      const as=(document.getElementById('cAS')?.value||'').trim();
+      kind=(hs!==''&&as!=='')?'calendar_result':'next_match';
+    }
 
     if(kind==='news'){
       const title=(document.getElementById('cnTitle')?.value||'').trim();
@@ -67,6 +84,14 @@
       const as=(document.getElementById('rAwayScore')?.value||'').trim();
       const away=(document.getElementById('rAway')?.value||'').trim();
       return {type:'result',title:'🏆 Risultato finale'+(sport?' · '+sport:''),body:`${home||'SGM'} ${hs||'-'} - ${as||'-'} ${away||''}`.trim(),target_url:'calendario-risultati.html',channel};
+    }
+    if(kind==='calendar_result'){
+      const sport=(sportLabels?.[window.currentCalendarSport]||window.currentCalendarSport||'SGM').trim();
+      const home=(document.getElementById('cHome')?.value||'').trim();
+      const away=(document.getElementById('cAway')?.value||'').trim();
+      const hs=(document.getElementById('cHS')?.value||'').trim();
+      const as=(document.getElementById('cAS')?.value||'').trim();
+      return {type:'result',title:'🏆 Risultato'+(sport?' · '+sport:''),body:`${home||'SGM'} ${hs||'-'} - ${as||'-'} ${away||''}`.trim(),target_url:'calendario-risultati.html',channel};
     }
     if(kind==='next_match'){
       const sport=(document.getElementById('mSport')?.value||sportLabels?.[window.currentCalendarSport]||window.currentCalendarSport||'').trim();

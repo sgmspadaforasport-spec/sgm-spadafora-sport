@@ -21,7 +21,16 @@
     if(!body||!modal||!modal.classList.contains('open'))return;
     const kind=kindFromModal();
     if(!kind)return;
-    body.querySelector('#sgmNotifyBox')?.remove();
+    const existing=body.querySelector('#sgmNotifyBox');
+    if(existing){
+      const label=existing.querySelector('#sgmNotifyLabel');
+      if(label&&kind==='calendar_game'){
+        const hs=(document.getElementById('cHS')?.value||'').trim();
+        const as=(document.getElementById('cAS')?.value||'').trim();
+        label.textContent=(hs!==''&&as!=='')?'Invia notifica risultato':'Invia notifica partita';
+      }
+      return;
+    }
 
     const box=document.createElement('div');
     box.id='sgmNotifyBox';

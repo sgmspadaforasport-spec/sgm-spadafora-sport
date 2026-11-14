@@ -69,11 +69,16 @@
       return {type:'result',title:'🏆 Risultato finale'+(sport?' · '+sport:''),body:`${home||'SGM'} ${hs||'-'} - ${as||'-'} ${away||''}`.trim(),target_url:'calendario-risultati.html',channel};
     }
     if(kind==='next_match'){
-      const sport=(document.getElementById('mSport')?.value||'').trim();
+      const sport=(document.getElementById('mSport')?.value||sportLabels?.[window.currentCalendarSport]||window.currentCalendarSport||'').trim();
       const date=(document.getElementById('mDate')?.value||document.getElementById('cDate')?.value||'').trim();
       const time=(document.getElementById('mTime')?.value||document.getElementById('cTime')?.value||'').trim();
       const home=(document.getElementById('mHome')?.value||document.getElementById('cHome')?.value||'').trim();
       const away=(document.getElementById('mAway')?.value||document.getElementById('cAway')?.value||'').trim();
+      const hs=(document.getElementById('cHS')?.value||'').trim();
+      const as=(document.getElementById('cAS')?.value||'').trim();
+      if(document.getElementById('cHS') && hs!=='' && as!==''){
+        return {type:'result',title:'🏆 Risultato finale'+(sport?' · '+sport:''),body:`${home||'SGM'} ${hs} - ${as} ${away||''}`.trim(),target_url:'calendario-risultati.html',channel};
+      }
       return {type:'next_match',title:'📅 Prossima partita'+(sport?' · '+sport:''),body:`${home||'SGM'} vs ${away||''}${date?' · '+date:''}${time?' · '+time:''}`,target_url:'calendario-risultati.html',channel};
     }
     return null;

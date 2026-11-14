@@ -64,19 +64,20 @@
       target.innerHTML=`<div class="sgm-tv-shell"><div class="sgm-tv-top"><p class="sgm-tv-kicker">Il canale ufficiale giallonero</p><h2>Guarda SGM TV</h2><p>Highlights, interviste, format e tutte le puntate dedicate al mondo ASD SGM Spadafora Sport.</p><div class="sgm-tv-all"><button class="sgm-tv-filter active" data-cat="">▶ Tutti i video</button></div></div><p class="sgm-tv-categories-title">Esplora per categoria</p><div class="sgm-tv-filters">${cats.map(c=>`<button class="sgm-tv-filter category" data-cat="${esc(c.name)}" style="${c.cover?`background-image:url('${esc(c.cover)}')`:''}"><span>${esc(c.name)}</span></button>`).join('')}</div><div class="sgm-tv-section-head"><h3 id="sgmTvTitle">Tutti i video</h3><span class="sgm-tv-count" id="sgmTvCount"></span></div><div id="sgmTvDynamicGrid" class="sgm-tv-grid"></div></div>`;
       const grid=document.getElementById('sgmTvDynamicGrid'),title=document.getElementById('sgmTvTitle'),count=document.getElementById('sgmTvCount');
       const render=cat=>{
-        const list=(cat?videos.filter(v=>v.category===cat):videos).slice().sort((a,b)=>{
-          const parseDate=v=>{
-            const x=String(v||'').trim();
-            if(!x)return 0;
-            let m=x.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-            if(m)return new Date(+m[1],+m[2]-1,+m[3]).getTime();
-            m=x.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
-            if(m)return new Date(+m[3],+m[2]-1,+m[1]).getTime();
-            const t=Date.parse(x);
-            return Number.isFinite(t)?t:0;
-          };
-          return parseDate(b.date)-parseDate(a.date);
-        });
+        const source=(cat?videos.filter(v=>v.category===cat):videos);
+        const parseDate=v=>{
+          const x=String(v||'').trim();
+          if(!x)return null;
+          let m=x.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+          if(m)return new Date(+m[1],+m[2]-1,+m[3]).getTime();
+          m=x.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+          if(m)return new Date(+m[3],+m[2]-1,+m[1]).getTime();
+          const t=Date.parse(x);
+          return Number.isFinite(t)?t:null;
+        };
+        const dated=source.map((v,i)=>({v,i,t:parseDate(v.date)})).filter(x=>x.t!==null).sort((a,b)=>(b.t-a.t)||(a.i-b.i));
+        let di=0;
+        const list=source.map(v=>parseDate(v.date)===null?v:dated[di++].v);
         title.textContent=cat||'Tutti i video';
         count.textContent=list.length+' '+(list.length===1?'video':'video');
         grid.innerHTML=list.length?list.map(v=>`<article class="sgm-tv-card">${v.url?`<a class="sgm-tv-thumb sgm-tv-thumb-link" href="${esc(v.url)}" target="_blank" rel="noopener" aria-label="Riproduci ${esc(v.title||'video')}"${v.thumbnail?` style="background-image:url('${esc(v.thumbnail)}')"`:''}></a>`:(v.thumbnail?`<div class="sgm-tv-thumb" style="background-image:url('${esc(v.thumbnail)}')"></div>`:'<div class="sgm-tv-thumb"></div>')}<div class="sgm-tv-card-body"><span class="sgm-tv-card-cat">${esc(v.category||'SGM TV')}</span><h4>${esc(v.title||'Video')}</h4>${v.description?`<p class="sgm-tv-description">${esc(v.description)}</p>`:''}${v.date?`<p class="sgm-tv-date">${esc(v.date)}</p>`:''}${v.url?`<a class="sgm-tv-watch" href="${esc(v.url)}" target="_blank" rel="noopener">▶ Guarda il video</a>`:'<span class="sgm-tv-date">Contenuto in preparazione</span>'}</div></article>`).join(''):'<div class="sgm-tv-empty">Nessun video disponibile in questa categoria.</div>';

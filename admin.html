@@ -757,8 +757,17 @@ $('logout').onclick=async()=>{await window.SGM_DB.signOut();location.href='login
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="supabase-data.js?v=120"></script>
+<script src="supabase-data.js?v=121"></script>
  <script>
+(function(){
+  const fields=document.querySelector('#contacts .fields');
+  if(fields&&!document.getElementById('youtube')){
+    const wrap=document.createElement('div');
+    wrap.className='field';
+    wrap.innerHTML='<label>YouTube</label><input id="youtube" placeholder="Link del canale YouTube">';
+    fields.appendChild(wrap);
+  }
+})();
 loadData();
 </script>
 <!-- SGM-ADMIN-V80: calendario e risultati label -->

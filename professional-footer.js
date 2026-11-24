@@ -34,7 +34,7 @@
     const address=c.address||'Via Riolo 2, 98048 Spadafora (ME)';
     const email=c.email||'sgmspadaforasport@gmail.com';
     const pec=c.pec||'';
-    const socials=[['Facebook',c.facebook],['Instagram',c.instagram],['TikTok',c.tiktok],['Twitch',c.twitch]].filter(x=>x[1]);
+    const socials=[['Facebook',c.facebook],['Instagram',c.instagram],['YouTube',c.youtube],['TikTok',c.tiktok],['Twitch',c.twitch]].filter(x=>x[1]);
     footer.className='footer sgm-pro-footer';
     footer.innerHTML=`<div class="sgm-footer-main"><div class="container sgm-footer-grid">
       <div class="sgm-footer-brand"><img src="IMG-20250217-WA0006.jpg" alt="Logo ASD SGM Spadafora Sport"><h2>ASD SGM<br>Spadafora Sport</h2><p>Polisportiva dilettantistica. Sport, crescita e comunità nel territorio di Spadafora.</p></div>

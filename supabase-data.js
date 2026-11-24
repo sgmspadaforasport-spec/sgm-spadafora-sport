@@ -34,6 +34,6 @@
   if(page.endsWith('-calendario.html'))extras.push('calendar-details-display.js?v=114');
   if(page==='staff.html')extras.push('staff-dynamic.js');
   if(page===''||page==='index.html')extras.push('home-news.js','home-layout-cleanup.js','home-hero-dynamic.js','home-admin-access.js','calendar-details-display.js?v=114');
-  if(page!=='admin.html'&&page!=='admin')extras.push('professional-footer.js','web-notifications.js');
+  if(page!=='admin.html'&&page!=='admin')extras.push('professional-footer.js?v=121','web-notifications.js');
   extras.forEach(src=>{const script=document.createElement('script');script.src=src+(src.includes('?')?'&v=109':'?v=109');script.async=false;document.head.appendChild(script);});
 })();
